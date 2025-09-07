@@ -8,7 +8,7 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      width: 300px;
+      width: 360px;
       background: white;
       border: 2px solid #333;
       border-radius: 8px;
@@ -79,8 +79,13 @@
 
   // ===== Suggestion list =====
   const suggestions = {
+    "VB": "Verbal",
+    "Q": "Quant",
+    "D" : "DI",
     "CR": "Critical Reasoning",
-    "SC": "Sentence Correction",
+    "AS": "Assumption",
+    "ST": "Strengthen",
+    "WK": "Weaken",
     "RC": "Reading Comprehension",
     "PS": "Problem Solving",
     "DS": "Data Sufficiency",
@@ -91,11 +96,12 @@
   // ===== Show suggestion when typing =====
   noteInput.addEventListener("keyup", (e) => {
     const val = noteInput.value.split(" ").pop();
-    if (suggestions[val]) {
-      suggestionBox.textContent = suggestions[val];
+    const key = val.toUpperCase();
+    if (suggestions[key]) {
+      suggestionBox.textContent = suggestions[key];
       suggestionBox.style.display = "block";
       suggestionBox.onclick = () => {
-        applySuggestion(val);
+        applySuggestion(key);
       };
     } else {
       suggestionBox.style.display = "none";
@@ -104,6 +110,18 @@
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       saveData();
+    }
+  });
+
+  // ===== Accept suggestion with Tab =====
+  noteInput.addEventListener("keydown", (e) => {
+    if (e.key === "Tab" && suggestionBox.style.display === "block") {
+      e.preventDefault();
+      const val = noteInput.value.split(" ").pop();
+      const key = val.toUpperCase();
+      if (suggestions[key]) {
+        applySuggestion(key);
+      }
     }
   });
 

@@ -135,22 +135,34 @@
 
   // ===== Save =====
   function saveData() {
+    // Map popup fields to API body
+    const question = document.getElementById("gmatQuickAddLink").value;
+    const notes = noteInput.value;
+    // You may want to parse or let user select these fields in the future
     const data = {
-      link: document.getElementById("gmatQuickAddLink").value,
-      note: noteInput.value,
-      createdAt: new Date().toISOString()
+      question: question,
+      source: "", // static for now
+      section: "", // static for now
+      category: "", // static for now
+      difficulty: "", // static for now
+      notes: notes,
+      questionDate: new Date().toISOString().slice(0, 10) // yyyy-mm-dd
     };
     console.log("Saved:", data);
 
-    // TODO: thay API của bạn vào đây
-    // fetch("https://gmat-errorlog.vercel.app/api/add", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(data)
-    // });
-
-    alert("Saved!");
-    document.body.removeChild(popup);
+    fetch("https://gmat-errorlog.vercel.app/api/questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to save");
+      alert("Saved!");
+      document.body.removeChild(popup);
+    })
+    .catch(err => {
+      alert("Error: " + err.message);
+    });
   }
 
   document.getElementById("gmatQuickAddSave").onclick = saveData;

@@ -1,5 +1,5 @@
-/** 
- * GMAT Error Log Bookmarklet - GitHub Hosted Version 0.3
+/**
+ * GMAT Error Log Bookmarklet - GitHub Hosted Version 0.4
  * Usage: javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/huy-pm/gmat-errorlog@main/gmat-logger-bookmarklet.js';document.head.appendChild(s);})();
  */
 (function() {
@@ -138,14 +138,24 @@
     return { section, category, difficulty, source, extractedNotes: remainingWords.trim() || undefined };
   }
   
-  function parseNotesAndLink(notes, questionLink) {
-    const notesResult = parseNotes(notes);
-    const linkSource = questionLink ? detectSourceFromLink(questionLink) : undefined;
-    const finalSource = linkSource || notesResult.source;
-    return { ...notesResult, source: finalSource };
-  }
+    // Parse notes and question link to extract complete metadata
+    function parseNotesAndLink(notes, questionLink) {
+      // First parse the notes
+      const notesResult = parseNotes(notes);
+      
+      // Then try to detect source from link
+      const linkSource = questionLink ? detectSourceFromLink(questionLink) : undefined;
+      
+      // Link-detected source takes precedence over notes-detected source
+      const finalSource = linkSource || notesResult.source;
+      
+      return {
+        ...notesResult,
+        source: finalSource,
+      };
+    }
   
-  function getAutoSuggestions(input, cursorPosition) {
+  function getAutoSuggestions(input, cursorPosition, parsedInfo) {
     const beforeCursor = input.substring(0, cursorPosition).toLowerCase();
     const words = beforeCursor.split(/\s+/);
     const currentWord = words[words.length - 1] || '';
@@ -154,68 +164,82 @@
     const suggestions = [];
     const startIndex = cursorPosition - currentWord.length;
 
-    // Section suggestions
-    Object.entries(allSectionMappings).forEach(([key, value]) => {
-      if (key.startsWith(currentWord) && key !== currentWord) {
-        let displayName = value === 'di' ? 'DI' : value.charAt(0).toUpperCase() + value.slice(1);
-        suggestions.push({ type: 'section', shortName: key, fullName: displayName, startIndex, endIndex: cursorPosition });
-      }
-    });
+    // Check what's already been detected
+    const hasSection = parsedInfo?.section;
+    const hasDifficulty = parsedInfo?.difficulty;
+    const hasSource = parsedInfo?.source;
+    const hasCategory = parsedInfo?.category;
 
-    // Difficulty suggestions
-    Object.entries(allDifficultyMappings).forEach(([key, value]) => {
-      if (key.startsWith(currentWord) && key !== currentWord) {
-        suggestions.push({ type: 'difficulty', shortName: key, fullName: value.charAt(0).toUpperCase() + value.slice(1), startIndex, endIndex: cursorPosition });
-      }
-    });
+    // Section suggestions (only if not already detected)
+    if (!hasSection) {
+      Object.entries(allSectionMappings).forEach(([key, value]) => {
+        if (key.startsWith(currentWord) && key !== currentWord) {
+          let displayName = value === 'di' ? 'DI' : value.charAt(0).toUpperCase() + value.slice(1);
+          suggestions.push({ type: 'section', shortName: key, fullName: displayName, startIndex, endIndex: cursorPosition });
+        }
+      });
+    }
 
-    // Source suggestions
-    Object.entries(sourceMappings).forEach(([key, value]) => {
-      if (key.startsWith(currentWord) && key !== currentWord) {
-        suggestions.push({ type: 'source', shortName: key, fullName: value, startIndex, endIndex: cursorPosition });
-      }
-    });
+    // Difficulty suggestions (only if not already detected)
+    if (!hasDifficulty) {
+      Object.entries(allDifficultyMappings).forEach(([key, value]) => {
+        if (key.startsWith(currentWord) && key !== currentWord) {
+          suggestions.push({ type: 'difficulty', shortName: key, fullName: value.charAt(0).toUpperCase() + value.slice(1), startIndex, endIndex: cursorPosition });
+        }
+      });
+    }
 
-    // Category suggestions - enhanced to handle multi-word matching
-    categories.forEach(category => {
-      // Match by shortName
-      if (category.shortName && category.shortName.toLowerCase().startsWith(currentWord) && category.shortName.toLowerCase() !== currentWord) {
-        suggestions.push({
-          type: 'category',
-          shortName: category.shortName.toLowerCase(),
-          fullName: category.name,
-          startIndex,
-          endIndex: cursorPosition,
-        });
-      }
-      
-      // Match by category name - handle both single words and multi-word phrases
-      const categoryNameLower = category.name.toLowerCase();
-      
-      // Check if the current input (from start or last few words) matches the beginning of category name
-      const inputFromStart = beforeCursor.trim();
-      const lastTwoWords = words.slice(-2).join(' ');
-      const lastThreeWords = words.slice(-3).join(' ');
-      
-      // Try to match with different word combinations
-      const possibleMatches = [currentWord, lastTwoWords, lastThreeWords, inputFromStart];
-      
-      for (const match of possibleMatches) {
-        if (match && match.length >= 1 && categoryNameLower.startsWith(match) && categoryNameLower !== match) {
-          // Calculate the correct start index based on the matched phrase
-          const matchStartIndex = cursorPosition - match.length;
-          
+    // Source suggestions (only if not already detected)
+    if (!hasSource) {
+      Object.entries(sourceMappings).forEach(([key, value]) => {
+        if (key.startsWith(currentWord) && key !== currentWord) {
+          suggestions.push({ type: 'source', shortName: key, fullName: value, startIndex, endIndex: cursorPosition });
+        }
+      });
+    }
+
+    // Category suggestions - enhanced to handle multi-word matching (only if not already detected)
+    if (!hasCategory) {
+      categories.forEach(category => {
+        // Match by shortName
+        if (category.shortName && category.shortName.toLowerCase().startsWith(currentWord) && category.shortName.toLowerCase() !== currentWord) {
           suggestions.push({
             type: 'category',
-            shortName: categoryNameLower,
+            shortName: category.shortName.toLowerCase(),
             fullName: category.name,
-            startIndex: matchStartIndex,
+            startIndex,
             endIndex: cursorPosition,
           });
-          break; // Only add one suggestion per category
         }
-      }
-    });
+        
+        // Match by category name - handle both single words and multi-word phrases
+        const categoryNameLower = category.name.toLowerCase();
+        
+        // Check if the current input (from start or last few words) matches the beginning of category name
+        const inputFromStart = beforeCursor.trim();
+        const lastTwoWords = words.slice(-2).join(' ');
+        const lastThreeWords = words.slice(-3).join(' ');
+        
+        // Try to match with different word combinations
+        const possibleMatches = [currentWord, lastTwoWords, lastThreeWords, inputFromStart];
+        
+        for (const match of possibleMatches) {
+          if (match && match.length >= 1 && categoryNameLower.startsWith(match) && categoryNameLower !== match) {
+            // Calculate the correct start index based on the matched phrase
+            const matchStartIndex = cursorPosition - match.length;
+            
+            suggestions.push({
+              type: 'category',
+              shortName: categoryNameLower,
+              fullName: category.name,
+              startIndex: matchStartIndex,
+              endIndex: cursorPosition,
+            });
+            break; // Only add one suggestion per category
+          }
+        }
+      });
+    }
 
     return suggestions.sort((a, b) => a.shortName.length - b.shortName.length || a.shortName.localeCompare(b.shortName)).slice(0, 1);
   }
@@ -286,7 +310,8 @@
     
     function updateSuggestions() {
       const input = notesTextarea.value;
-      const suggestions = getAutoSuggestions(input, cursorPosition);
+      const parsed = parseNotesAndLink(input, questionLinkInput.value);
+      const suggestions = getAutoSuggestions(input, cursorPosition, parsed);
       currentSuggestions = suggestions;
       
       if (suggestions.length > 0) {

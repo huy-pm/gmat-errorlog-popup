@@ -1,5 +1,5 @@
 /**
- * GMAT Error Log Bookmarklet - GitHub Hosted Version 0.4
+ * GMAT Error Log Bookmarklet - GitHub Hosted Version
  * Usage: javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/huy-pm/gmat-errorlog@main/gmat-logger-bookmarklet.js';document.head.appendChild(s);})();
  */
 (function() {
@@ -8,7 +8,7 @@
   const CONFIG = {
     apiUrl: 'https://gmat-errorlog.vercel.app',
     devUrl: 'http://localhost:5001',
-    version: '1.0.0'
+    version: '1.1.0' // Updated version to reflect caching improvement
   };
   
   const isLocalhost = window.location.hostname === 'localhost' || 
@@ -255,10 +255,35 @@
   
   async function fetchCategories() {
     try {
+      // Try to get categories from localStorage first (cache for 1 hour)
+      const cachedData = localStorage.getItem('gmatLoggerCategories');
+      if (cachedData) {
+        const { timestamp, data } = JSON.parse(cachedData);
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        
+        // If cached data is less than 1 hour old, use it
+        if (Date.now() - timestamp < oneHour) {
+          categories = Array.isArray(data) ? data : data.categories || [];
+          if (categories.length > 0) {
+            console.log('Using cached categories');
+            return; // Use cached categories
+          }
+        }
+      }
+      
+      // Fetch from API if no valid cache
+      console.log('Fetching categories from API');
       const response = await fetch(`${baseUrl}/api/categories`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       categories = Array.isArray(data) ? data : data.categories || [];
+      
+      // Cache the fetched categories with current timestamp
+      localStorage.setItem('gmatLoggerCategories', JSON.stringify({
+        timestamp: Date.now(),
+        data: categories
+      }));
+      
       if (categories.length === 0) {
         categories = [
           { id: 'fallback-1', name: 'Weaken', section: 'verbal', shortName: null },
@@ -268,6 +293,25 @@
         ];
       }
     } catch (error) {
+      console.warn('Error fetching categories:', error);
+      // Try to use cached categories even if API fails
+      const cachedData = localStorage.getItem('gmatLoggerCategories');
+      if (cachedData) {
+        try {
+          const { data } = JSON.parse(cachedData);
+          categories = Array.isArray(data) ? data : data.categories || [];
+          if (categories.length > 0) {
+            console.log('Using cached categories despite API error');
+            return; // Use cached categories despite API error
+          }
+        } catch (parseError) {
+          console.warn('Error parsing cached categories:', parseError);
+          // Ignore parse errors and fall back to hardcoded categories
+        }
+      }
+      
+      // Fallback to hardcoded categories if everything else fails
+      console.log('Using fallback categories');
       categories = [
         { id: 'fallback-1', name: 'Weaken', section: 'verbal', shortName: null },
         { id: 'fallback-2', name: 'Strengthen', section: 'verbal', shortName: null },

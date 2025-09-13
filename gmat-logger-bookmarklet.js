@@ -1,5 +1,5 @@
-/**
- * GMAT Error Log Bookmarklet - GitHub Hosted Version
+/** 
+ * GMAT Error Log Bookmarklet - GitHub Hosted Version 0.3
  * Usage: javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/huy-pm/gmat-errorlog@main/gmat-logger-bookmarklet.js';document.head.appendChild(s);})();
  */
 (function() {
@@ -64,15 +64,70 @@
       if (sourceMappings[word]) { source = sourceMappings[word]; usedWords.add(i); break; }
     }
 
-    // Parse categories
+    // Parse category using shortName or full name
+    // First try to match multi-word category names
+    for (const cat of categories) {
+      const categoryWords = cat.name.toLowerCase().split(' ');
+      
+      // For multi-word categories, check if consecutive words match
+      if (categoryWords.length > 1) {
+        for (let i = 0; i <= words.length - categoryWords.length; i++) {
+          // Skip if any of these word positions are already used
+          const wordIndices = Array.from({length: categoryWords.length}, (_, idx) => i + idx);
+          if (wordIndices.some(idx => usedWords.has(idx))) continue;
+          
+          // Check if consecutive words match the category name
+          const matchesCategory = categoryWords.every((catWord, idx) => 
+            words[i + idx] === catWord
+          );
+          
+          if (matchesCategory) {
+            category = cat.name;
+            // Auto-detect section from category if section is not already set
+            if (!section) {
+              section = cat.section;
+            }
+            // Mark all matched words as used
+            wordIndices.forEach(idx => usedWords.add(idx));
+            break;
+          }
+        }
+        if (category) break;
+      }
+    }
+    
+    // If no multi-word category was found, try single-word matches
     if (!category) {
       for (let i = 0; i < words.length; i++) {
         if (usedWords.has(i)) continue;
         const word = words[i];
-        const categoryByName = categories.find(cat => cat.name.toLowerCase() === word);
+        
+        // Try to match by shortName first (exact match)
+        const categoryByShort = categories.find(cat => 
+          cat.shortName?.toLowerCase() === word
+        );
+        
+        if (categoryByShort) {
+          category = categoryByShort.name;
+          // Auto-detect section from category if section is not already set
+          if (!section) {
+            section = categoryByShort.section;
+          }
+          usedWords.add(i);
+          break;
+        }
+        
+        // Try to match by single-word category name (exact match only)
+        const categoryByName = categories.find(cat => 
+          cat.name.toLowerCase() === word
+        );
+        
         if (categoryByName) {
           category = categoryByName.name;
-          if (!section) section = categoryByName.section;
+          // Auto-detect section from category if section is not already set
+          if (!section) {
+            section = categoryByName.section;
+          }
           usedWords.add(i);
           break;
         }
@@ -121,11 +176,44 @@
       }
     });
 
-    // Category suggestions
+    // Category suggestions - enhanced to handle multi-word matching
     categories.forEach(category => {
+      // Match by shortName
+      if (category.shortName && category.shortName.toLowerCase().startsWith(currentWord) && category.shortName.toLowerCase() !== currentWord) {
+        suggestions.push({
+          type: 'category',
+          shortName: category.shortName.toLowerCase(),
+          fullName: category.name,
+          startIndex,
+          endIndex: cursorPosition,
+        });
+      }
+      
+      // Match by category name - handle both single words and multi-word phrases
       const categoryNameLower = category.name.toLowerCase();
-      if (categoryNameLower.startsWith(currentWord) && categoryNameLower !== currentWord) {
-        suggestions.push({ type: 'category', shortName: categoryNameLower, fullName: category.name, startIndex, endIndex: cursorPosition });
+      
+      // Check if the current input (from start or last few words) matches the beginning of category name
+      const inputFromStart = beforeCursor.trim();
+      const lastTwoWords = words.slice(-2).join(' ');
+      const lastThreeWords = words.slice(-3).join(' ');
+      
+      // Try to match with different word combinations
+      const possibleMatches = [currentWord, lastTwoWords, lastThreeWords, inputFromStart];
+      
+      for (const match of possibleMatches) {
+        if (match && match.length >= 1 && categoryNameLower.startsWith(match) && categoryNameLower !== match) {
+          // Calculate the correct start index based on the matched phrase
+          const matchStartIndex = cursorPosition - match.length;
+          
+          suggestions.push({
+            type: 'category',
+            shortName: categoryNameLower,
+            fullName: category.name,
+            startIndex: matchStartIndex,
+            endIndex: cursorPosition,
+          });
+          break; // Only add one suggestion per category
+        }
       }
     });
 
@@ -295,12 +383,12 @@
     
     const parsed = parseNotesAndLink(notes, questionLink);
     const payload = {
-      question: questionLink || 'No link provided',
-      source: parsed.source || 'Unknown',
-      section: parsed.section || 'verbal',
-      category: parsed.category || 'General',
-      difficulty: parsed.difficulty || 'medium',
-      notes: parsed.extractedNotes || notes || 'No notes provided'
+      question: questionLink || '',
+      source: parsed.source || '',
+      section: parsed.section || '',
+      category: parsed.category || '',
+      difficulty: parsed.difficulty || '',
+      notes: parsed.extractedNotes || notes || ''
     };
     submitBtn.disabled = true;
     submitBtn.textContent = 'Adding...';

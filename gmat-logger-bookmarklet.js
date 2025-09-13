@@ -295,14 +295,13 @@
     
     const parsed = parseNotesAndLink(notes, questionLink);
     const payload = {
-      questionLink: questionLink || undefined,
-      notes: parsed.extractedNotes || notes || undefined,
-      section: parsed.section || undefined,
-      category: parsed.category || undefined,
-      difficulty: parsed.difficulty || undefined,
-      source: parsed.source || undefined
+      question: questionLink || 'No link provided',
+      source: parsed.source || 'Unknown',
+      section: parsed.section || 'verbal',
+      category: parsed.category || 'General',
+      difficulty: parsed.difficulty || 'medium',
+      notes: parsed.extractedNotes || notes || 'No notes provided'
     };
-    
     submitBtn.disabled = true;
     submitBtn.textContent = 'Adding...';
     

@@ -300,8 +300,7 @@
       section: parsed.section || undefined,
       category: parsed.category || undefined,
       difficulty: parsed.difficulty || undefined,
-      source: parsed.source || undefined,
-      metadata: { createdVia: 'bookmarklet', version: CONFIG.version, url: window.location.href }
+      source: parsed.source || undefined
     };
     
     submitBtn.disabled = true;

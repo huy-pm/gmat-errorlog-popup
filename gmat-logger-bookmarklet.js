@@ -1,5 +1,5 @@
 /**
- * GMAT Error Log Bookmarklet - GitHub Hosted Version 0.5
+ * GMAT Error Log Bookmarklet - GitHub Hosted Version
  * Usage: javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/huy-pm/gmat-errorlog@main/gmat-logger-bookmarklet.js';document.head.appendChild(s);})();
  */
 (function() {
@@ -8,7 +8,7 @@
   const CONFIG = {
     apiUrl: 'https://gmat-errorlog.vercel.app',
     devUrl: 'http://localhost:5001',
-    version: '1.2.0' // Updated version to reflect line break preservation and original casing
+    version: '1.3.0' // Updated version to reflect draggable popup functionality
   };
   
   const isLocalhost = window.location.hostname === 'localhost' || 
@@ -388,11 +388,12 @@
     
     const modal = document.createElement('div');
     modal.id = 'gmat-logger-modal';
-    modal.innerHTML = `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><div style="background:white;border-radius:12px;padding:24px;width:90%;max-width:500px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="margin:0;font-size:20px;font-weight:600;color:#1f2937">⚡ Quick Log</h2><button id="gmat-logger-close" style="background:none;border:none;font-size:24px;cursor:pointer;padding:4px;color:#6b7280">×</button></div><form id="gmat-logger-form"><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Question Link</label><input id="gmat-question-link" type="url" placeholder="https://gmatclub.com/forum/..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box"/></div><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Smart Notes</label><div style="position:relative"><textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;resize:vertical;min-height:80px;font-family:inherit;box-sizing:border-box"></textarea><div id="gmat-suggestions" style="position:absolute;z-index:10;width:100%;margin-top:1px;background:white;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:none"></div></div><p style="font-size:12px;color:#6b7280;margin-top:4px;margin-bottom:0">Type keywords: <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">weaken</code>, <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">hard</code> and press Tab to complete.</p></div><div id="gmat-parsed-preview" style="background:rgba(156,163,175,0.1);padding:16px;border-radius:8px;margin-bottom:16px;display:none"><h4 style="font-weight:500;font-size:14px;color:#6b7280;margin:0 0 8px 0">Parsed Information:</h4><div id="gmat-parsed-badges" style="display:flex;flex-wrap:wrap;gap:8px"></div><p id="gmat-parsed-notes" style="font-size:12px;color:#6b7280;margin:8px 0 0 0;display:none"></p></div><div style="display:flex;gap:12px;justify-content:flex-end"><button type="button" id="gmat-logger-cancel" style="padding:8px 16px;border:1px solid #d1d5db;background:white;color:#374151;border-radius:6px;font-size:14px;cursor:pointer">Cancel</button><button type="submit" id="gmat-logger-submit" style="padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500">Quick Add</button></div></form><div id="gmat-logger-status" style="margin-top:16px;padding:12px;border-radius:6px;font-size:14px;display:none"></div></div></div>`;
+    modal.innerHTML = `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><div id="gmat-logger-dialog" style="background:white;border-radius:12px;padding:0;width:90%;max-width:500px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);position:relative"><div id="gmat-logger-header" style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #e5e7eb;cursor:move;user-select:none"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;background:#d1d5db;border-radius:50%;margin-right:4px"></div><div style="width:8px;height:8px;background:#d1d5db;border-radius:50%;margin-right:4px"></div><div style="width:8px;height:8px;background:#d1d5db;border-radius:50%;margin-right:8px"></div><h2 style="margin:0;font-size:20px;font-weight:600;color:#1f2937">⚡ Quick Log</h2></div><button id="gmat-logger-close" style="background:none;border:none;font-size:24px;cursor:pointer;padding:4px;color:#6b7280">×</button></div><div style="padding:24px"><form id="gmat-logger-form"><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Question Link</label><input id="gmat-question-link" type="url" placeholder="https://gmatclub.com/forum/..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box"/></div><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Smart Notes</label><div style="position:relative"><textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;resize:vertical;min-height:80px;font-family:inherit;box-sizing:border-box"></textarea><div id="gmat-suggestions" style="position:absolute;z-index:10;width:100%;margin-top:1px;background:white;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:none"></div></div><p style="font-size:12px;color:#6b7280;margin-top:4px;margin-bottom:0">Type keywords: <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">weaken</code>, <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">hard</code> and press Tab to complete.</p></div><div id="gmat-parsed-preview" style="background:rgba(156,163,175,0.1);padding:16px;border-radius:8px;margin-bottom:16px;display:none"><h4 style="font-weight:500;font-size:14px;color:#6b7280;margin:0 0 8px 0">Parsed Information:</h4><div id="gmat-parsed-badges" style="display:flex;flex-wrap:wrap;gap:8px"></div><p id="gmat-parsed-notes" style="font-size:12px;color:#6b7280;margin:8px 0 0 0;display:none"></p></div><div style="display:flex;gap:12px;justify-content:flex-end"><button type="button" id="gmat-logger-cancel" style="padding:8px 16px;border:1px solid #d1d5db;background:white;color:#374151;border-radius:6px;font-size:14px;cursor:pointer">Cancel</button><button type="submit" id="gmat-logger-submit" style="padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500">Quick Add</button></div></form><div id="gmat-logger-status" style="margin-top:16px;padding:12px;border-radius:6px;font-size:14px;display:none"></div></div></div></div>`;
     
     document.body.appendChild(modal);
     document.getElementById('gmat-question-link').value = window.location.href;
     setupEventListeners();
+    setupDragFunctionality();
   }
   
   function setupEventListeners() {
@@ -551,6 +552,97 @@
     const styles = { success: { background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0' }, error: { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }, default: { background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' } };
     const style = styles[type] || styles.default;
     Object.assign(statusDiv.style, style);
+  }
+
+  function setupDragFunctionality() {
+    const dialog = document.getElementById('gmat-logger-dialog');
+    const header = document.getElementById('gmat-logger-header');
+    const modal = document.getElementById('gmat-logger-modal');
+    
+    let isDragging = false;
+    let startX, startY, startLeft, startTop;
+    
+    // Make the dialog initially positioned in center
+    dialog.style.position = 'absolute';
+    dialog.style.left = '50%';
+    dialog.style.top = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.margin = '0';
+    
+    // Remove the flex centering from the modal overlay
+    const overlay = modal.querySelector('div');
+    overlay.style.display = 'block';
+    overlay.style.position = 'relative';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    
+    header.addEventListener('mousedown', (e) => {
+      // Don't start dragging if clicking on the close button
+      if (e.target.id === 'gmat-logger-close') return;
+      
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      
+      // Get current position
+      const rect = dialog.getBoundingClientRect();
+      startLeft = rect.left;
+      startTop = rect.top;
+      
+      // Change cursor and add dragging class
+      document.body.style.cursor = 'grabbing';
+      dialog.style.cursor = 'grabbing';
+      dialog.style.transition = 'none';
+      
+      e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      
+      let newLeft = startLeft + deltaX;
+      let newTop = startTop + deltaY;
+      
+      // Keep dialog within viewport bounds
+      const dialogRect = dialog.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      // Constrain horizontal movement
+      if (newLeft < 0) newLeft = 0;
+      if (newLeft + dialogRect.width > viewportWidth) {
+        newLeft = viewportWidth - dialogRect.width;
+      }
+      
+      // Constrain vertical movement
+      if (newTop < 0) newTop = 0;
+      if (newTop + dialogRect.height > viewportHeight) {
+        newTop = viewportHeight - dialogRect.height;
+      }
+      
+      dialog.style.left = newLeft + 'px';
+      dialog.style.top = newTop + 'px';
+      dialog.style.transform = 'none';
+      
+      e.preventDefault();
+    });
+    
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.cursor = '';
+        dialog.style.cursor = '';
+        dialog.style.transition = '';
+      }
+    });
+    
+    // Prevent text selection while dragging
+    header.addEventListener('selectstart', (e) => {
+      e.preventDefault();
+    });
   }
 
   console.log('⚡ GMAT Quick Log Bookmarklet v' + CONFIG.version);

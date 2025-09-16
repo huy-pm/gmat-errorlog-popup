@@ -1,5 +1,5 @@
 /**
- * GMAT Error Log Bookmarklet - GitHub Hosted Version
+ * GMAT Error Log Bookmarklet - GitHub Hosted Version 0.5
  * Usage: javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/huy-pm/gmat-errorlog@main/gmat-logger-bookmarklet.js';document.head.appendChild(s);})();
  */
 (function() {
@@ -8,7 +8,7 @@
   const CONFIG = {
     apiUrl: 'https://gmat-errorlog.vercel.app',
     devUrl: 'http://localhost:5001',
-    version: '1.1.0' // Updated version to reflect caching improvement
+    version: '1.2.0' // Updated version to reflect line break preservation and original casing
   };
   
   const isLocalhost = window.location.hostname === 'localhost' || 
@@ -43,27 +43,15 @@
   }
   
   function parseNotes(notes) {
+    const originalNotes = notes;
     const normalizedNotes = notes.toLowerCase().trim();
     const words = normalizedNotes.split(/\s+/);
     let section, category, difficulty, source;
     const usedWords = new Set();
 
-    // Parse section, difficulty, source
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      if (!usedWords.has(i) && sectionMappings[word]) { section = sectionMappings[word]; usedWords.add(i); break; }
-    }
-    for (let i = 0; i < words.length; i++) {
-      if (usedWords.has(i)) continue;
-      const word = words[i];
-      if (difficultyMappings[word]) { difficulty = difficultyMappings[word]; usedWords.add(i); break; }
-    }
-    for (let i = 0; i < words.length; i++) {
-      if (usedWords.has(i)) continue;
-      const word = words[i];
-      if (sourceMappings[word]) { source = sourceMappings[word]; usedWords.add(i); break; }
-    }
-
+    // Parse category first to auto-detect section
+    let sectionAutoDetected = false;
+    
     // Parse category using shortName or full name
     // First try to match multi-word category names
     for (const cat of categories) {
@@ -83,10 +71,9 @@
           
           if (matchesCategory) {
             category = cat.name;
-            // Auto-detect section from category if section is not already set
-            if (!section) {
-              section = cat.section;
-            }
+            // Auto-detect section from category
+            section = cat.section;
+            sectionAutoDetected = true;
             // Mark all matched words as used
             wordIndices.forEach(idx => usedWords.add(idx));
             break;
@@ -109,10 +96,9 @@
         
         if (categoryByShort) {
           category = categoryByShort.name;
-          // Auto-detect section from category if section is not already set
-          if (!section) {
-            section = categoryByShort.section;
-          }
+          // Auto-detect section from category
+          section = categoryByShort.section;
+          sectionAutoDetected = true;
           usedWords.add(i);
           break;
         }
@@ -124,18 +110,92 @@
         
         if (categoryByName) {
           category = categoryByName.name;
-          // Auto-detect section from category if section is not already set
-          if (!section) {
-            section = categoryByName.section;
-          }
+          // Auto-detect section from category
+          section = categoryByName.section;
+          sectionAutoDetected = true;
           usedWords.add(i);
           break;
         }
       }
     }
 
-    const remainingWords = words.filter((_, index) => !usedWords.has(index)).join(' ');
-    return { section, category, difficulty, source, extractedNotes: remainingWords.trim() || undefined };
+    // Check for explicit section keywords only if no section was auto-detected from category
+    if (!sectionAutoDetected) {
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (sectionMappings[word]) {
+          section = sectionMappings[word];
+          usedWords.add(i);
+          break;
+        }
+      }
+    }
+
+    // Parse difficulty
+    for (let i = 0; i < words.length; i++) {
+      if (usedWords.has(i)) continue;
+      const word = words[i];
+      if (difficultyMappings[word]) { difficulty = difficultyMappings[word]; usedWords.add(i); break; }
+    }
+
+    // Parse source
+    for (let i = 0; i < words.length; i++) {
+      if (usedWords.has(i)) continue;
+      const word = words[i];
+      if (sourceMappings[word]) { source = sourceMappings[word]; usedWords.add(i); break; }
+    }
+
+    // Extract remaining words as notes while preserving original casing and line breaks
+    if (usedWords.size === 0) {
+      // No words were used for metadata, return all original notes
+      return {
+        section,
+        category,
+        difficulty,
+        source,
+        extractedNotes: originalNotes || undefined,
+      };
+    }
+
+    // Create a more robust approach that preserves the original text structure
+    // Split the original text into words while preserving all whitespace
+    const originalWords = originalNotes.split(/(\s+)/);
+    const normalizedWords = normalizedNotes.split(/\s+/);
+    
+    const keptParts = [];
+    let normalizedWordIndex = 0;
+    
+    for (let i = 0; i < originalWords.length; i++) {
+      const part = originalWords[i];
+      
+      if (/^\s+$/.test(part)) {
+        // This is whitespace (including newlines), always keep it
+        keptParts.push(part);
+      } else {
+        // This is a word, check if it should be kept
+        if (normalizedWordIndex < normalizedWords.length && !usedWords.has(normalizedWordIndex)) {
+          keptParts.push(part);
+        }
+        normalizedWordIndex++;
+      }
+    }
+    
+    // Join all parts
+    let extractedNotes = keptParts.join('');
+    
+    // More careful cleanup that preserves line structure
+    // Remove leading whitespace and newlines
+    extractedNotes = extractedNotes.replace(/^[\s]+/, '');
+    
+    // Remove trailing whitespace and newlines
+    extractedNotes = extractedNotes.replace(/[\s]+$/, '');
+    
+    // Trim only if the result is all whitespace
+    if (extractedNotes.trim() === '') {
+      extractedNotes = extractedNotes.trim();
+    }
+
+    return { section, category, difficulty, source, extractedNotes: extractedNotes || undefined };
   }
   
     // Parse notes and question link to extract complete metadata
@@ -427,7 +487,7 @@
     if (parsed.difficulty) badgesDiv.appendChild(createBadge(`Difficulty: ${parsed.difficulty.charAt(0).toUpperCase() + parsed.difficulty.slice(1)}`, 'default'));
     
     if (parsed.extractedNotes) {
-      notesP.innerHTML = `<strong>Notes:</strong> ${parsed.extractedNotes}`;
+      notesP.innerHTML = `<strong>Notes:</strong><br><pre style="white-space: pre-wrap; font-family: inherit; margin: 4px 0 0 0; font-size: inherit;">${parsed.extractedNotes}</pre>`;
       notesP.style.display = 'block';
     } else {
       notesP.style.display = 'none';

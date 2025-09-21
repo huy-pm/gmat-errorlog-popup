@@ -13,15 +13,19 @@ javascript:(function() {
     // Remove existing MathJax rendered HTML
     clone.querySelectorAll('.mjx-chtml, .MJX_Assistive_MathML').forEach(el => el.remove());
 
-    // Replace ALL TeX scripts with inline TeX spans
+    // Replace TeX scripts with proper delimiters ($...$ for inline, $$...$$ for block)
     clone.querySelectorAll('script[type="math/tex"]').forEach(script => {
       let tex = script.textContent.trim();
       let span = document.createElement('span');
-      span.innerHTML = "\\(" + tex + "\\)"; // inline LaTeX
+      if (script.getAttribute("mode") === "display") {
+        span.textContent = "$$" + tex + "$$";   // block math
+      } else {
+        span.textContent = "$" + tex + "$";     // inline math
+      }
       script.replaceWith(span);
     });
 
-    // Split into Question and Answers
+    // Extract text to split Question vs Answers
     let rawText = clone.innerText.trim();
     let match = rawText.match(/(.*?)\s*(A\..*)/s);
     if (!match) {
@@ -29,24 +33,24 @@ javascript:(function() {
       return;
     }
 
-    let questionHTML = clone.innerHTML.split(/A\./)[0].trim(); // keep HTML (with LaTeX)
+    let questionHTML = clone.innerHTML.split(/A\./)[0].trim();
     let answersText = match[2].trim();
 
-    // Clean answers: remove underscores, separators
+    // Clean answers: remove underscores, extra separators
     answersText = answersText.replace(/_{2,}/g, "").replace(/[\n\r]+/g, " ").trim();
 
-    // Force answers to separate lines (A–E)
+    // Force each choice onto its own line
     let answersArray = answersText.match(/[A-E]\.\s*[^A-E]*/g) || [];
     let answersHTML = answersArray.map(a => a.trim()).join("<br>");
     let answersPlain = answersArray.map(a => a.trim()).join("\n");
 
-    // Build overlay
+    // Create overlay
     let overlay = document.createElement('div');
     overlay.style.position = 'fixed';
-    overlay.style.top = '10%';
-    overlay.style.left = '10%';
-    overlay.style.width = '80%';
-    overlay.style.height = '80%';
+    overlay.style.top = '8%';
+    overlay.style.left = '8%';
+    overlay.style.width = '84%';
+    overlay.style.height = '84%';
     overlay.style.background = 'white';
     overlay.style.color = 'black';
     overlay.style.overflow = 'auto';
@@ -70,7 +74,7 @@ javascript:(function() {
     // Close button
     document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
 
-    // Copy button (keeps TeX intact for math)
+    // Copy button
     document.getElementById("bookmarklet-copy").onclick = () => {
       let copyText = "Question:\n" + match[1].trim() + "\n\nAnswer Choices:\n" + answersPlain;
       navigator.clipboard.writeText(copyText).then(() => {
@@ -81,16 +85,18 @@ javascript:(function() {
     };
 
     // Load MathJax if not already loaded
+    function typeset() {
+      MathJax.typesetPromise([overlay]).catch(err => console.error(err));
+    }
+
     if (typeof MathJax === "undefined") {
       let script = document.createElement("script");
       script.type = "text/javascript";
       script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
       document.head.appendChild(script);
-      script.onload = () => {
-        MathJax.typesetPromise([overlay]);
-      };
+      script.onload = () => typeset();
     } else {
-      MathJax.typesetPromise([overlay]);
+      typeset();
     }
   }
 

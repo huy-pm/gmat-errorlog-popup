@@ -84,7 +84,21 @@ javascript:(function() {
       <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:8px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">Close</button>
     `;
     document.body.appendChild(overlay);
-    
+    // After overlay is appended
+document.body.appendChild(overlay);
+
+// If MathJax is already loaded
+if (window.MathJax && window.MathJax.typesetPromise) {
+  MathJax.typesetPromise([overlay]);
+} else {
+  // Wait for MathJax to load, then typeset
+  let checkMJ = setInterval(() => {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      MathJax.typesetPromise([overlay]);
+      clearInterval(checkMJ);
+    }
+  }, 200);
+}
     // Close button
     document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
     

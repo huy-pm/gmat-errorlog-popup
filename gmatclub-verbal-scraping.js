@@ -25,17 +25,21 @@ javascript: (function() {
         
         var h = o.innerHTML.replace(/\r?\n|\r/g, "");
         
-        // Look for answer choices pattern (A. B. C. D. E.)
-        var answerMatch = h.search(/[A-E]\.\s/);
+        // Look for answer choices pattern - must be preceded by <br> or start after question
+        // This avoids matching names like "W. E. B. Du Bois" in the passage
+        var answerMatch = h.search(/(?:<br\s*\/?>\s*|^)[A-E]\.\s/);
         
         if (answerMatch === -1) {
             alert("No answer choices found (A. B. C. D. E. pattern).");
             return;
         }
         
+        // Adjust the match position to account for the <br> tag in our regex
+        var actualAnswerStart = h.substring(answerMatch).search(/[A-E]\.\s/) + answerMatch;
+        
         // Split content before answer choices
-        var beforeAnswers = h.substring(0, answerMatch);
-        var answersSection = h.substring(answerMatch);
+        var beforeAnswers = h.substring(0, actualAnswerStart);
+        var answersSection = h.substring(actualAnswerStart);
         
         // Find the question - look for the last sentence ending with "?" before answer choices
         var questionMatches = beforeAnswers.match(/([^<]*\?)\s*(?:<br\s*\/?>)*/gi);

@@ -10,33 +10,22 @@ javascript:(function() {
     // Remove unwanted blocks
     clone.querySelectorAll('.twoRowsBlock, .post_signature').forEach(el => el.remove());
     
-    // Remove existing MathJax rendered HTML
-    clone.querySelectorAll('.mjx-chtml, .MJX_Assistive_MathML, .MathJax, .MathJax_Display, .MathJax_Preview').forEach(el => el.remove());
+    // Remove existing MathJax rendered HTML but preserve the script tags with math content
+    clone.querySelectorAll('.MathJax_Preview, .mjx-chtml, .MJX_Assistive_MathML, .MathJax, .MathJax_Display').forEach(el => el.remove());
     
-    // Replace TeX scripts with proper delimiters
+    // Replace TeX scripts with proper delimiters for MathJax
     clone.querySelectorAll('script[type="math/tex"]').forEach(script => {
       let tex = script.textContent.trim();
       let span = document.createElement('span');
-      if (script.getAttribute("mode") === "display") {
-        span.innerHTML = "\\[" + tex + "\\]";   // block math with escaped backslashes
+      // Check if it's display math based on parent or script attributes
+      if (script.parentElement.classList.contains('MathJax_Display') || 
+          script.getAttribute("mode") === "display" || 
+          script.type.includes("display")) {
+        span.textContent = "$$" + tex + "$$";   // block math
       } else {
-        span.innerHTML = "\\(" + tex + "\\)";   // inline math with escaped backslashes
+        span.textContent = "$" + tex + "$";   // inline math
       }
-      script.replaceWith(span);
-    });
-    
-    // Also handle script[type="math/tex; mode=display"]
-    clone.querySelectorAll('script[type*="math/tex"]').forEach(script => {
-      if (!script.hasAttribute('replaced')) {
-        let tex = script.textContent.trim();
-        let span = document.createElement('span');
-        if (script.type.includes("display")) {
-          span.innerHTML = "\\[" + tex + "\\]";
-        } else {
-          span.innerHTML = "\\(" + tex + "\\)";
-        }
-        script.replaceWith(span);
-      }
+      script.parentNode.replaceChild(span, script);
     });
     
     // Extract text to split Question vs Answers
@@ -83,22 +72,9 @@ javascript:(function() {
       <button id="bookmarklet-copy" style="margin-top:20px;padding:8px 15px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Copy to Clipboard</button>
       <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:8px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">Close</button>
     `;
+    
     document.body.appendChild(overlay);
-    // After overlay is appended
-document.body.appendChild(overlay);
-
-// If MathJax is already loaded
-if (window.MathJax && window.MathJax.typesetPromise) {
-  MathJax.typesetPromise([overlay]);
-} else {
-  // Wait for MathJax to load, then typeset
-  let checkMJ = setInterval(() => {
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      MathJax.typesetPromise([overlay]);
-      clearInterval(checkMJ);
-    }
-  }, 200);
-}
+    
     // Close button
     document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
     
@@ -123,8 +99,8 @@ if (window.MathJax && window.MathJax.typesetPromise) {
     function configureMathJax() {
       window.MathJax = {
         tex: {
-          inlineMath: [['\\(', '\\)'], ['$', '$']],
-          displayMath: [['\\[', '\\]'], ['$$', '$$']],
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
           processEscapes: true,
           processEnvironments: true
         },
@@ -132,20 +108,16 @@ if (window.MathJax && window.MathJax.typesetPromise) {
           skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
           ignoreHtmlClass: 'tex2jax_ignore',
           processHtmlClass: 'tex2jax_process'
-        },
-        startup: {
-          pageReady: () => {
-            return MathJax.startup.defaultPageReady().then(() => {
-              console.log('MathJax initial typesetting complete');
-              typesetOverlay();
-            });
-          }
         }
       };
     }
     
+    // Typeset the overlay content with MathJax
     function typesetOverlay() {
-      if (window.MathJax && window.MathJax.typesetPromise) {
+      if (window.MathJax && window.MathJax.typeset) {
+        MathJax.typeset([overlay]);
+        console.log('Math typesetting complete');
+      } else if (window.MathJax && window.MathJax.typesetPromise) {
         MathJax.typesetPromise([overlay]).then(() => {
           console.log('Math typesetting complete');
         }).catch(err => {
@@ -155,7 +127,7 @@ if (window.MathJax && window.MathJax.typesetPromise) {
     }
     
     // Check if MathJax is loaded
-    if (typeof MathJax === "undefined") {
+    if (typeof MathJax === "undefined" || !MathJax.typeset) {
       // Configure MathJax before loading
       configureMathJax();
       
@@ -165,16 +137,15 @@ if (window.MathJax && window.MathJax.typesetPromise) {
       script.id = "MathJax-script";
       script.async = true;
       script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
+      script.onload = function() {
+        // Wait a bit for MathJax to initialize, then typeset
+        setTimeout(typesetOverlay, 1000);
+      };
       document.head.appendChild(script);
     } else {
       // MathJax already loaded, just typeset
       console.log('MathJax already loaded, typesetting...');
-      // Reset MathJax if needed
-      if (window.MathJax.startup) {
-        MathJax.startup.document.clear();
-        MathJax.startup.document.updateDocument();
-      }
-      typesetOverlay();
+      setTimeout(typesetOverlay, 500);
     }
   }
   

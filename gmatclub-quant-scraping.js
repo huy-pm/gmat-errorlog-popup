@@ -8,7 +8,7 @@ javascript:(function() {
     let clone = container.cloneNode(true);
     
     // Remove unwanted blocks
-    clone.querySelectorAll('.twoRowsBlock, .post_signature').forEach(el => el.remove());
+    clone.querySelectorAll('.twoRowsBlock, .post_signature, .spoiler').forEach(el => el.remove());
     
     // Remove existing MathJax rendered HTML but preserve the script tags with math content
     clone.querySelectorAll('.MathJax_Preview, .mjx-chtml, .MJX_Assistive_MathML, .MathJax, .MathJax_Display').forEach(el => el.remove());
@@ -28,25 +28,69 @@ javascript:(function() {
       script.parentNode.replaceChild(span, script);
     });
     
-    // Extract text to split Question vs Answers
-    let rawText = clone.innerText.trim();
-    let match = rawText.match(/(.*?)\s*(A\..*)/s);
+    // Convert the clone to HTML string for easier manipulation
+    let htmlContent = clone.innerHTML;
     
-    if (!match) {
-      alert('Could not split into question and choices.');
-      return;
+    // Find the first answer choice to split question from answers
+    // Look for any pattern that starts with a letter in parentheses or followed by a period
+    let answerStartIndex = -1;
+    let firstAnswerLetter = '';
+    
+    // Patterns to match answer choices: (A), A., A), etc.
+    let patterns = [
+      /\(\s*[A-E]\s*\)/,  // (A), (B), etc.
+      /[A-E]\s*\./,       // A., B., etc.
+      /[A-E]\s*\)/,       // A), B), etc.
+    ];
+    
+    for (let pattern of patterns) {
+      let match = htmlContent.match(pattern);
+      if (match) {
+        answerStartIndex = match.index;
+        firstAnswerLetter = match[0].match(/[A-E]/)[0];
+        break;
+      }
     }
     
-    let questionHTML = clone.innerHTML.split(/A\./)[0].trim();
-    let answersText = match[2].trim();
+    let questionHTML = '';
+    let answersHTML = '';
     
-    // Clean answers: remove underscores, extra separators
-    answersText = answersText.replace(/_{2,}/g, "").replace(/[\n\r]+/g, " ").trim();
-    
-    // Force each choice onto its own line
-    let answersArray = answersText.match(/[A-E]\.\s*[^A-E]*/g) || [];
-    let answersHTML = answersArray.map(a => a.trim()).join("<br>");
-    let answersPlain = answersArray.map(a => a.trim()).join("\n");
+    if (answerStartIndex !== -1) {
+      // Split content into question and answers
+      questionHTML = htmlContent.substring(0, answerStartIndex).trim();
+      let answersPart = htmlContent.substring(answerStartIndex).trim();
+      
+      // Extract all answer choices
+      let answerChoices = [];
+      let answerRegex = /(?:(?:\(\s*([A-E])\s*\))|(?:([A-E])\s*\.?)|(?:([A-E])\s*\)))/g;
+      let match;
+      let lastMatchEnd = 0;
+      
+      while ((match = answerRegex.exec(answersPart)) !== null) {
+        let letter = match[1] || match[2] || match[3]; // Get the letter from any of the capture groups
+        if (letter) {
+          if (answerChoices.length > 0) {
+            // Set the content for the previous answer choice
+            answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd, match.index).trim();
+          }
+          // Add new answer choice
+          answerChoices.push({letter: letter, content: ''});
+          lastMatchEnd = match.index + match[0].length;
+        }
+      }
+      
+      // Set content for the last answer choice
+      if (answerChoices.length > 0) {
+        answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd).trim();
+      }
+      
+      // Format answers for display
+      answersHTML = answerChoices.map(choice => `${choice.letter}. ${choice.content}`).join("<br>");
+    } else {
+      // Fallback: if we can't find answer choices, treat everything as question
+      questionHTML = htmlContent;
+      answersHTML = "No answer choices found";
+    }
     
     // Create overlay
     let overlay = document.createElement('div');
@@ -80,7 +124,7 @@ javascript:(function() {
     
     // Copy button
     document.getElementById("bookmarklet-copy").onclick = () => {
-      let copyText = "Question:\n" + match[1].trim() + "\n\nAnswer Choices:\n" + answersPlain;
+      let copyText = "Question:\n" + questionHTML.replace(/<[^>]*>/g, '') + "\n\nAnswer Choices:\n" + answersHTML.replace(/<[^>]*>/g, '\n').replace(/\n+/g, '\n').trim();
       navigator.clipboard.writeText(copyText).then(() => {
         let btn = document.getElementById("bookmarklet-copy");
         let originalText = btn.innerText;

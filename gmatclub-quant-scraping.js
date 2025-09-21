@@ -10,14 +10,18 @@ javascript:(function() {
     // Remove unwanted blocks
     clone.querySelectorAll('.twoRowsBlock, .post_signature').forEach(el => el.remove());
 
-    // Keep MathJax TeX for rendering
+    // Remove existing MathJax rendered HTML
+    clone.querySelectorAll('.mjx-chtml, .MJX_Assistive_MathML').forEach(el => el.remove());
+
+    // Replace TeX scripts with TeX spans
     clone.querySelectorAll('script[type="math/tex"]').forEach(script => {
       let tex = script.textContent.trim();
       let span = document.createElement('span');
-      span.textContent = "$" + tex + "$"; // inline TeX
+      span.textContent = "$" + tex + "$"; // inline TeX for MathJax
       script.replaceWith(span);
     });
 
+    // Extract text to split Question vs Answers
     let rawText = clone.innerText.trim();
     let match = rawText.match(/(.*?)\s*(A\..*)/s);
     if (!match) {
@@ -25,8 +29,16 @@ javascript:(function() {
       return;
     }
 
-    let question = match[1].trim();
-    let answers = match[2].trim().replace(/\n/g, "<br>");
+    let questionHTML = clone.innerHTML.split(/A\./)[0].trim(); // keep HTML so TeX is rendered
+    let answersText = match[2].trim();
+
+    // Clean answers: remove underscores, extra separators
+    answersText = answersText.replace(/_{2,}/g, "").replace(/[\n\r]+/g, " ").trim();
+
+    // Force each choice onto its own line
+    let answersArray = answersText.match(/[A-E]\.\s*[^A-E]*/g) || [];
+    let answersHTML = answersArray.map(a => a.trim()).join("<br>");
+    let answersPlain = answersArray.map(a => a.trim()).join("\n");
 
     // Create overlay
     let overlay = document.createElement('div');
@@ -46,9 +58,9 @@ javascript:(function() {
 
     overlay.innerHTML = `
       <h2>Question</h2>
-      <div id="bookmarklet-question">${question}</div>
+      <div id="bookmarklet-question">${questionHTML}</div>
       <h2>Answer Choices</h2>
-      <div id="bookmarklet-answers">${answers}</div>
+      <div id="bookmarklet-answers">${answersHTML}</div>
       <button id="bookmarklet-copy" style="margin-top:20px;padding:5px 10px;">Copy to Clipboard</button>
       <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:5px 10px;">Close</button>
     `;
@@ -60,8 +72,7 @@ javascript:(function() {
 
     // Copy button
     document.getElementById("bookmarklet-copy").onclick = () => {
-      let plainAnswers = match[2].trim();
-      let copyText = "Question:\n" + question + "\n\nAnswer Choices:\n" + plainAnswers;
+      let copyText = "Question:\n" + match[1].trim() + "\n\nAnswer Choices:\n" + answersPlain;
       navigator.clipboard.writeText(copyText).then(() => {
         alert("Copied to clipboard!");
       }).catch(err => {

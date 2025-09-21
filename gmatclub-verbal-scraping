@@ -1,0 +1,50 @@
+javascript: (function() {
+    try {
+        var e = document.querySelector('.post-wrapper.first-post');
+        if (!e) {
+            alert("Could not find the first post wrapper!");
+            return
+        }
+        var t = e.querySelector('.post-info.add-bookmark');
+        if (!t) {
+            alert("Could not find the post-info add-bookmark section!");
+            return
+        }
+        var n = t.querySelector('.item.text');
+        if (!n) {
+            alert("Could not find the item text div!");
+            return
+        }
+        var o = n.cloneNode(true);
+        o.querySelectorAll('.item.twoRowsBlock,.post_signature').forEach(function(e) {
+            e.remove()
+        });
+        var h = o.innerHTML.replace(/\r?\n|\r/g, "");
+        var b = h.indexOf("<br>");
+        if (b == -1) {
+            alert("No <br> tag found to split passage and question.");
+            return
+        }
+        var passage = h.substring(0, b).replace(/<[^>]+>/g, "").trim(),
+            rest = h.substring(b + 4).trim();
+        var c = rest.match(/^([\s\S]*?\?)(<br>|<br\/>|<br \/>)/i);
+        var ques, ans;
+        if (c) {
+            ques = c[1].replace(/<[^>]+>/g, "").trim();
+            ans = rest.substring(c[0].length).trim();
+        } else {
+            ques = rest.replace(/<[^>]+>/g, "").trim();
+            ans = "";
+        }
+        var ansArr = ans.replace(/<br\s*\/?>/gi, "\n").split("\n").map(function(l) {
+            return l.trim()
+        }).filter(function(l) {
+            return /^[A-E]\./.test(l)
+        });
+        ans = ansArr.join('\n');
+        var popup = window.open("", "Extracted Data", "width=600,height=500");
+        popup.document.write("<h2>Passage</h2><pre>" + passage + "</pre><h2>Question</h2><pre>" + ques + "</pre><h2>Answer choices</h2><pre>" + ans + "</pre>")
+    } catch (s) {
+        alert("Error occurred: " + s)
+    }
+})();

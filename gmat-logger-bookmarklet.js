@@ -8,7 +8,7 @@
   const CONFIG = {
     apiUrl: 'https://gmat-errorlog.vercel.app',
     devUrl: 'http://localhost:5001',
-    version: '1.3.0' // Updated version to include status field support
+    version: '1.4.0' // Updated version to include status field support
   };
   
   const isLocalhost = window.location.hostname === 'localhost' || 
@@ -461,7 +461,7 @@
     if (parsed.difficulty) badgesDiv.appendChild(createBadge(`Difficulty: ${parsed.difficulty.charAt(0).toUpperCase() + parsed.difficulty.slice(1)}`, 'default'));
     
     if (parsed.extractedNotes) {
-      notesP.innerHTML = `<strong>Notes:</strong> ${parsed.extractedNotes}`;
+      notesP.innerHTML = `<strong>Notes:</strong><br><pre style="white-space: pre-wrap; font-family: inherit; margin: 4px 0 0 0; font-size: inherit;">${parsed.extractedNotes}</pre>`;
       notesP.style.display = 'block';
     } else {
       notesP.style.display = 'none';

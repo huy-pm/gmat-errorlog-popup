@@ -84,7 +84,7 @@ javascript:(function() {
         answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd).trim();
       }
       
-      // Format answers for display
+      // Format answers for display - ALWAYS in format "A. [Answer choice]"
       answersHTML = answerChoices.map(choice => `${choice.letter}. ${choice.content}`).join("<br>");
     } else {
       // Fallback: if we can't find answer choices, treat everything as question

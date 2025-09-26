@@ -182,13 +182,31 @@ javascript: (function() {
                         'var passage = document.getElementById("passage").textContent;' +
                         'var question = document.getElementById("question").textContent;' +
                         'var answers = document.getElementById("answers").textContent;' +
-                        'var content = passage + "\n\n" + question + "\n\n" + answers;' +
+                        'var content = passage + "\\n\\n" + question + "\\n\\n" + answers;' +
                         'navigator.clipboard.writeText(content).then(function() {' +
-                            'alert("Content copied to clipboard!");' +
+                            'showToast("Content copied to clipboard");' +
                         '}).catch(function(err) {' +
                             'console.error("Failed to copy: ", err);' +
-                            'alert("Failed to copy content to clipboard.");' +
+                            'showToast("Failed to copy content to clipboard");' +
                         '});' +
+                    '}' +
+                    'function showToast(message) {' +
+                        'var toast = document.createElement("div");' +
+                        'toast.textContent = message;' +
+                        'toast.style.cssText = "position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); " +' +
+                            '"background-color: #333; color: white; padding: 16px; border-radius: 4px; " +' +
+                            '"z-index: 1000; font-family: Arial, sans-serif; font-size: 16px; " +' +
+                            '"box-shadow: 0 2px 8px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s;";' +
+                        'document.body.appendChild(toast);' +
+                        'setTimeout(function() {' +
+                            'toast.style.opacity = "1";' +
+                        '}, 100);' +
+                        'setTimeout(function() {' +
+                            'toast.style.opacity = "0";' +
+                            'setTimeout(function() {' +
+                                'document.body.removeChild(toast);' +
+                            '}, 300);' +
+                        '}, 3000);' +
                     '}' +
                 '</script>' +
             '</body>' +

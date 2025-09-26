@@ -26,16 +26,22 @@ javascript: (function() {
         var h = o.innerHTML.replace(/\r?\n|\r/g, "");
         
         // Find where answer choices begin - look for multiple patterns
-        var answerSectionStart = h.indexOf("<br><br>(");
+        // More comprehensive pattern matching for answer sections
+        var answerSectionStart = -1;
+        var answerPatterns = [
+            "<br><br>\\(", // For (A) format
+            "<br><br>[A-Za-z][.:;)/]", // For A., A), A:, A;, A/, A) formats (both uppercase and lowercase)
+            "<br><br>[A-Za-z]\\s", // For A followed by space
+            "<br><br>&lt;[A-Za-z]&gt;" // For <A> format
+        ];
         
-        // Also check for <br><br>A. pattern (as seen in test cases)
-        if (answerSectionStart === -1) {
-            answerSectionStart = h.indexOf("<br><br>A.");
-        }
-        
-        // Also check for <br><br>A: pattern (as seen in test cases)
-        if (answerSectionStart === -1) {
-            answerSectionStart = h.indexOf("<br><br>A:");
+        // Try to find the first occurrence of any answer pattern
+        for (var i = 0; i < answerPatterns.length; i++) {
+            var pattern = new RegExp(answerPatterns[i]);
+            var match = h.search(pattern);
+            if (match !== -1 && (answerSectionStart === -1 || match < answerSectionStart)) {
+                answerSectionStart = match;
+            }
         }
         
         var questionHTML = '';
@@ -50,19 +56,34 @@ javascript: (function() {
             var answerLines = answersPart.split("<br>");
             var answerChoices = [];
             
+            // More comprehensive regex for answer detection
+            // Matches: (A), (a), A., a., A), a), A:, a:, A;, a;, A/, a/, A, a followed by space or content
+            var answerRegex = /^\([A-Za-z]\)|^[A-Za-z][.:;)/]?|^([A-Za-z])\s+|^&lt;[A-Za-z]&gt;/;
+            
             for (var i = 0; i < answerLines.length; i++) {
                 var line = answerLines[i].trim();
-                // Check for answer patterns: (A), A., A:, or just A followed by space/content
-                if (line.length > 0 && (/^\([A-E]\)|^[A-E][.:]|^[A-E]\s/.test(line))) {
+                // Check for answer patterns with more comprehensive regex
+                if (line.length > 0 && answerRegex.test(line)) {
                     answerChoices.push(line);
                 }
             }
             
             // Format answers for display - ALWAYS in format "A. [Answer choice]"
             answersHTML = answerChoices.map(function(choice) {
-                // Convert (A) format to A. format
-                // Also handle A: format
-                return choice.replace(/^\(([A-E])\)/, '$1.').replace(/^([A-E]):/, '$1.') + "";
+                // Comprehensive conversion to standard A. format
+                return choice
+                    // Convert (A) format to A.
+                    .replace(/^\(([A-Za-z])\)/, '$1.')
+                    // Convert A:, a:, A;, a;, A/, a/, A), a) formats to A.
+                    .replace(/^([A-Za-z])[:;)/]/, '$1.')
+                    // Convert <A> format to A.
+                    .replace(/^&lt;([A-Za-z])&gt;/, '$1.')
+                    // Convert A.    (with extra spaces) to A. (single space)
+                    .replace(/^([A-Za-z])\.\s+/, '$1. ')
+                    // Ensure there's a period after the letter if missing
+                    .replace(/^([A-Za-z])\s+/, '$1. ')
+                    // Fallback for any remaining formats
+                    .replace(/^([A-Za-z])(\s+|$)/, '$1. ');
             }).join("<br>");
         } else {
             // Fallback: if we can't find answer choices, treat everything as question

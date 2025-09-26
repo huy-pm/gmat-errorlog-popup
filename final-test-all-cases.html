@@ -21,7 +21,7 @@
         <div class="post-wrapper first-post">
             <div class="post-info add-bookmark">
                 <div class="item text">
-                    Scientists studying climate change have found that global warming results not only in higher planetary temperatures but also in earlier springs and later autumns. While some argue that this shift is advantageous due to longer summer growing seasons, others fear that many animal species may be unable to adapt, increasing their risk of extinction.<br>       <br>Which of the following, if true, provides the strongest evidence that longer summer growing seasons caused by global warming will increase the risk of extinction for some animal species?<br>     <br><br>A. Squirrels and chipmunks store larger quantities of nuts due to longer summers, but these supplies spoil more rapidly in warmer winters, leaving fewer edible reserves.<br>B. Fungus species that typically produce spores annually now produce them twice in longer summers, disrupting the diets of animals that depend on them.<br>C. Butterfly caterpillars, responding to earlier springs, now mature into butterflies before certain bird species hatch chicks that rely exclusively on these caterpillars for food.<br>D. Salmon migrating earlier accumulate lower fat reserves, greatly reducing survival rates during migration and decreasing the number reaching breeding sites each year.<br>E. Reptiles forced to emerge earlier from hibernation spend more time foraging before mating, reducing their available energy for reproduction.
+                    Scientists studying climate change have found that global warming results not only in higher planetary temperatures but also in earlier springs and later autumns. While some argue that this shift is advantageous due to longer summer growing seasons, others fear that many animal species may be unable to adapt, increasing their risk of extinction.<br>       <br>Which of the following, if true, provides the strongest evidence that longer summer growing seasons caused by global warming will increase the risk of extinction for some animal species?   <br><br>a/ Squirrels and chipmunks store larger quantities of nuts due to longer summers, but these supplies spoil more rapidly in warmer winters, leaving fewer edible reserves.<br>B: Fungus species that typically produce spores annually now produce them twice in longer summers, disrupting the diets of animals that depend on them.<br>(C) Butterfly caterpillars, responding to earlier springs, now mature into butterflies before certain bird species hatch chicks that rely exclusively on these caterpillars for food.<br>D; Salmon migrating earlier accumulate lower fat reserves, greatly reducing survival rates during migration and decreasing the number reaching breeding sites each year.<br>E/ Reptiles forced to emerge earlier from hibernation spend more time foraging before mating, reducing their available energy for reproduction.
                     <div class="item twoRowsBlock">
                         <div class="upRow" onclick="hideAnswer(this,'spoiler_1416212');">
                             <a href="javascript:void(0)">
@@ -124,7 +124,46 @@
         </div>
     </div>
     
+    <div class="test-case">
+        <h2>Test Case 5</h2>
+        <button onclick="runTestCase(5)">Run Verbal Scraper on Test Case 5</button>
+        <div class="post-wrapper first-post">
+            <div class="post-info add-bookmark">
+                <div class="item text">
+                    The popular belief that a snake's age can be determined by counting the number of layers of scales on its body is generally true. However, to help regulate its internal temperature, the outermost layers of scales of the Black Mamba snake often peel away when the temperature exceeding 120 degrees Fahrenheit, leaving the snake with fewer layers of scales than it would otherwise have. So only if the temperature in the Black Mamba's environment never exceeds 120 degrees Fahrenheit will its layers be a reliable measure of the snake's age.<br><br>Which of the following is an assumption on which the argument above depends? <br><br><br><br>A)    The growth of new layers of scales in a snake is not a function of levels of its basal metabolic rate.<br><br>B)    Only the Black Mamba loses layers of scales because of excessive heat. <br><br>C)    One day of temperatures above 120 degrees Fahrenheit will cause the Black Mamba snake to lose a layer of scales.<br><br>D)    The layers of scales of all snakes are of uniform thickness.<br><br>E)    The number of layers of scales that will be lost when the temperature exceeds 120 degrees Fahrenheit is not predictable.<br><br>Vercules                                                                <div class="item twoRowsBlock">
+                                    <div class="upRow" onclick="hideAnswer(this,'spoiler_1184417');">
+                                        <a href="javascript:void(0)">
+                                            <span class="show">Show</span><span class="hide">Hide</span> Answer
+                                        </a>
+                                        <div class="answer-block">
+                                            <a class="btn-show-answer text-white" role="button">
+                                                <span class="icon-svg icon-svg-forum-question-banks"></span>
+                                                <span class="tooltiptext">Official Answer</span>
+                                            </a>
+                                            <div id="spoiler_1184417" class="downRow">E</div>
+                                        </div>
+                                    </div>
+                                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
+        // Function to hide/show answers
+        function hideAnswer(element, spoilerId) {
+            var spoiler = document.getElementById(spoilerId);
+            if (spoiler.style.display === 'none') {
+                spoiler.style.display = 'block';
+                element.querySelector('.show').style.display = 'none';
+                element.querySelector('.hide').style.display = 'inline';
+            } else {
+                spoiler.style.display = 'none';
+                element.querySelector('.show').style.display = 'inline';
+                element.querySelector('.hide').style.display = 'none';
+            }
+        }
+        
         // Function to run the updated gmatclub-verbal-scraping.js script on a specific test case
         function runTestCase(testCaseNumber) {
             // Get the specific test case container
@@ -147,7 +186,7 @@
             
             // Run the scraping logic (copy of the updated gmatclub-verbal-scraping.js)
             try {
-                var e = document.querySelector('.post-wrapper.first-post');
+                var e = selectedContainer.querySelector('.post-wrapper.first-post');
                 if (!e) {
                     alert("Could not find the first post wrapper!");
                     // Restore visibility
@@ -185,16 +224,22 @@
                 var h = o.innerHTML.replace(/\r?\n|\r/g, "");
                 
                 // Find where answer choices begin - look for multiple patterns
-                var answerSectionStart = h.indexOf("<br><br>(");
+                // More comprehensive pattern matching for answer sections
+                var answerSectionStart = -1;
+                var answerPatterns = [
+                    "<br><br>\\(", // For (A) format
+                    "<br><br>[A-Za-z][.:;)/]", // For A., A), A:, A;, A/, A) formats (both uppercase and lowercase)
+                    "<br><br>[A-Za-z]\\s", // For A followed by space
+                    "<br><br>&lt;[A-Za-z]&gt;" // For <A> format
+                ];
                 
-                // Also check for <br><br>A. pattern (as seen in test cases)
-                if (answerSectionStart === -1) {
-                    answerSectionStart = h.indexOf("<br><br>A.");
-                }
-                
-                // Also check for <br><br>A: pattern (as seen in test cases)
-                if (answerSectionStart === -1) {
-                    answerSectionStart = h.indexOf("<br><br>A:");
+                // Try to find the first occurrence of any answer pattern
+                for (var i = 0; i < answerPatterns.length; i++) {
+                    var pattern = new RegExp(answerPatterns[i]);
+                    var match = h.search(pattern);
+                    if (match !== -1 && (answerSectionStart === -1 || match < answerSectionStart)) {
+                        answerSectionStart = match;
+                    }
                 }
                 
                 var questionHTML = '';
@@ -209,19 +254,34 @@
                     var answerLines = answersPart.split("<br>");
                     var answerChoices = [];
                     
+                    // More comprehensive regex for answer detection
+                    // Matches: (A), (a), A., a., A), a), A:, a:, A;, a;, A/, a/, A, a followed by space or content
+                    var answerRegex = /^\([A-Za-z]\)|^[A-Za-z][.:;)/]?|^([A-Za-z])\s+|^&lt;[A-Za-z]&gt;/;
+                    
                     for (var i = 0; i < answerLines.length; i++) {
                         var line = answerLines[i].trim();
-                        // Check for answer patterns: (A), A., A:, or just A followed by space/content
-                        if (line.length > 0 && (/^\([A-E]\)|^[A-E][.:]|^[A-E]\s/.test(line))) {
+                        // Check for answer patterns with more comprehensive regex
+                        if (line.length > 0 && answerRegex.test(line)) {
                             answerChoices.push(line);
                         }
                     }
                     
                     // Format answers for display - ALWAYS in format "A. [Answer choice]"
                     answersHTML = answerChoices.map(function(choice) {
-                        // Convert (A) format to A. format
-                        // Also handle A: format
-                        return choice.replace(/^\(([A-E])\)/, '$1.').replace(/^([A-E]):/, '$1.') + "";
+                        // Comprehensive conversion to standard A. format
+                        return choice
+                            // Convert (A) format to A.
+                            .replace(/^\(([A-Za-z])\)/, '$1.')
+                            // Convert A:, a:, A;, a;, A/, a/, A), a) formats to A.
+                            .replace(/^([A-Za-z])[:;)/]/, '$1.')
+                            // Convert <A> format to A.
+                            .replace(/^&lt;([A-Za-z])&gt;/, '$1.')
+                            // Convert A.    (with extra spaces) to A. (single space)
+                            .replace(/^([A-Za-z])\.\s+/, '$1. ')
+                            // Ensure there's a period after the letter if missing
+                            .replace(/^([A-Za-z])\s+/, '$1. ')
+                            // Fallback for any remaining formats
+                            .replace(/^([A-Za-z])(\s+|$)/, '$1. ');
                     }).join("<br>");
                 } else {
                     // Fallback: if we can't find answer choices, treat everything as question

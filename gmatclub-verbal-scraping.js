@@ -25,45 +25,103 @@ javascript: (function() {
         
         var h = o.innerHTML.replace(/\r?\n|\r/g, "");
         
-        // Look for answer choices pattern - must be preceded by <br> or start after question
-        // This avoids matching names like "W. E. B. Du Bois" in the passage
-        var answerMatch = h.search(/(?:<br\s*\/?>\s*|^)[A-E]\.\s/);
+        // Find where answer choices begin - look for multiple patterns
+        var answerSectionStart = h.indexOf("<br><br>(");
         
-        if (answerMatch === -1) {
-            alert("No answer choices found (A. B. C. D. E. pattern).");
-            return;
+        // Also check for <br><br>A. pattern (as seen in test cases)
+        if (answerSectionStart === -1) {
+            answerSectionStart = h.indexOf("<br><br>A.");
         }
         
-        // Adjust the match position to account for the <br> tag in our regex
-        var actualAnswerStart = h.substring(answerMatch).search(/[A-E]\.\s/) + answerMatch;
+        // Also check for <br><br>A: pattern (as seen in test cases)
+        if (answerSectionStart === -1) {
+            answerSectionStart = h.indexOf("<br><br>A:");
+        }
         
-        // Split content before answer choices
-        var beforeAnswers = h.substring(0, actualAnswerStart);
-        var answersSection = h.substring(actualAnswerStart);
+        var questionHTML = '';
+        var answersHTML = '';
         
-        // Find the question - look for the last sentence ending with "?" before answer choices
-        var questionMatches = beforeAnswers.match(/([^<]*\?)\s*(?:<br\s*\/?>)*/gi);
-        
-        var passage, question;
-        
-        if (questionMatches && questionMatches.length > 0) {
-            // Get the last question match
-            var lastQuestion = questionMatches[questionMatches.length - 1];
-            var questionIndex = beforeAnswers.lastIndexOf(lastQuestion);
+        if (answerSectionStart !== -1) {
+            // Split content at the answer choices
+            questionHTML = h.substring(0, answerSectionStart).trim();
+            var answersPart = h.substring(answerSectionStart).trim();
             
-            // Everything before the question is passage
-            passage = beforeAnswers.substring(0, questionIndex);
-            question = lastQuestion;
+            // Extract answer choices by splitting on <br> and filtering
+            var answerLines = answersPart.split("<br>");
+            var answerChoices = [];
+            
+            for (var i = 0; i < answerLines.length; i++) {
+                var line = answerLines[i].trim();
+                // Check for answer patterns: (A), A., A:, or just A followed by space/content
+                if (line.length > 0 && (/^\([A-E]\)|^[A-E][.:]|^[A-E]\s/.test(line))) {
+                    answerChoices.push(line);
+                }
+            }
+            
+            // Format answers for display - ALWAYS in format "A. [Answer choice]"
+            answersHTML = answerChoices.map(function(choice) {
+                // Convert (A) format to A. format
+                // Also handle A: format
+                return choice.replace(/^\(([A-E])\)/, '$1.').replace(/^([A-E]):/, '$1.') + "";
+            }).join("<br>");
         } else {
-            // Fallback: if no question found, treat everything as passage
-            passage = beforeAnswers;
-            question = "";
+            // Fallback: if we can't find answer choices, treat everything as question
+            questionHTML = h;
+            answersHTML = "No answer choices found";
+        }
+        
+        // Extract passage and question
+        var passage = "";
+        var question = "";
+        
+        // Robust approach: Split by <br> and intelligently identify the question
+        var parts = questionHTML.split("<br>");
+        var questionIndex = -1;
+        
+        // Look for the question part - it's typically the last meaningful part with a question mark
+        // or contains key question words
+        for (var i = parts.length - 1; i >= 0; i--) {
+            var part = parts[i].trim();
+            // Skip empty parts
+            if (part.length === 0) continue;
+            
+            // Look for question patterns
+            if ((part.includes("?") && (part.toLowerCase().includes("which") || 
+                                       part.toLowerCase().includes("what") || 
+                                       part.toLowerCase().includes("how") || 
+                                       part.toLowerCase().includes("why") || 
+                                       part.toLowerCase().includes("except:")))) {
+                questionIndex = i;
+                question = part;
+                break;
+            }
+        }
+        
+        // Fallback: if we didn't find a specific pattern, look for any text ending with ?
+        if (questionIndex === -1) {
+            for (var i = parts.length - 1; i >= 0; i--) {
+                var part = parts[i].trim();
+                if (part.length > 0 && part.includes("?")) {
+                    questionIndex = i;
+                    question = part;
+                    break;
+                }
+            }
+        }
+        
+        if (questionIndex >= 0) {
+            // Build passage from parts before the question
+            var passageParts = parts.slice(0, questionIndex);
+            passage = passageParts.join(" ").trim();
+        } else {
+            // If no question found, treat everything as passage
+            passage = questionHTML;
         }
         
         // Clean up passage - remove HTML tags and normalize
         passage = passage
             .replace(/<br\s*\/?>/gi, '\n')          // Convert <br> to newlines
-            .replace(/<[^>]*>/g, '')                 // Remove HTML tags (fixed regex)
+            .replace(/<[^>]*>/g, '')                 // Remove HTML tags
             .replace(/&ldquo;/g, '"')                // Convert HTML entities
             .replace(/&rdquo;/g, '"')
             .replace(/&amp;/g, '&')
@@ -72,29 +130,26 @@ javascript: (function() {
         
         // Clean up question
         question = question
-            .replace(/<br\s*\/?>/gi, ' ')            // Convert <br> to spaces in question
-            .replace(/<[^>]*>/g, '')                 // Remove HTML tags (fixed regex)
+            .replace(/<br\s*\/?>/gi, ' ')            // Convert <br> to spaces
+            .replace(/<[^>]*>/g, '')                 // Remove HTML tags
             .replace(/&ldquo;/g, '"')                // Convert HTML entities
             .replace(/&rdquo;/g, '"')
             .replace(/&amp;/g, '&')
             .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
             .trim();
         
-        // Extract answer choices
-        var answerChoices = answersSection
+        // Clean up answers
+        var cleanAnswers = answersHTML
             .replace(/<br\s*\/?>/gi, '\n')
-            .split('\n')
-            .map(function(line) {
-                return line.replace(/<[^>]*>/g, '').trim();
-            })
-            .filter(function(line) {
-                return /^[A-E]\./.test(line);
-            });
-        
-        var answers = answerChoices.join('\n');
+            .replace(/<[^>]*>/g, '')
+            .replace(/&ldquo;/g, '"')
+            .replace(/&rdquo;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&[a-zA-Z0-9#]+;/g, '')
+            .trim();
         
         // Create popup window
-        var popup = window.open("", "Extracted Data", "width=700,height=600,scrollbars=yes");
+        var popup = window.open("", "Extracted Data", "width=800,height=700,scrollbars=yes");
         popup.document.write(
             '<html>' +
             '<head>' +
@@ -117,7 +172,7 @@ javascript: (function() {
                 '</div>' +
                 '<div class="section">' +
                     '<h2>Answer Choices</h2>' +
-                    '<pre>' + answers + '</pre>' +
+                    '<pre>' + cleanAnswers + '</pre>' +
                 '</div>' +
             '</body>' +
             '</html>'

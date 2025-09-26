@@ -159,21 +159,38 @@ javascript: (function() {
                     'h2 { color: #333; border-bottom: 2px solid #333; padding-bottom: 5px; }' +
                     'pre { background: #f4f4f4; padding: 15px; border-left: 4px solid #333; white-space: pre-wrap; word-wrap: break-word; }' +
                     '.section { margin-bottom: 30px; }' +
+                    'button { padding: 10px 15px; margin: 5px; background-color: #2196F3; color: white; border: none; cursor: pointer; }' +
+                    'button:hover { background-color: #0b7dda; }' +
                 '</style>' +
             '</head>' +
             '<body>' +
+                '<button onclick="copyToClipboard()">Copy to Clipboard</button>' +
                 '<div class="section">' +
                     '<h2>Passage</h2>' +
-                    '<pre>' + passage + '</pre>' +
+                    '<pre id="passage">' + passage + '</pre>' +
                 '</div>' +
                 '<div class="section">' +
                     '<h2>Question</h2>' +
-                    '<pre>' + question + '</pre>' +
+                    '<pre id="question">' + question + '</pre>' +
                 '</div>' +
                 '<div class="section">' +
                     '<h2>Answer Choices</h2>' +
-                    '<pre>' + cleanAnswers + '</pre>' +
+                    '<pre id="answers">' + cleanAnswers + '</pre>' +
                 '</div>' +
+                '<script>' +
+                    'function copyToClipboard() {' +
+                        'var passage = document.getElementById("passage").textContent;' +
+                        'var question = document.getElementById("question").textContent;' +
+                        'var answers = document.getElementById("answers").textContent;' +
+                        'var content = passage + "\n\n" + question + "\n\n" + answers;' +
+                        'navigator.clipboard.writeText(content).then(function() {' +
+                            'alert("Content copied to clipboard!");' +
+                        '}).catch(function(err) {' +
+                            'console.error("Failed to copy: ", err);' +
+                            'alert("Failed to copy content to clipboard.");' +
+                        '});' +
+                    '}' +
+                '</script>' +
             '</body>' +
             '</html>'
         );

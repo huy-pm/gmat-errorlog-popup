@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GMAT Math Question Renderer</title>
+    <meta charset="UTF-8">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #question-display {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+        .question-section {
+            margin-bottom: 25px;
+        }
+        .question-section h2 {
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+        .answer-choices {
+            line-height: 1.8;
+        }
+        .answer-choice {
+            margin-bottom: 8px;
+        }
+        .rendering-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .rendering-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .rendering-info ul {
+            margin-bottom: 0;
+        }
+        .rendering-info li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GMAT Math Question Renderer</h1>
+        
+        <div class="rendering-info">
+            <h3>How to Use:</h3>
+            <ul>
+                <li>Copy a GMAT question from the clipboard (using the bookmarklet)</li>
+                <li>Paste it into the text area below</li>
+                <li>Click "Render Question" to display with proper math formatting</li>
+                <li>Use "Clear" to reset the form</li>
+            </ul>
+            <p><strong>Supported formats:</strong> Standard text with $inline$ and $$display$$ math expressions</p>
+        </div>
+        
+        <textarea id="question-input" placeholder="Paste your GMAT question here...&#10;&#10;Example:&#10;n is the product of the first 5 prime numbers. If $\dfrac{12!}{n}$ is divisible by $2^k$, what is the greatest value of a positive integer $k$?&#10;&#10;A. 6&#10;B. 7&#10;C. 8&#10;D. 9&#10;E. 10"></textarea>
+        
+        <button id="render-btn">Render Question</button>
+        <button id="clear-btn">Clear</button>
+        <button id="sample-btn">Load Sample</button>
+        
+        <div id="question-display">
+            <p style="color: #666; text-align: center; font-style: italic;">Question will be displayed here after rendering...</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const questionInput = document.getElementById('question-input');
+        const renderBtn = document.getElementById('render-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const sampleBtn = document.getElementById('sample-btn');
+        const questionDisplay = document.getElementById('question-display');
+        
+        // Sample question
+        const sampleQuestion = `n is the product of the first 5 prime numbers. If $\\dfrac{12!}{n}$ is divisible by $2^k$, what is the greatest value of a positive integer $k$?
+
+A. 6
+B. 7
+C. 8
+D. 9
+E. 10`;
+        
+        // Event listeners
+        renderBtn.addEventListener('click', renderQuestion);
+        clearBtn.addEventListener('click', clearForm);
+        sampleBtn.addEventListener('click', loadSample);
+        
+        // Render question function
+        function renderQuestion() {
+            const inputText = questionInput.value.trim();
+            if (!inputText) {
+                alert('Please paste a question first!');
+                return;
+            }
+            
+            try {
+                // Parse the input text
+                const parsedContent = parseQuestion(inputText);
+                
+                // Render the content
+                questionDisplay.innerHTML = `
+                    <div class="question-section">
+                        <h2>Question</h2>
+                        <div id="question-content">${parsedContent.question}</div>
+                    </div>
+                    <div class="question-section">
+                        <h2>Answer Choices</h2>
+                        <div class="answer-choices">${parsedContent.answers}</div>
+                    </div>
+                `;
+                
+                // Render math with MathJax
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([questionDisplay]).then(() => {
+                        console.log('MathJax rendering complete');
+                    }).catch((err) => {
+                        console.error('MathJax rendering error:', err);
+                    });
+                }
+                
+                // Render math with KaTeX as fallback
+                if (typeof renderMathInElement !== 'undefined') {
+                    renderMathInElement(questionDisplay, {
+                        delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false}
+                        ]
+                    });
+                }
+            } catch (error) {
+                console.error('Error rendering question:', error);
+                questionDisplay.innerHTML = `<p style="color: red;">Error rendering question: ${error.message}</p>`;
+            }
+        }
+        
+        // Parse question function - simplified and more robust version
+        function parseQuestion(text) {
+            // Split the text into lines
+            const lines = text.split('\n');
+            
+            // Find where answer choices start
+            let answerStartIndex = -1;
+            
+            // Look for various patterns that indicate start of answer choices
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                // Check if line starts with a letter followed by a period or parenthesis
+                if (/^[A-E][\.\)]/.test(line)) {
+                    answerStartIndex = i;
+                    break;
+                }
+                // Check if this line is a header like "Answer Choices:" and the next non-empty line starts with A.
+                if (line.toLowerCase().includes("answer") && line.toLowerCase().includes("choice")) {
+                    // Look for the first actual answer choice after this header
+                    for (let j = i + 1; j < lines.length; j++) {
+                        if (/^[A-E][\.\)]/.test(lines[j].trim())) {
+                            answerStartIndex = j;
+                            break;
+                        }
+                    }
+                    if (answerStartIndex !== -1) break;
+                }
+            }
+            
+            let question = '';
+            let answers = '';
+            
+            if (answerStartIndex === -1) {
+                // No answer choices found, treat everything as question
+                question = lines.join('<br>');
+                answers = '<p style="color: #666; font-style: italic;">No answer choices found</p>';
+            } else {
+                // Split into question and answers
+                // Question is everything before the first answer choice
+                const questionLines = lines.slice(0, answerStartIndex);
+                question = questionLines.join('<br>');
+                
+                // Remove any "Answer Choices:" headers from the question
+                question = question.replace(/<br>\s*Answer\s+Choices\s*:?\s*<br>/gi, '<br>');
+                question = question.replace(/\s*Answer\s+Choices\s*:?\s*/gi, '');
+                
+                // Collect answer choices
+                const answerChoices = [];
+                for (let i = answerStartIndex; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (/^[A-E][\.\)]/.test(line)) {
+                        answerChoices.push(line);
+                    } else if (line && answerChoices.length > 0) {
+                        // This is a continuation of the last answer choice
+                        answerChoices[answerChoices.length - 1] += ' ' + line;
+                    }
+                }
+                
+                // Format answers
+                answers = answerChoices.map(choice => 
+                    `<div class="answer-choice">${choice}</div>`
+                ).join('');
+            }
+            
+            return {
+                question: question,
+                answers: answers || '<p style="color: #666; font-style: italic;">No answer choices found</p>'
+            };
+        }
+        
+        // Clear form function
+        function clearForm() {
+            questionInput.value = '';
+            questionDisplay.innerHTML = '<p style="color: #666; text-align: center; font-style: italic;">Question will be displayed here after rendering...</p>';
+            questionInput.focus();
+        }
+        
+        // Load sample function
+        function loadSample() {
+            questionInput.value = sampleQuestion;
+        }
+        
+        // Auto-render math when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof MathJax !== 'undefined') {
+                MathJax.startup.promise.then(() => {
+                    console.log('MathJax loaded');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

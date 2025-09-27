@@ -1,0 +1,2490 @@
+<div class="item text">
+								<div style="text-align:justify;"><div class="bbcodeBoxOut"><div class="bbcodeBoxIn"><div>﻿That Native Americans in colonial North America were thrust into a world at least as new as that confronting the ever-increasing numbers of European immigrants and transplanted Africans is a simple yet important truth that students of the period have overlooked. The f<span style="background-color: #FFFF00">ailure to explore the Native Americans' new world</span> helps to explain why the history of the colonial period often remains a history of Europeans and Africans. One reason Native Americans have been left out may be historians' apparent inability to fit them into the New World theme, a theme that exerts a powerful hold on historians' imagination. From <span style="background-color: #FFFF00">Turner</span> to Allen, from <span style="background-color: #FFFF00">Herskovits</span> to Littlefield, scholars have analyzed encounters between peoples from the Old World and conditions in the New World. Since Native Americans had not recently arrived from a faraway land, it must have seemed logical to exclude them.<br><br>Recent research, however, suggests that perhaps historians should think of a "world" as the physical and cultural milieu within which people live and a "new world" as a dramatically different milieu demanding basic changes in ways of life. Considered in these terms, the experience of Native Americans was more closely akin to that of immigrants, and the idea of an encounter between worlds can, and indeed must, include the original inhabitants of America.</div></div><div class="bbcodeBoxIn"><div class="question-navigation-wrapper"><button id="prevQuestionBtn" class="question-nav-button left gmatBtn blue" disabled=""><i class="fa-solid fa-arrow-left"></i></button><select id="questionSelector" class="question-selector"><option value="all">All questions</option><option value="0">Question 1</option><option value="1">Question 2</option><option value="2">Question 3</option></select><button id="nextQuestionBtn" class="question-nav-button right gmatBtn blue" disabled=""><i class="fa-solid fa-arrow-right"></i></button></div><div></div><div class="question_wrapper" id="question_wrapper_1" style="display: block;"><div id="rc_timer_placeholder_1" class="placeholderTimerRC">
+	<script type="text/javascript">
+		// <![CDATA[
+		/* Timer RC MOD B
+																 ------------------ */
+
+		var timer_start_time_1 = null;
+		var timer_stop_time_1 = null;
+		var timer_id_1 = 0;
+		var show_answer_id_1 = 0;
+		var selected_answer_1 = null;
+
+		function timer_answer_1( answer_1 )
+		{
+			var selected_1 = null;
+			selected_answer_1 = answer_1;
+			/**
+			 * Type of question ONE
+			 *
+			 */
+			if ( answer_1 >= 1 && answer_1 <= 3 )
+			{
+				if(document.getElementById( 'timer_answer_1_1' ) )
+				{
+					document.getElementById( 'timer_answer_1_1' ).disabled = true;
+				}
+
+				if(document.getElementById( 'timer_answer_2_1' ) )
+				{
+					document.getElementById( 'timer_answer_2_1' ).disabled = true;
+				}
+
+				if(document.getElementById( 'timer_answer_3_1' ) )
+				{
+					document.getElementById( 'timer_answer_3_1' ).disabled = true;
+				}
+
+				setTimeout(function(){ store_answer_1( answer_1 ); }, 10 );
+			}
+
+			/**
+			 * Type of question TWO
+			 *
+			 */
+			if ( answer_1 >= 11 && answer_1 <= 15 )
+			{
+				if( document.getElementById( 'timer_answer_a_1' ) )
+				{
+					document.getElementById( 'timer_answer_a_1' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_b_1' ) )
+				{
+					document.getElementById( 'timer_answer_b_1' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_c_1' ) )
+				{
+					document.getElementById( 'timer_answer_c_1' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_d_1' ) )
+				{
+					document.getElementById( 'timer_answer_d_1' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_e_1' ) )
+				{
+					document.getElementById( 'timer_answer_e_1' ).onclick = null;
+				}
+
+				checkAnswerType_1(timer_id_1);
+
+				if ( timer_id_1 != 0 )
+				{
+					timer_stop_time_1 = new Date();
+					timer_offset_1 = timer_stop_time_1.getTime() - timer_start_time_1.getTime();
+					clearInterval( timer_id_1 );
+					timer_id_1 = 0;
+				}
+
+
+				document.getElementById('timer_button_1').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+
+
+				setTimeout(function() { store_answer_1( answer_1 ); }, 10 );
+
+				switch( answer_1 )
+				{
+				case 12:
+					{
+						selected_1 = 'b';
+
+					}break;
+
+				case 13:
+					{
+						selected_1 = 'c';
+
+					}break;
+
+				case 14:
+					{
+						selected_1 = 'd';
+
+					}break;
+
+				case 15:
+					{
+						selected_1 = 'e';
+
+					}break;
+
+				default:
+					{
+						selected_1 = 'a';
+
+					} break;
+				}
+
+				
+				write_timer_message_1("");
+
+				var element_1 = document.getElementById( 'timer_answer_C_1'.toLowerCase() );
+
+				if ( element_1 != null )
+				{
+					element_1.src = '/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/' + 'C'.toLowerCase() + '_green.png';
+					element_1.style.backgroundColor = '#8DC63F';
+
+				}
+
+				if( 'C'.toLowerCase() != selected_1 )
+				{
+										document.getElementById( 'timer_answer_' + selected_1 + '_' + 1 ).src = '/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/' + selected_1 + '_red.png';
+					document.getElementById( 'timer_answer_' + selected_1 + '_' + 1 ).style.backgroundColor = '#F26D7D';
+									}
+
+				show_answer_id_1 = setInterval( blink_right_answer_1, 200 );
+
+				
+			}
+			timer_offset_1 = 0;
+		}
+
+
+		function checkAnswerType_1(id){
+			if($.cookie('timer.popup_showed') == 3){
+				return true;
+			}
+
+			if(id){
+				$.cookie('timer.add_answer_without_start', null);
+			}
+			else{
+				var count = 1;
+				if(parseInt($.cookie('timer.add_answer_without_start'))){
+					count = parseInt($.cookie('timer.add_answer_without_start')) + 1;
+				}
+
+				if(!$.cookie('timer.popup_showed') && count == 3){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 1, { expires: 356 });
+				}
+				else if($.cookie('timer.popup_showed') == 1 && count == 10){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 2, { expires: 356 });
+				}
+				else if($.cookie('timer.popup_showed') == 2 && count == 20){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 3, { expires: 356 });
+				}
+
+				$.cookie('timer.add_answer_without_start', count, { expires: 356 });
+			}
+		}
+
+		function callbackStoreAnswer_1( xmlDoc )
+		{
+
+						document.getElementById("wrap_btn_question_1").classList.add('enabled');
+			
+			setTimeout(function(){write_timer_message_1(xmlDoc.getElementsByTagName("message")[0].firstChild.nodeValue);},1000);
+
+			setTimeout(function(){enable_timer_answer_group_1();},1000);
+
+			if(xmlDoc.getElementsByTagName("error")[0].firstChild.nodeValue > 0)
+				return false;
+
+
+			var a = xmlDoc.getElementsByTagName("percentage_answers_a")[0].firstChild.nodeValue;
+			var b = xmlDoc.getElementsByTagName("percentage_answers_b")[0].firstChild.nodeValue;
+			var c = xmlDoc.getElementsByTagName("percentage_answers_c")[0].firstChild.nodeValue;
+			var d = xmlDoc.getElementsByTagName("percentage_answers_d")[0].firstChild.nodeValue;
+			var e = xmlDoc.getElementsByTagName("percentage_answers_e")[0].firstChild.nodeValue;
+			var off_answer = xmlDoc.getElementsByTagName("offical_answers")[0].firstChild.nodeValue;
+			var error = xmlDoc.getElementsByTagName("error")[0].firstChild.nodeValue;
+
+						phpbbTimerResult_1(a,b,c,d,e,off_answer,error);
+			             
+			const topicAttempts = xmlDoc.getElementsByTagName('topic_attempts');
+			const correctAnswer = xmlDoc.getElementsByTagName('correct_answer')[0].firstChild.nodeValue;
+			const timer=document.getElementById("timer_message_1").parentElement;
+			const historyTable = timer.querySelector('.historyTable'); 
+			historyTable.innerHTML = '';
+			const header='<div class="historyTableHead"><div class="date">Date</div><div class="time">Time</div><div class="result">Result</div></div>'
+			historyTable.innerHTML += header;
+
+			let topicAttemptsArr=Array.from(topicAttempts[0].children);
+			topicAttemptsArr.forEach(attempt => {
+				const attemptRow = document.createElement('div');
+				attemptRow.classList.add('historyTableRow');
+				const dateSpan = document.createElement('div');
+				dateSpan.classList.add('date');
+				dateSpan.textContent = attempt.getElementsByTagName("date")[0].firstChild.nodeValue;
+				const correctDuration= attempt.getElementsByTagName("timer_duration_class_name_is_correct")[0].firstChild.nodeValue;
+				const timeSpan = document.createElement('div');
+				timeSpan.classList.add('time');
+				if(correctDuration=="1"){
+					timeSpan.classList.add('green');
+				}
+				timeSpan.textContent = attempt.getElementsByTagName("time")[0].firstChild.nodeValue;
+				const selectedAnswer= attempt.getElementsByTagName("selected_answer")[0].firstChild.nodeValue;
+				const resultSpan = document.createElement('div');
+				resultSpan.classList.add('result');
+				const result= attempt.getElementsByTagName("result")[0].firstChild.nodeValue;
+				let svgIcon = '';
+				if (result === '2') {
+					svgIcon = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-2"></use>
+						</svg>
+					`;
+				} else if (result === '3') {
+					svgIcon = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-3"></use>
+						</svg>
+					`;
+				}
+				resultSpan.innerHTML = svgIcon;
+				const answersPopup = selectedAnswer == correctAnswer ? '<div class="answersPopup"><div class="answersPopupRow">Correct Answer: <span>' + correctAnswer + '</span></div></div>'
+				:'<div class="answersPopup"><div class="answersPopupRow first">My Answer: <span>' + selectedAnswer + '</span></div><div class="answersPopupRow">Correct Answer: <span>' + correctAnswer + '</span></div></div>';
+				resultSpan.innerHTML += answersPopup;
+
+				attemptRow.appendChild(dateSpan);
+				attemptRow.appendChild(timeSpan);
+				attemptRow.appendChild(resultSpan);
+
+				historyTable.appendChild(attemptRow);
+			})
+			showMoreHistoryBtn()
+		}
+
+		function phpbbTimerResult_1(a,b,c,d,e,off_answer,error)
+		{
+
+			if( ((a+b+c+d+e) > 0) && (error == 0))
+			{
+				var i = 0;
+
+				$('.statisticWrap_1').each(function() {
+
+					var sumbol = '', value = 0;
+
+					switch(i)
+					{
+						case 0:{
+							sumbol = 'a';
+							value = a;
+						}break;
+						case 1:{
+							sumbol = 'b';
+							value = b;
+						}break;
+						case 2:{
+							sumbol = 'c';
+							value = c;
+						}break;
+						case 3:{
+							sumbol = 'd';
+							value = d;
+						}break;
+						case 4:{
+							sumbol = 'e';
+							value = e;
+						}break;
+					}
+
+
+					if(off_answer == (++i))
+					{
+												$(this).addClass('correctAnswer');
+											}
+
+					if((selected_answer_1 - 10) == i)
+					{
+												$(this).addClass('selectedAnswer');
+											}
+
+					var tpl = '<span class="answerType">'+sumbol+'</span>';
+					tpl	+= '<span class="answerPercentage correctAnswer">'+value+'%</span>';
+					tpl	+= '<div style="height: '+value+'%;" class="answerStatistic"></div>';
+
+					$(this).html(tpl);
+
+				});
+			};
+
+		}
+
+		function store_answer_1( answer_1 )
+		{
+			var timer_duration_1 = 0;
+
+			if(timer_stop_time_1 !== null && timer_start_time_1 !== null)
+			{
+				timer_duration_1 = Math.floor( ( timer_stop_time_1.getTime() - timer_start_time_1.getTime() ) / 1000);
+			}
+			var url = "/forum/timer_rc.php?topic_id=418338&question_id=1&user_id=1548198&timer_duration=" + timer_duration_1 + "&timer_answer=" + answer_1 + "&r=" + Math.random() + "";
+			sendAjax( "GET", url, callbackStoreAnswer_1 );
+		}
+
+		var timer_offset_1 = 0;
+
+		function timer_click_1(reset)
+		{
+			let  timerDisplay = document.getElementById('timer_display_1');
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;	
+		if (reset){
+			document.getElementById('timer_display_1').innerHTML = "00:00";
+			document.getElementById('timer_button_1').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+			document.getElementById('timer_play_1').classList.remove('playing');
+			clearInterval(timer_id_1 );
+			timer_offset_1 = 0;
+			timer_id_1 = 0; 
+			let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+			resetMessageBlock.classList.add('active');
+		}else if ( timer_id_1 == 0 )
+			{
+				const spoilerElement = document.querySelector("[id^='spoiler_'][id$='1']");
+				if (spoilerElement) {
+					const upRowElement = spoilerElement.closest('.upRow.show');
+					if (upRowElement) {
+						upRowElement.click();
+					}
+				}
+
+				document.getElementById('timer_button_1').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_pause_btn.svg";
+				document.getElementById('timer_message_1').innerHTML = "";
+				let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+				resetMessageBlock.classList.remove('active');
+				var i = 0;
+				$('.statisticWrap_1').each(function() {
+
+					var sumbol = '', value = 0;
+
+					switch(i)
+					{
+						case 0:{
+							sumbol = 'a';
+							value = 11;
+						}break;
+						case 1:{
+							sumbol = 'b';
+							value = 12;
+						}break;
+						case 2:{
+							sumbol = 'c';
+							value = 13;
+						}break;
+						case 3:{
+							sumbol = 'd';
+							value = 14;
+						}break;
+						case 4:{
+							sumbol = 'e';
+							value = 15;
+						}break;
+					}
+
+					$(this).removeClass('correctAnswer');
+					$(this).removeClass('selectedAnswer');
+
+					var tpl = '<div id="timer_answer_'+sumbol+'_1" onclick="timer_answer_1('+value+')" class="answerOption" style="height: 100%;" >'+sumbol.toUpperCase()+'</div>';
+
+					$(this).html(tpl);
+
+					i++;
+
+				});
+				timer_start_time_1 = new Date();
+				timer_start_time_1.setTime(timer_start_time_1.getTime() - timer_offset_1);
+
+				document.getElementById('timer_play_1').classList.add('playing');
+				// let  timerDisplay = document.getElementById('timer_display_1');
+				// let  timerContainer = timerDisplay.parentElement.parentElement;
+				let  showAnswerBlock = timerContainer.querySelector('.showAnswer');
+				showAnswerBlock.classList.add('hidden');
+				let  buttonsBlock = timerContainer.querySelector('.buttons');
+				buttonsBlock.classList.remove('hidden');
+				let  correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+				correctAnswerBlock.classList.add('hidden');
+
+				toggle_user_options('hide', 'timer_statistics');
+
+				if(timer_offset_1 > 0)
+					timer_loop_1();
+				else
+					document.getElementById('timer_display_1').innerHTML = "00:00";
+				timer_id_1 = setInterval( timer_loop_1, 200 );
+
+				selected_answer_1 = null;
+
+							}
+		else
+			{
+				timer_rc_click_stop_1();
+			}
+		}
+		
+		function timer_rc_click_stop_1()
+		{
+			if (timer_id_1 != 0) {
+				timer_stop_time_1 = new Date();
+				timer_offset_1 = timer_stop_time_1.getTime() - timer_start_time_1.getTime();
+				document.getElementById('timer_play_1').classList.remove('playing');
+				clearInterval( timer_id_1 );
+				timer_id_1 = 0;
+				document.getElementById('timer_button_1').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+
+				if(selected_answer_1 !== null)
+				store_answer_1(0);
+
+							}
+		}
+
+		function blink_right_answer_1()
+		{
+			var element = document.getElementById( 'timer_answer_C_1'.toLowerCase() );
+			if ( element != null )
+			{
+				if( element.style.visibility == "hidden" )
+				{
+					element.style.visibility = "visible";
+
+				} else {
+
+					element.style.visibility = "hidden";
+				}
+			}
+		}
+
+		function timer_loop_1()
+		{
+			var current_time_1 = new Date();
+			var timer_elapsed_1 = 0;
+			var timer_minutes_1 = 0;
+			var timer_seconds_1 = 0;
+
+			timer_elapsed_1 = current_time_1.getTime() - timer_start_time_1.getTime();
+			timer_elapsed_1 = Math.floor(timer_elapsed_1 / 1000);
+			timer_minutes_1 = Math.floor(timer_elapsed_1 / 60);
+			timer_seconds_1 = timer_elapsed_1 - timer_minutes_1 * 60;
+
+			if( timer_minutes_1 < 10 )
+			{
+				timer_minutes_1= "0" + timer_minutes_1;
+			}
+
+			if( timer_seconds_1 < 10 )
+			{
+				timer_seconds_1 = "0" + timer_seconds_1;
+			}
+
+			document.getElementById('timer_display_1').innerHTML = timer_minutes_1 + ":" + timer_seconds_1;
+		}
+
+		function write_timer_message_1( message_1 )
+		{
+			document.getElementById( 'timer_message_1' ).innerHTML = message_1;
+		}
+
+
+		function enable_timer_answer_group_1()
+		{
+			if ( show_answer_id_1 != 0 )
+			{
+				clearInterval( show_answer_id_1 );
+				show_answer_id_1 = 0;
+			}
+
+			var element_1 = document.getElementById( 'timer_answer_C_1'.toLowerCase() );
+			if ( element_1 != null )
+			{
+				element_1.style.visibility = "visible";
+			}
+
+
+			if( document.getElementById( 'timer_answer_1_1' ) )
+			{
+				document.getElementById( 'timer_answer_1_1' ).disabled = false;
+			}
+
+			if( document.getElementById( 'timer_answer_2_1' ) )
+			{
+				document.getElementById( 'timer_answer_2_1' ).disabled = false;
+			}
+
+			if( document.getElementById( 'timer_answer_3_1'))
+			{
+				document.getElementById( 'timer_answer_3_1').disabled = false;
+			}
+
+
+			if ( document.getElementById( 'timer_answer_a_1' ) )
+			{
+				document.getElementById( 'timer_answer_a_1' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/a_white.png";
+				document.getElementById( 'timer_answer_a_1' ).onclick = function() { timer_answer_1( 11 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_b_1' ) )
+			{
+				document.getElementById( 'timer_answer_b_1' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/b_white.png";
+				document.getElementById( 'timer_answer_b_1' ).onclick = function() { timer_answer_1( 12 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_c_1' ) )
+			{
+				document.getElementById( 'timer_answer_c_1' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/c_white.png";
+				document.getElementById( 'timer_answer_c_1' ).onclick = function() { timer_answer_1( 13 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_d_1' ) )
+			{
+				document.getElementById( 'timer_answer_d_1' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/d_white.png";
+				document.getElementById( 'timer_answer_d_1' ).onclick = function() { timer_answer_1( 14 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_e_1' ) )
+			{
+				document.getElementById( 'timer_answer_e_1' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/e_white.png";
+				document.getElementById( 'timer_answer_e_1' ).onclick = function() { timer_answer_1( 15 ) };
+			}
+		}
+		function showCorrectAnswerRC(id){
+			let  timerDisplay = document.getElementById(id);
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+
+			const lastNumber = id.substring(id.lastIndexOf('_') + 1);
+			const spoilerElement = document.querySelector("[id^='spoiler_'][id$='" + lastNumber + "']");
+			if (spoilerElement) {
+				const upRowElement = spoilerElement.closest('.upRow');
+				if (upRowElement && !upRowElement.classList.contains('show')) {
+					upRowElement.click();
+				}
+			}
+
+
+			if ($(timerContainer).hasClass('unactiveTimer')) {
+				if ("1"){
+					var state = $('.item.timer').hasClass('unactiveTimer') ? 'show': 'hide';
+
+					if (!"1" && typeof(Storage) !== "undefined") {
+						localStorage.setItem("GUEST_SHOW_TIMER_STATISTICS", state);
+						toggle_timer_statistics(state);
+					} else {
+						toggle_user_options(state, 'timer_statistics');
+					}
+				}
+			}
+		}
+		function showAnswerRCMessage(id){
+			let  timerDisplay = document.getElementById(id);
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+			let  showAnswerMessage = timerContainer.querySelector('.showAnswerMessage');
+			showAnswerMessage.classList.add('active');
+		}
+        
+		window.addEventListener("load", function(){
+			$('.upRow').on('click', function(){
+				let spoilerElement = $(this).find(".downRow");
+				let id = spoilerElement.attr("id");
+				let questionNumber = id.split("_")[id.split("_").length - 1];
+				let timerDisplay = document.getElementById("timer_display_" + questionNumber);
+				let timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+				let showAnswerBlock = timerContainer.querySelector('.showAnswer');
+				let optionButtonsBlock = timerContainer.querySelector('.buttons');
+				optionButtonsBlock.classList.add('hidden');
+				// showAnswerBlock.click();
+				showAnswerBlock.classList.add('hidden');
+				let  correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+				correctAnswerBlock.classList.remove('hidden');
+				if ($(this).hasClass('show')) {
+					toggle_user_options('show', 'timer_statistics');
+					if (timer_id_1 > 0 ){
+						timer_click_1(true)
+					}
+				}
+			if (!$(this).hasClass('show')) {
+				let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+			         resetMessageBlock.classList.remove('active');
+				toggle_user_options('hide', 'timer_statistics');
+				if($(optionButtonsBlock).hasClass('hidden')){
+					$(showAnswerBlock).removeClass('hidden');
+					let correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+					correctAnswerBlock.classList.add('hidden');
+				}
+			}
+			})
+		});
+	 function showMoreHistoryBtn (){
+			$('.historyTable').each(function() {
+				if ($(this).children().length > 4) {
+					$(this).css({
+						'height': '100px',
+					});
+					if (!$(this).next().hasClass('showMoreHistory')) {
+						let showMoreBtn = $('<button class="showMoreHistory">Show More</button>');
+						$(this).after(showMoreBtn);
+						showMoreBtn.on('click', function() {
+							if ($(this).prev().css('height') === '100px') {
+								$(this).prev().css('height', 'auto');
+								$(this).text('Show Less');
+							} else {
+								$(this).prev().css('height', '100px');
+								$(this).text('Show More');
+							}
+						});
+					}
+				}
+			});
+		};
+		window.addEventListener("load", showMoreHistoryBtn)
+	</script>
+	<div>
+		Question 1	</div>
+		<div class="itemRC item timer unactiveTimer">
+		<div class="timerBox">
+			<div class="logo">
+				<a href="/dailypractice" target="_blank"><img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_logo_new_small.svg" alt="">
+					<div class="logoPopup">GMAT Timer</div>
+				</a>
+			</div>
+			<div id="timer_play_1" class="timerBlock timerBlockPlay" onclick="timer_click_1()">
+				<div class="play">
+					<img id="timer_button_1" onmouseover="this.style.cursor='pointer';" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg" alt="">
+				</div>
+				<div id="timer_display_1" class="time">
+					<!-- 02:34 -->
+					00:00
+									</div>
+				<div class="timerStartPopup">Start Timer</div>
+				<div class="timerPausePopup">Pause Timer</div>
+				<div class="timerResumePopup">Resume Timer</div>
+			</div>
+			<div class="timerBlock showAnswer" onclick="showCorrectAnswerRC('timer_display_1')">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 23 30" fill="none">
+				<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-show-answer"></use>
+			</svg>
+			Show Answer
+
+		</div>
+		<div class="correctAnswerBlock hidden">
+			<div class="statisticWrapExisting 
+						"><span class="answerType">a</span><span class="answerPercentage">4%</span><div style="height:4%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">b</span><span class="answerPercentage">11%</span><div style="height:11%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+			 correctAnswer selectedAnswer			"><span class="answerType">c</span><span class="answerPercentage">72%</span><div style="height:72%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">d</span><span class="answerPercentage">7%</span><div style="height:7%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">e</span><span class="answerPercentage">6%</span><div style="height:6%;" class="answerStatistic"></div></div>
+		</div>
+		<div class="timerBlock correctAnswerBlock hidden">
+			Correct Answer: C		</div>
+		<div id="timer_abcde" class="buttons hidden">
+			<div class="statisticWrap statisticWrap_1">
+				<div id="timer_answer_a_1" onclick="timer_answer_1(11)" class="answerOption" style="height: 100%;">
+					A
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_1">
+				<div id="timer_answer_b_1" onclick="timer_answer_1(12)" class="answerOption" style="height: 100%;">
+					B
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_1">
+				<div id="timer_answer_c_1" onclick="timer_answer_1(13)" class="answerOption" style="height: 100%;">
+					C
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_1">
+				<div id="timer_answer_d_1" onclick="timer_answer_1(14)" class="answerOption" style="height: 100%;">
+					D
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_1">
+				<div id="timer_answer_e_1" onclick="timer_answer_1(15)" class="answerOption" style="height: 100%;">
+					E
+				</div>
+			</div>
+		</div>
+		<div class="timerBlock history">
+			<div class="historyBtn hideTimer ">
+				<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-show-history"></use>
+				</svg>
+				<div class="historyBtnTexts">
+					<div class="hidenTimer" style="display: none;">Hide</div>
+					<div class="shownTimer" style="display: inline-block;">Show</div>
+					History
+				</div>
+			</div>
+			<div class="addNotesButton  enabled" id="wrap_btn_question_1">
+				<svg class="no-mistake" width="12" height="12" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-no-mistake"></use>
+				</svg>
+				<svg class="has-mistake" width="12" height="12" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-has-mistake"></use>
+				</svg>
+				<button data-popup-rc="" data-forum-name="137" data-note="" data-mistakes="[]" data-question-id="1" id="btn_question_1" data-timer-ind="2">
+												<span class="text">
+																										Tag Mistake
+																									</span>
+				</button>
+			</div>
+		</div>
+		<a href="/forum/analytics.php#error_log" class="errorLogBtn" target="_blank">
+			<svg width="36" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-error-log"></use>
+			</svg>
+			<div class="errorLogBtnPopup">Error Log</div>
+		</a>
+	</div>
+	<div class="showAnswerMessage">C</div>
+	<div class="workbookBlock" id="timer_message_1"></div>
+	<div id="reset_message">Be sure to select an answer first to save it in the Error Log before revealing the correct answer (OA)!</div>
+	<div class="timerResult">
+		<div class="timerResultLeft">
+			<div class="difficulty" id="timer_difficulty">
+								<p>Difficulty:</p>
+				<div>
+													<span class="difImg">
+																												<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_medium.svg" alt="">
+														<!-- <img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" />
+														<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" />
+														<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_grey.png" alt="" /> -->
+																											</span>
+					<b>
+
+						25%					</b>
+					(medium)
+				</div>
+							</div>
+
+			<div class="question">
+				<p>Question Stats:</p>
+				<b>
+					<small>
+						72%
+					</small>
+				</b>
+				<small>
+					(02:07)
+				</small>
+				correct				<img class="sep" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_separator.png" alt=""> <span class="red"><b><small>28%</small></b>
+													<small>(02:19)</small></span> wrong				<img class="sep" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_separator.png" alt="">
+				<span style="width:10px;">&nbsp;</span>
+				<span class="black">
+												based on													<b>795</b>
+												sessions												</span>
+			</div>
+		</div>
+		<div class="timerResultRight">
+			<p>History</p>
+			<div class="historyTable">
+				<div class="historyTableHead">
+					<div class="date">Date</div>
+					<div class="time">Time</div>
+					<div class="result">Result</div>
+				</div>
+								<div class="historyTableRow">
+					<div class="date">25 Sep 2025</div>
+					<div class="time ">02:34</div>
+					<div class="result">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-2"></use>
+						</svg>
+												<div class="answersPopup">
+															<div class="answersPopupRow">
+									Correct Answer: <span>C</span>
+								</div>
+							</div>
+					</div>
+				</div>
+							</div>
+		</div>
+	</div>
+	</div>
+</div><span style="font-weight: bold">1. In the passage, the author is primarily concerned with</span><br><br>A. disclosing new evidence<br>B. correcting a factual error<br>C. recommending a new approach<br>D. summarizing a scholarly debate<br>E. assessing conflicting information<br><br><br></div><div class="question_wrapper" id="question_wrapper_2" style="display: block;"><div id="rc_timer_placeholder_2" class="placeholderTimerRC">
+	<script type="text/javascript">
+		// <![CDATA[
+		/* Timer RC MOD B
+																 ------------------ */
+
+		var timer_start_time_2 = null;
+		var timer_stop_time_2 = null;
+		var timer_id_2 = 0;
+		var show_answer_id_2 = 0;
+		var selected_answer_2 = null;
+
+		function timer_answer_2( answer_2 )
+		{
+			var selected_2 = null;
+			selected_answer_2 = answer_2;
+			/**
+			 * Type of question ONE
+			 *
+			 */
+			if ( answer_2 >= 1 && answer_2 <= 3 )
+			{
+				if(document.getElementById( 'timer_answer_1_2' ) )
+				{
+					document.getElementById( 'timer_answer_1_2' ).disabled = true;
+				}
+
+				if(document.getElementById( 'timer_answer_2_2' ) )
+				{
+					document.getElementById( 'timer_answer_2_2' ).disabled = true;
+				}
+
+				if(document.getElementById( 'timer_answer_3_2' ) )
+				{
+					document.getElementById( 'timer_answer_3_2' ).disabled = true;
+				}
+
+				setTimeout(function(){ store_answer_2( answer_2 ); }, 10 );
+			}
+
+			/**
+			 * Type of question TWO
+			 *
+			 */
+			if ( answer_2 >= 11 && answer_2 <= 15 )
+			{
+				if( document.getElementById( 'timer_answer_a_2' ) )
+				{
+					document.getElementById( 'timer_answer_a_2' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_b_2' ) )
+				{
+					document.getElementById( 'timer_answer_b_2' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_c_2' ) )
+				{
+					document.getElementById( 'timer_answer_c_2' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_d_2' ) )
+				{
+					document.getElementById( 'timer_answer_d_2' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_e_2' ) )
+				{
+					document.getElementById( 'timer_answer_e_2' ).onclick = null;
+				}
+
+				checkAnswerType_2(timer_id_2);
+
+				if ( timer_id_2 != 0 )
+				{
+					timer_stop_time_2 = new Date();
+					timer_offset_2 = timer_stop_time_2.getTime() - timer_start_time_2.getTime();
+					clearInterval( timer_id_2 );
+					timer_id_2 = 0;
+				}
+
+
+				document.getElementById('timer_button_2').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+
+
+				setTimeout(function() { store_answer_2( answer_2 ); }, 10 );
+
+				switch( answer_2 )
+				{
+				case 12:
+					{
+						selected_2 = 'b';
+
+					}break;
+
+				case 13:
+					{
+						selected_2 = 'c';
+
+					}break;
+
+				case 14:
+					{
+						selected_2 = 'd';
+
+					}break;
+
+				case 15:
+					{
+						selected_2 = 'e';
+
+					}break;
+
+				default:
+					{
+						selected_2 = 'a';
+
+					} break;
+				}
+
+				
+				write_timer_message_2("");
+
+				var element_2 = document.getElementById( 'timer_answer_A_2'.toLowerCase() );
+
+				if ( element_2 != null )
+				{
+					element_2.src = '/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/' + 'A'.toLowerCase() + '_green.png';
+					element_2.style.backgroundColor = '#8DC63F';
+
+				}
+
+				if( 'A'.toLowerCase() != selected_2 )
+				{
+										document.getElementById( 'timer_answer_' + selected_2 + '_' + 2 ).src = '/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/' + selected_2 + '_red.png';
+					document.getElementById( 'timer_answer_' + selected_2 + '_' + 2 ).style.backgroundColor = '#F26D7D';
+									}
+
+				show_answer_id_2 = setInterval( blink_right_answer_2, 200 );
+
+				
+			}
+			timer_offset_2 = 0;
+		}
+
+
+		function checkAnswerType_2(id){
+			if($.cookie('timer.popup_showed') == 3){
+				return true;
+			}
+
+			if(id){
+				$.cookie('timer.add_answer_without_start', null);
+			}
+			else{
+				var count = 1;
+				if(parseInt($.cookie('timer.add_answer_without_start'))){
+					count = parseInt($.cookie('timer.add_answer_without_start')) + 1;
+				}
+
+				if(!$.cookie('timer.popup_showed') && count == 3){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 1, { expires: 356 });
+				}
+				else if($.cookie('timer.popup_showed') == 1 && count == 10){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 2, { expires: 356 });
+				}
+				else if($.cookie('timer.popup_showed') == 2 && count == 20){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 3, { expires: 356 });
+				}
+
+				$.cookie('timer.add_answer_without_start', count, { expires: 356 });
+			}
+		}
+
+		function callbackStoreAnswer_2( xmlDoc )
+		{
+
+						document.getElementById("wrap_btn_question_2").classList.add('enabled');
+			
+			setTimeout(function(){write_timer_message_2(xmlDoc.getElementsByTagName("message")[0].firstChild.nodeValue);},1000);
+
+			setTimeout(function(){enable_timer_answer_group_2();},1000);
+
+			if(xmlDoc.getElementsByTagName("error")[0].firstChild.nodeValue > 0)
+				return false;
+
+
+			var a = xmlDoc.getElementsByTagName("percentage_answers_a")[0].firstChild.nodeValue;
+			var b = xmlDoc.getElementsByTagName("percentage_answers_b")[0].firstChild.nodeValue;
+			var c = xmlDoc.getElementsByTagName("percentage_answers_c")[0].firstChild.nodeValue;
+			var d = xmlDoc.getElementsByTagName("percentage_answers_d")[0].firstChild.nodeValue;
+			var e = xmlDoc.getElementsByTagName("percentage_answers_e")[0].firstChild.nodeValue;
+			var off_answer = xmlDoc.getElementsByTagName("offical_answers")[0].firstChild.nodeValue;
+			var error = xmlDoc.getElementsByTagName("error")[0].firstChild.nodeValue;
+
+						phpbbTimerResult_2(a,b,c,d,e,off_answer,error);
+			             
+			const topicAttempts = xmlDoc.getElementsByTagName('topic_attempts');
+			const correctAnswer = xmlDoc.getElementsByTagName('correct_answer')[0].firstChild.nodeValue;
+			const timer=document.getElementById("timer_message_2").parentElement;
+			const historyTable = timer.querySelector('.historyTable'); 
+			historyTable.innerHTML = '';
+			const header='<div class="historyTableHead"><div class="date">Date</div><div class="time">Time</div><div class="result">Result</div></div>'
+			historyTable.innerHTML += header;
+
+			let topicAttemptsArr=Array.from(topicAttempts[0].children);
+			topicAttemptsArr.forEach(attempt => {
+				const attemptRow = document.createElement('div');
+				attemptRow.classList.add('historyTableRow');
+				const dateSpan = document.createElement('div');
+				dateSpan.classList.add('date');
+				dateSpan.textContent = attempt.getElementsByTagName("date")[0].firstChild.nodeValue;
+				const correctDuration= attempt.getElementsByTagName("timer_duration_class_name_is_correct")[0].firstChild.nodeValue;
+				const timeSpan = document.createElement('div');
+				timeSpan.classList.add('time');
+				if(correctDuration=="1"){
+					timeSpan.classList.add('green');
+				}
+				timeSpan.textContent = attempt.getElementsByTagName("time")[0].firstChild.nodeValue;
+				const selectedAnswer= attempt.getElementsByTagName("selected_answer")[0].firstChild.nodeValue;
+				const resultSpan = document.createElement('div');
+				resultSpan.classList.add('result');
+				const result= attempt.getElementsByTagName("result")[0].firstChild.nodeValue;
+				let svgIcon = '';
+				if (result === '2') {
+					svgIcon = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-2"></use>
+						</svg>
+					`;
+				} else if (result === '3') {
+					svgIcon = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-3"></use>
+						</svg>
+					`;
+				}
+				resultSpan.innerHTML = svgIcon;
+				const answersPopup = selectedAnswer == correctAnswer ? '<div class="answersPopup"><div class="answersPopupRow">Correct Answer: <span>' + correctAnswer + '</span></div></div>'
+				:'<div class="answersPopup"><div class="answersPopupRow first">My Answer: <span>' + selectedAnswer + '</span></div><div class="answersPopupRow">Correct Answer: <span>' + correctAnswer + '</span></div></div>';
+				resultSpan.innerHTML += answersPopup;
+
+				attemptRow.appendChild(dateSpan);
+				attemptRow.appendChild(timeSpan);
+				attemptRow.appendChild(resultSpan);
+
+				historyTable.appendChild(attemptRow);
+			})
+			showMoreHistoryBtn()
+		}
+
+		function phpbbTimerResult_2(a,b,c,d,e,off_answer,error)
+		{
+
+			if( ((a+b+c+d+e) > 0) && (error == 0))
+			{
+				var i = 0;
+
+				$('.statisticWrap_2').each(function() {
+
+					var sumbol = '', value = 0;
+
+					switch(i)
+					{
+						case 0:{
+							sumbol = 'a';
+							value = a;
+						}break;
+						case 1:{
+							sumbol = 'b';
+							value = b;
+						}break;
+						case 2:{
+							sumbol = 'c';
+							value = c;
+						}break;
+						case 3:{
+							sumbol = 'd';
+							value = d;
+						}break;
+						case 4:{
+							sumbol = 'e';
+							value = e;
+						}break;
+					}
+
+
+					if(off_answer == (++i))
+					{
+												$(this).addClass('correctAnswer');
+											}
+
+					if((selected_answer_2 - 10) == i)
+					{
+												$(this).addClass('selectedAnswer');
+											}
+
+					var tpl = '<span class="answerType">'+sumbol+'</span>';
+					tpl	+= '<span class="answerPercentage correctAnswer">'+value+'%</span>';
+					tpl	+= '<div style="height: '+value+'%;" class="answerStatistic"></div>';
+
+					$(this).html(tpl);
+
+				});
+			};
+
+		}
+
+		function store_answer_2( answer_2 )
+		{
+			var timer_duration_2 = 0;
+
+			if(timer_stop_time_2 !== null && timer_start_time_2 !== null)
+			{
+				timer_duration_2 = Math.floor( ( timer_stop_time_2.getTime() - timer_start_time_2.getTime() ) / 1000);
+			}
+			var url = "/forum/timer_rc.php?topic_id=418338&question_id=2&user_id=1548198&timer_duration=" + timer_duration_2 + "&timer_answer=" + answer_2 + "&r=" + Math.random() + "";
+			sendAjax( "GET", url, callbackStoreAnswer_2 );
+		}
+
+		var timer_offset_2 = 0;
+
+		function timer_click_2(reset)
+		{
+			let  timerDisplay = document.getElementById('timer_display_2');
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;	
+		if (reset){
+			document.getElementById('timer_display_2').innerHTML = "00:00";
+			document.getElementById('timer_button_2').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+			document.getElementById('timer_play_2').classList.remove('playing');
+			clearInterval(timer_id_2 );
+			timer_offset_2 = 0;
+			timer_id_2 = 0; 
+			let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+			resetMessageBlock.classList.add('active');
+		}else if ( timer_id_2 == 0 )
+			{
+				const spoilerElement = document.querySelector("[id^='spoiler_'][id$='2']");
+				if (spoilerElement) {
+					const upRowElement = spoilerElement.closest('.upRow.show');
+					if (upRowElement) {
+						upRowElement.click();
+					}
+				}
+
+				document.getElementById('timer_button_2').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_pause_btn.svg";
+				document.getElementById('timer_message_2').innerHTML = "";
+				let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+				resetMessageBlock.classList.remove('active');
+				var i = 0;
+				$('.statisticWrap_2').each(function() {
+
+					var sumbol = '', value = 0;
+
+					switch(i)
+					{
+						case 0:{
+							sumbol = 'a';
+							value = 11;
+						}break;
+						case 1:{
+							sumbol = 'b';
+							value = 12;
+						}break;
+						case 2:{
+							sumbol = 'c';
+							value = 13;
+						}break;
+						case 3:{
+							sumbol = 'd';
+							value = 14;
+						}break;
+						case 4:{
+							sumbol = 'e';
+							value = 15;
+						}break;
+					}
+
+					$(this).removeClass('correctAnswer');
+					$(this).removeClass('selectedAnswer');
+
+					var tpl = '<div id="timer_answer_'+sumbol+'_2" onclick="timer_answer_2('+value+')" class="answerOption" style="height: 100%;" >'+sumbol.toUpperCase()+'</div>';
+
+					$(this).html(tpl);
+
+					i++;
+
+				});
+				timer_start_time_2 = new Date();
+				timer_start_time_2.setTime(timer_start_time_2.getTime() - timer_offset_2);
+
+				document.getElementById('timer_play_2').classList.add('playing');
+				// let  timerDisplay = document.getElementById('timer_display_2');
+				// let  timerContainer = timerDisplay.parentElement.parentElement;
+				let  showAnswerBlock = timerContainer.querySelector('.showAnswer');
+				showAnswerBlock.classList.add('hidden');
+				let  buttonsBlock = timerContainer.querySelector('.buttons');
+				buttonsBlock.classList.remove('hidden');
+				let  correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+				correctAnswerBlock.classList.add('hidden');
+
+				toggle_user_options('hide', 'timer_statistics');
+
+				if(timer_offset_2 > 0)
+					timer_loop_2();
+				else
+					document.getElementById('timer_display_2').innerHTML = "00:00";
+				timer_id_2 = setInterval( timer_loop_2, 200 );
+
+				selected_answer_2 = null;
+
+							}
+		else
+			{
+				timer_rc_click_stop_2();
+			}
+		}
+		
+		function timer_rc_click_stop_2()
+		{
+			if (timer_id_2 != 0) {
+				timer_stop_time_2 = new Date();
+				timer_offset_2 = timer_stop_time_2.getTime() - timer_start_time_2.getTime();
+				document.getElementById('timer_play_2').classList.remove('playing');
+				clearInterval( timer_id_2 );
+				timer_id_2 = 0;
+				document.getElementById('timer_button_2').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+
+				if(selected_answer_2 !== null)
+				store_answer_2(0);
+
+							}
+		}
+
+		function blink_right_answer_2()
+		{
+			var element = document.getElementById( 'timer_answer_A_2'.toLowerCase() );
+			if ( element != null )
+			{
+				if( element.style.visibility == "hidden" )
+				{
+					element.style.visibility = "visible";
+
+				} else {
+
+					element.style.visibility = "hidden";
+				}
+			}
+		}
+
+		function timer_loop_2()
+		{
+			var current_time_2 = new Date();
+			var timer_elapsed_2 = 0;
+			var timer_minutes_2 = 0;
+			var timer_seconds_2 = 0;
+
+			timer_elapsed_2 = current_time_2.getTime() - timer_start_time_2.getTime();
+			timer_elapsed_2 = Math.floor(timer_elapsed_2 / 1000);
+			timer_minutes_2 = Math.floor(timer_elapsed_2 / 60);
+			timer_seconds_2 = timer_elapsed_2 - timer_minutes_2 * 60;
+
+			if( timer_minutes_2 < 10 )
+			{
+				timer_minutes_2= "0" + timer_minutes_2;
+			}
+
+			if( timer_seconds_2 < 10 )
+			{
+				timer_seconds_2 = "0" + timer_seconds_2;
+			}
+
+			document.getElementById('timer_display_2').innerHTML = timer_minutes_2 + ":" + timer_seconds_2;
+		}
+
+		function write_timer_message_2( message_2 )
+		{
+			document.getElementById( 'timer_message_2' ).innerHTML = message_2;
+		}
+
+
+		function enable_timer_answer_group_2()
+		{
+			if ( show_answer_id_2 != 0 )
+			{
+				clearInterval( show_answer_id_2 );
+				show_answer_id_2 = 0;
+			}
+
+			var element_2 = document.getElementById( 'timer_answer_A_2'.toLowerCase() );
+			if ( element_2 != null )
+			{
+				element_2.style.visibility = "visible";
+			}
+
+
+			if( document.getElementById( 'timer_answer_1_2' ) )
+			{
+				document.getElementById( 'timer_answer_1_2' ).disabled = false;
+			}
+
+			if( document.getElementById( 'timer_answer_2_2' ) )
+			{
+				document.getElementById( 'timer_answer_2_2' ).disabled = false;
+			}
+
+			if( document.getElementById( 'timer_answer_3_2'))
+			{
+				document.getElementById( 'timer_answer_3_2').disabled = false;
+			}
+
+
+			if ( document.getElementById( 'timer_answer_a_2' ) )
+			{
+				document.getElementById( 'timer_answer_a_2' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/a_white.png";
+				document.getElementById( 'timer_answer_a_2' ).onclick = function() { timer_answer_2( 11 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_b_2' ) )
+			{
+				document.getElementById( 'timer_answer_b_2' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/b_white.png";
+				document.getElementById( 'timer_answer_b_2' ).onclick = function() { timer_answer_2( 12 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_c_2' ) )
+			{
+				document.getElementById( 'timer_answer_c_2' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/c_white.png";
+				document.getElementById( 'timer_answer_c_2' ).onclick = function() { timer_answer_2( 13 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_d_2' ) )
+			{
+				document.getElementById( 'timer_answer_d_2' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/d_white.png";
+				document.getElementById( 'timer_answer_d_2' ).onclick = function() { timer_answer_2( 14 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_e_2' ) )
+			{
+				document.getElementById( 'timer_answer_e_2' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/e_white.png";
+				document.getElementById( 'timer_answer_e_2' ).onclick = function() { timer_answer_2( 15 ) };
+			}
+		}
+		function showCorrectAnswerRC(id){
+			let  timerDisplay = document.getElementById(id);
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+
+			const lastNumber = id.substring(id.lastIndexOf('_') + 1);
+			const spoilerElement = document.querySelector("[id^='spoiler_'][id$='" + lastNumber + "']");
+			if (spoilerElement) {
+				const upRowElement = spoilerElement.closest('.upRow');
+				if (upRowElement && !upRowElement.classList.contains('show')) {
+					upRowElement.click();
+				}
+			}
+
+
+			if ($(timerContainer).hasClass('unactiveTimer')) {
+				if ("1"){
+					var state = $('.item.timer').hasClass('unactiveTimer') ? 'show': 'hide';
+
+					if (!"1" && typeof(Storage) !== "undefined") {
+						localStorage.setItem("GUEST_SHOW_TIMER_STATISTICS", state);
+						toggle_timer_statistics(state);
+					} else {
+						toggle_user_options(state, 'timer_statistics');
+					}
+				}
+			}
+		}
+		function showAnswerRCMessage(id){
+			let  timerDisplay = document.getElementById(id);
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+			let  showAnswerMessage = timerContainer.querySelector('.showAnswerMessage');
+			showAnswerMessage.classList.add('active');
+		}
+        
+		window.addEventListener("load", function(){
+			$('.upRow').on('click', function(){
+				let spoilerElement = $(this).find(".downRow");
+				let id = spoilerElement.attr("id");
+				let questionNumber = id.split("_")[id.split("_").length - 1];
+				let timerDisplay = document.getElementById("timer_display_" + questionNumber);
+				let timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+				let showAnswerBlock = timerContainer.querySelector('.showAnswer');
+				let optionButtonsBlock = timerContainer.querySelector('.buttons');
+				optionButtonsBlock.classList.add('hidden');
+				// showAnswerBlock.click();
+				showAnswerBlock.classList.add('hidden');
+				let  correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+				correctAnswerBlock.classList.remove('hidden');
+				if ($(this).hasClass('show')) {
+					toggle_user_options('show', 'timer_statistics');
+					if (timer_id_2 > 0 ){
+						timer_click_2(true)
+					}
+				}
+			if (!$(this).hasClass('show')) {
+				let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+			         resetMessageBlock.classList.remove('active');
+				toggle_user_options('hide', 'timer_statistics');
+				if($(optionButtonsBlock).hasClass('hidden')){
+					$(showAnswerBlock).removeClass('hidden');
+					let correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+					correctAnswerBlock.classList.add('hidden');
+				}
+			}
+			})
+		});
+	 function showMoreHistoryBtn (){
+			$('.historyTable').each(function() {
+				if ($(this).children().length > 4) {
+					$(this).css({
+						'height': '100px',
+					});
+					if (!$(this).next().hasClass('showMoreHistory')) {
+						let showMoreBtn = $('<button class="showMoreHistory">Show More</button>');
+						$(this).after(showMoreBtn);
+						showMoreBtn.on('click', function() {
+							if ($(this).prev().css('height') === '100px') {
+								$(this).prev().css('height', 'auto');
+								$(this).text('Show Less');
+							} else {
+								$(this).prev().css('height', '100px');
+								$(this).text('Show More');
+							}
+						});
+					}
+				}
+			});
+		};
+		window.addEventListener("load", showMoreHistoryBtn)
+	</script>
+	<div>
+		Question 2	</div>
+		<div class="itemRC item timer unactiveTimer">
+		<div class="timerBox">
+			<div class="logo">
+				<a href="/dailypractice" target="_blank"><img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_logo_new_small.svg" alt="">
+					<div class="logoPopup">GMAT Timer</div>
+				</a>
+			</div>
+			<div id="timer_play_2" class="timerBlock timerBlockPlay" onclick="timer_click_2()">
+				<div class="play">
+					<img id="timer_button_2" onmouseover="this.style.cursor='pointer';" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg" alt="">
+				</div>
+				<div id="timer_display_2" class="time">
+					<!-- 02:30 -->
+					00:00
+									</div>
+				<div class="timerStartPopup">Start Timer</div>
+				<div class="timerPausePopup">Pause Timer</div>
+				<div class="timerResumePopup">Resume Timer</div>
+			</div>
+			<div class="timerBlock showAnswer" onclick="showCorrectAnswerRC('timer_display_2')">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 23 30" fill="none">
+				<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-show-answer"></use>
+			</svg>
+			Show Answer
+
+		</div>
+		<div class="correctAnswerBlock hidden">
+			<div class="statisticWrapExisting 
+			 correctAnswer			"><span class="answerType">a</span><span class="answerPercentage">35%</span><div style="height:35%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+			 selectedAnswer			"><span class="answerType">b</span><span class="answerPercentage">10%</span><div style="height:10%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">c</span><span class="answerPercentage">17%</span><div style="height:17%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">d</span><span class="answerPercentage">32%</span><div style="height:32%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">e</span><span class="answerPercentage">6%</span><div style="height:6%;" class="answerStatistic"></div></div>
+		</div>
+		<div class="timerBlock correctAnswerBlock hidden">
+			Correct Answer: A		</div>
+		<div id="timer_abcde" class="buttons hidden">
+			<div class="statisticWrap statisticWrap_2">
+				<div id="timer_answer_a_2" onclick="timer_answer_2(11)" class="answerOption" style="height: 100%;">
+					A
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_2">
+				<div id="timer_answer_b_2" onclick="timer_answer_2(12)" class="answerOption" style="height: 100%;">
+					B
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_2">
+				<div id="timer_answer_c_2" onclick="timer_answer_2(13)" class="answerOption" style="height: 100%;">
+					C
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_2">
+				<div id="timer_answer_d_2" onclick="timer_answer_2(14)" class="answerOption" style="height: 100%;">
+					D
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_2">
+				<div id="timer_answer_e_2" onclick="timer_answer_2(15)" class="answerOption" style="height: 100%;">
+					E
+				</div>
+			</div>
+		</div>
+		<div class="timerBlock history">
+			<div class="historyBtn hideTimer ">
+				<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-show-history"></use>
+				</svg>
+				<div class="historyBtnTexts">
+					<div class="hidenTimer" style="display: none;">Hide</div>
+					<div class="shownTimer" style="display: inline-block;">Show</div>
+					History
+				</div>
+			</div>
+			<div class="addNotesButton  enabled" id="wrap_btn_question_2">
+				<svg class="no-mistake" width="12" height="12" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-no-mistake"></use>
+				</svg>
+				<svg class="has-mistake" width="12" height="12" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-has-mistake"></use>
+				</svg>
+				<button data-popup-rc="" data-forum-name="137" data-note="" data-mistakes="[]" data-question-id="2" id="btn_question_2" data-timer-ind="2">
+												<span class="text">
+																										Tag Mistake
+																									</span>
+				</button>
+			</div>
+		</div>
+		<a href="/forum/analytics.php#error_log" class="errorLogBtn" target="_blank">
+			<svg width="36" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-error-log"></use>
+			</svg>
+			<div class="errorLogBtnPopup">Error Log</div>
+		</a>
+	</div>
+	<div class="showAnswerMessage">A</div>
+	<div class="workbookBlock" id="timer_message_2"></div>
+	<div id="reset_message">Be sure to select an answer first to save it in the Error Log before revealing the correct answer (OA)!</div>
+	<div class="timerResult">
+		<div class="timerResultLeft">
+			<div class="difficulty" id="timer_difficulty">
+								<p>Difficulty:</p>
+				<div>
+													<span class="difImg">
+																												<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_hard.svg" alt="">
+														<!-- <img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" />
+														<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" />
+														<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" /> -->
+																											</span>
+					<b>
+
+						85%					</b>
+					(hard)
+				</div>
+							</div>
+
+			<div class="question">
+				<p>Question Stats:</p>
+				<b>
+					<small>
+						35%
+					</small>
+				</b>
+				<small>
+					(01:17)
+				</small>
+				correct				<img class="sep" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_separator.png" alt=""> <span class="red"><b><small>65%</small></b>
+													<small>(01:18)</small></span> wrong				<img class="sep" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_separator.png" alt="">
+				<span style="width:10px;">&nbsp;</span>
+				<span class="black">
+												based on													<b>834</b>
+												sessions												</span>
+			</div>
+		</div>
+		<div class="timerResultRight">
+			<p>History</p>
+			<div class="historyTable">
+				<div class="historyTableHead">
+					<div class="date">Date</div>
+					<div class="time">Time</div>
+					<div class="result">Result</div>
+				</div>
+								<div class="historyTableRow">
+					<div class="date">25 Sep 2025</div>
+					<div class="time ">02:30</div>
+					<div class="result">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-3"></use>
+						</svg>
+												<div class="answersPopup">
+															<div class="answersPopupRow first">
+									My Answer: <span>B</span>
+								</div>
+															<div class="answersPopupRow">
+									Correct Answer: <span>A</span>
+								</div>
+							</div>
+					</div>
+				</div>
+							</div>
+		</div>
+	</div>
+	</div>
+</div><span style="font-weight: bold">2. The passage suggests that the "failure to explore the Native Americans' new world" (see highlighted text) resulted from historians'</span><br><br>A. emphasis on the contrast between the Old World and the New World<br>B. lack of familiarity with the precolonial history of Native Americans<br>C. inability to document the activities of Native Americans in colonial America<br>D. inability to reconstruct the interactions between Native Americans and immigrants to the New World<br>E. belief that physical environment has little effect on culture<br><br></div><div class="question_wrapper" id="question_wrapper_3" style="display: block;"><div id="rc_timer_placeholder_3" class="placeholderTimerRC">
+	<script type="text/javascript">
+		// <![CDATA[
+		/* Timer RC MOD B
+																 ------------------ */
+
+		var timer_start_time_3 = null;
+		var timer_stop_time_3 = null;
+		var timer_id_3 = 0;
+		var show_answer_id_3 = 0;
+		var selected_answer_3 = null;
+
+		function timer_answer_3( answer_3 )
+		{
+			var selected_3 = null;
+			selected_answer_3 = answer_3;
+			/**
+			 * Type of question ONE
+			 *
+			 */
+			if ( answer_3 >= 1 && answer_3 <= 3 )
+			{
+				if(document.getElementById( 'timer_answer_1_3' ) )
+				{
+					document.getElementById( 'timer_answer_1_3' ).disabled = true;
+				}
+
+				if(document.getElementById( 'timer_answer_2_3' ) )
+				{
+					document.getElementById( 'timer_answer_2_3' ).disabled = true;
+				}
+
+				if(document.getElementById( 'timer_answer_3_3' ) )
+				{
+					document.getElementById( 'timer_answer_3_3' ).disabled = true;
+				}
+
+				setTimeout(function(){ store_answer_3( answer_3 ); }, 10 );
+			}
+
+			/**
+			 * Type of question TWO
+			 *
+			 */
+			if ( answer_3 >= 11 && answer_3 <= 15 )
+			{
+				if( document.getElementById( 'timer_answer_a_3' ) )
+				{
+					document.getElementById( 'timer_answer_a_3' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_b_3' ) )
+				{
+					document.getElementById( 'timer_answer_b_3' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_c_3' ) )
+				{
+					document.getElementById( 'timer_answer_c_3' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_d_3' ) )
+				{
+					document.getElementById( 'timer_answer_d_3' ).onclick = null;
+				}
+
+				if(document.getElementById( 'timer_answer_e_3' ) )
+				{
+					document.getElementById( 'timer_answer_e_3' ).onclick = null;
+				}
+
+				checkAnswerType_3(timer_id_3);
+
+				if ( timer_id_3 != 0 )
+				{
+					timer_stop_time_3 = new Date();
+					timer_offset_3 = timer_stop_time_3.getTime() - timer_start_time_3.getTime();
+					clearInterval( timer_id_3 );
+					timer_id_3 = 0;
+				}
+
+
+				document.getElementById('timer_button_3').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+
+
+				setTimeout(function() { store_answer_3( answer_3 ); }, 10 );
+
+				switch( answer_3 )
+				{
+				case 12:
+					{
+						selected_3 = 'b';
+
+					}break;
+
+				case 13:
+					{
+						selected_3 = 'c';
+
+					}break;
+
+				case 14:
+					{
+						selected_3 = 'd';
+
+					}break;
+
+				case 15:
+					{
+						selected_3 = 'e';
+
+					}break;
+
+				default:
+					{
+						selected_3 = 'a';
+
+					} break;
+				}
+
+				
+				write_timer_message_3("");
+
+				var element_3 = document.getElementById( 'timer_answer_B_3'.toLowerCase() );
+
+				if ( element_3 != null )
+				{
+					element_3.src = '/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/' + 'B'.toLowerCase() + '_green.png';
+					element_3.style.backgroundColor = '#8DC63F';
+
+				}
+
+				if( 'B'.toLowerCase() != selected_3 )
+				{
+										document.getElementById( 'timer_answer_' + selected_3 + '_' + 3 ).src = '/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/' + selected_3 + '_red.png';
+					document.getElementById( 'timer_answer_' + selected_3 + '_' + 3 ).style.backgroundColor = '#F26D7D';
+									}
+
+				show_answer_id_3 = setInterval( blink_right_answer_3, 200 );
+
+				
+			}
+			timer_offset_3 = 0;
+		}
+
+
+		function checkAnswerType_3(id){
+			if($.cookie('timer.popup_showed') == 3){
+				return true;
+			}
+
+			if(id){
+				$.cookie('timer.add_answer_without_start', null);
+			}
+			else{
+				var count = 1;
+				if(parseInt($.cookie('timer.add_answer_without_start'))){
+					count = parseInt($.cookie('timer.add_answer_without_start')) + 1;
+				}
+
+				if(!$.cookie('timer.popup_showed') && count == 3){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 1, { expires: 356 });
+				}
+				else if($.cookie('timer.popup_showed') == 1 && count == 10){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 2, { expires: 356 });
+				}
+				else if($.cookie('timer.popup_showed') == 2 && count == 20){
+					$('#popUp').modal('show');
+					$.cookie('timer.popup_showed', 3, { expires: 356 });
+				}
+
+				$.cookie('timer.add_answer_without_start', count, { expires: 356 });
+			}
+		}
+
+		function callbackStoreAnswer_3( xmlDoc )
+		{
+
+						document.getElementById("wrap_btn_question_3").classList.add('enabled');
+			
+			setTimeout(function(){write_timer_message_3(xmlDoc.getElementsByTagName("message")[0].firstChild.nodeValue);},1000);
+
+			setTimeout(function(){enable_timer_answer_group_3();},1000);
+
+			if(xmlDoc.getElementsByTagName("error")[0].firstChild.nodeValue > 0)
+				return false;
+
+
+			var a = xmlDoc.getElementsByTagName("percentage_answers_a")[0].firstChild.nodeValue;
+			var b = xmlDoc.getElementsByTagName("percentage_answers_b")[0].firstChild.nodeValue;
+			var c = xmlDoc.getElementsByTagName("percentage_answers_c")[0].firstChild.nodeValue;
+			var d = xmlDoc.getElementsByTagName("percentage_answers_d")[0].firstChild.nodeValue;
+			var e = xmlDoc.getElementsByTagName("percentage_answers_e")[0].firstChild.nodeValue;
+			var off_answer = xmlDoc.getElementsByTagName("offical_answers")[0].firstChild.nodeValue;
+			var error = xmlDoc.getElementsByTagName("error")[0].firstChild.nodeValue;
+
+						phpbbTimerResult_3(a,b,c,d,e,off_answer,error);
+			             
+			const topicAttempts = xmlDoc.getElementsByTagName('topic_attempts');
+			const correctAnswer = xmlDoc.getElementsByTagName('correct_answer')[0].firstChild.nodeValue;
+			const timer=document.getElementById("timer_message_3").parentElement;
+			const historyTable = timer.querySelector('.historyTable'); 
+			historyTable.innerHTML = '';
+			const header='<div class="historyTableHead"><div class="date">Date</div><div class="time">Time</div><div class="result">Result</div></div>'
+			historyTable.innerHTML += header;
+
+			let topicAttemptsArr=Array.from(topicAttempts[0].children);
+			topicAttemptsArr.forEach(attempt => {
+				const attemptRow = document.createElement('div');
+				attemptRow.classList.add('historyTableRow');
+				const dateSpan = document.createElement('div');
+				dateSpan.classList.add('date');
+				dateSpan.textContent = attempt.getElementsByTagName("date")[0].firstChild.nodeValue;
+				const correctDuration= attempt.getElementsByTagName("timer_duration_class_name_is_correct")[0].firstChild.nodeValue;
+				const timeSpan = document.createElement('div');
+				timeSpan.classList.add('time');
+				if(correctDuration=="1"){
+					timeSpan.classList.add('green');
+				}
+				timeSpan.textContent = attempt.getElementsByTagName("time")[0].firstChild.nodeValue;
+				const selectedAnswer= attempt.getElementsByTagName("selected_answer")[0].firstChild.nodeValue;
+				const resultSpan = document.createElement('div');
+				resultSpan.classList.add('result');
+				const result= attempt.getElementsByTagName("result")[0].firstChild.nodeValue;
+				let svgIcon = '';
+				if (result === '2') {
+					svgIcon = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-2"></use>
+						</svg>
+					`;
+				} else if (result === '3') {
+					svgIcon = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-3"></use>
+						</svg>
+					`;
+				}
+				resultSpan.innerHTML = svgIcon;
+				const answersPopup = selectedAnswer == correctAnswer ? '<div class="answersPopup"><div class="answersPopupRow">Correct Answer: <span>' + correctAnswer + '</span></div></div>'
+				:'<div class="answersPopup"><div class="answersPopupRow first">My Answer: <span>' + selectedAnswer + '</span></div><div class="answersPopupRow">Correct Answer: <span>' + correctAnswer + '</span></div></div>';
+				resultSpan.innerHTML += answersPopup;
+
+				attemptRow.appendChild(dateSpan);
+				attemptRow.appendChild(timeSpan);
+				attemptRow.appendChild(resultSpan);
+
+				historyTable.appendChild(attemptRow);
+			})
+			showMoreHistoryBtn()
+		}
+
+		function phpbbTimerResult_3(a,b,c,d,e,off_answer,error)
+		{
+
+			if( ((a+b+c+d+e) > 0) && (error == 0))
+			{
+				var i = 0;
+
+				$('.statisticWrap_3').each(function() {
+
+					var sumbol = '', value = 0;
+
+					switch(i)
+					{
+						case 0:{
+							sumbol = 'a';
+							value = a;
+						}break;
+						case 1:{
+							sumbol = 'b';
+							value = b;
+						}break;
+						case 2:{
+							sumbol = 'c';
+							value = c;
+						}break;
+						case 3:{
+							sumbol = 'd';
+							value = d;
+						}break;
+						case 4:{
+							sumbol = 'e';
+							value = e;
+						}break;
+					}
+
+
+					if(off_answer == (++i))
+					{
+												$(this).addClass('correctAnswer');
+											}
+
+					if((selected_answer_3 - 10) == i)
+					{
+												$(this).addClass('selectedAnswer');
+											}
+
+					var tpl = '<span class="answerType">'+sumbol+'</span>';
+					tpl	+= '<span class="answerPercentage correctAnswer">'+value+'%</span>';
+					tpl	+= '<div style="height: '+value+'%;" class="answerStatistic"></div>';
+
+					$(this).html(tpl);
+
+				});
+			};
+
+		}
+
+		function store_answer_3( answer_3 )
+		{
+			var timer_duration_3 = 0;
+
+			if(timer_stop_time_3 !== null && timer_start_time_3 !== null)
+			{
+				timer_duration_3 = Math.floor( ( timer_stop_time_3.getTime() - timer_start_time_3.getTime() ) / 1000);
+			}
+			var url = "/forum/timer_rc.php?topic_id=418338&question_id=3&user_id=1548198&timer_duration=" + timer_duration_3 + "&timer_answer=" + answer_3 + "&r=" + Math.random() + "";
+			sendAjax( "GET", url, callbackStoreAnswer_3 );
+		}
+
+		var timer_offset_3 = 0;
+
+		function timer_click_3(reset)
+		{
+			let  timerDisplay = document.getElementById('timer_display_3');
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;	
+		if (reset){
+			document.getElementById('timer_display_3').innerHTML = "00:00";
+			document.getElementById('timer_button_3').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+			document.getElementById('timer_play_3').classList.remove('playing');
+			clearInterval(timer_id_3 );
+			timer_offset_3 = 0;
+			timer_id_3 = 0; 
+			let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+			resetMessageBlock.classList.add('active');
+		}else if ( timer_id_3 == 0 )
+			{
+				const spoilerElement = document.querySelector("[id^='spoiler_'][id$='3']");
+				if (spoilerElement) {
+					const upRowElement = spoilerElement.closest('.upRow.show');
+					if (upRowElement) {
+						upRowElement.click();
+					}
+				}
+
+				document.getElementById('timer_button_3').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_pause_btn.svg";
+				document.getElementById('timer_message_3').innerHTML = "";
+				let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+				resetMessageBlock.classList.remove('active');
+				var i = 0;
+				$('.statisticWrap_3').each(function() {
+
+					var sumbol = '', value = 0;
+
+					switch(i)
+					{
+						case 0:{
+							sumbol = 'a';
+							value = 11;
+						}break;
+						case 1:{
+							sumbol = 'b';
+							value = 12;
+						}break;
+						case 2:{
+							sumbol = 'c';
+							value = 13;
+						}break;
+						case 3:{
+							sumbol = 'd';
+							value = 14;
+						}break;
+						case 4:{
+							sumbol = 'e';
+							value = 15;
+						}break;
+					}
+
+					$(this).removeClass('correctAnswer');
+					$(this).removeClass('selectedAnswer');
+
+					var tpl = '<div id="timer_answer_'+sumbol+'_3" onclick="timer_answer_3('+value+')" class="answerOption" style="height: 100%;" >'+sumbol.toUpperCase()+'</div>';
+
+					$(this).html(tpl);
+
+					i++;
+
+				});
+				timer_start_time_3 = new Date();
+				timer_start_time_3.setTime(timer_start_time_3.getTime() - timer_offset_3);
+
+				document.getElementById('timer_play_3').classList.add('playing');
+				// let  timerDisplay = document.getElementById('timer_display_3');
+				// let  timerContainer = timerDisplay.parentElement.parentElement;
+				let  showAnswerBlock = timerContainer.querySelector('.showAnswer');
+				showAnswerBlock.classList.add('hidden');
+				let  buttonsBlock = timerContainer.querySelector('.buttons');
+				buttonsBlock.classList.remove('hidden');
+				let  correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+				correctAnswerBlock.classList.add('hidden');
+
+				toggle_user_options('hide', 'timer_statistics');
+
+				if(timer_offset_3 > 0)
+					timer_loop_3();
+				else
+					document.getElementById('timer_display_3').innerHTML = "00:00";
+				timer_id_3 = setInterval( timer_loop_3, 200 );
+
+				selected_answer_3 = null;
+
+							}
+		else
+			{
+				timer_rc_click_stop_3();
+			}
+		}
+		
+		function timer_rc_click_stop_3()
+		{
+			if (timer_id_3 != 0) {
+				timer_stop_time_3 = new Date();
+				timer_offset_3 = timer_stop_time_3.getTime() - timer_start_time_3.getTime();
+				document.getElementById('timer_play_3').classList.remove('playing');
+				clearInterval( timer_id_3 );
+				timer_id_3 = 0;
+				document.getElementById('timer_button_3').src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg";
+
+				if(selected_answer_3 !== null)
+				store_answer_3(0);
+
+							}
+		}
+
+		function blink_right_answer_3()
+		{
+			var element = document.getElementById( 'timer_answer_B_3'.toLowerCase() );
+			if ( element != null )
+			{
+				if( element.style.visibility == "hidden" )
+				{
+					element.style.visibility = "visible";
+
+				} else {
+
+					element.style.visibility = "hidden";
+				}
+			}
+		}
+
+		function timer_loop_3()
+		{
+			var current_time_3 = new Date();
+			var timer_elapsed_3 = 0;
+			var timer_minutes_3 = 0;
+			var timer_seconds_3 = 0;
+
+			timer_elapsed_3 = current_time_3.getTime() - timer_start_time_3.getTime();
+			timer_elapsed_3 = Math.floor(timer_elapsed_3 / 1000);
+			timer_minutes_3 = Math.floor(timer_elapsed_3 / 60);
+			timer_seconds_3 = timer_elapsed_3 - timer_minutes_3 * 60;
+
+			if( timer_minutes_3 < 10 )
+			{
+				timer_minutes_3= "0" + timer_minutes_3;
+			}
+
+			if( timer_seconds_3 < 10 )
+			{
+				timer_seconds_3 = "0" + timer_seconds_3;
+			}
+
+			document.getElementById('timer_display_3').innerHTML = timer_minutes_3 + ":" + timer_seconds_3;
+		}
+
+		function write_timer_message_3( message_3 )
+		{
+			document.getElementById( 'timer_message_3' ).innerHTML = message_3;
+		}
+
+
+		function enable_timer_answer_group_3()
+		{
+			if ( show_answer_id_3 != 0 )
+			{
+				clearInterval( show_answer_id_3 );
+				show_answer_id_3 = 0;
+			}
+
+			var element_3 = document.getElementById( 'timer_answer_B_3'.toLowerCase() );
+			if ( element_3 != null )
+			{
+				element_3.style.visibility = "visible";
+			}
+
+
+			if( document.getElementById( 'timer_answer_1_3' ) )
+			{
+				document.getElementById( 'timer_answer_1_3' ).disabled = false;
+			}
+
+			if( document.getElementById( 'timer_answer_2_3' ) )
+			{
+				document.getElementById( 'timer_answer_2_3' ).disabled = false;
+			}
+
+			if( document.getElementById( 'timer_answer_3_3'))
+			{
+				document.getElementById( 'timer_answer_3_3').disabled = false;
+			}
+
+
+			if ( document.getElementById( 'timer_answer_a_3' ) )
+			{
+				document.getElementById( 'timer_answer_a_3' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/a_white.png";
+				document.getElementById( 'timer_answer_a_3' ).onclick = function() { timer_answer_3( 11 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_b_3' ) )
+			{
+				document.getElementById( 'timer_answer_b_3' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/b_white.png";
+				document.getElementById( 'timer_answer_b_3' ).onclick = function() { timer_answer_3( 12 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_c_3' ) )
+			{
+				document.getElementById( 'timer_answer_c_3' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/c_white.png";
+				document.getElementById( 'timer_answer_c_3' ).onclick = function() { timer_answer_3( 13 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_d_3' ) )
+			{
+				document.getElementById( 'timer_answer_d_3' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/d_white.png";
+				document.getElementById( 'timer_answer_d_3' ).onclick = function() { timer_answer_3( 14 ) };
+			}
+
+			if ( document.getElementById( 'timer_answer_e_3' ) )
+			{
+				document.getElementById( 'timer_answer_e_3' ).src="/forum/styles/gmatclub_light/theme/images/viewtopic/buttons/e_white.png";
+				document.getElementById( 'timer_answer_e_3' ).onclick = function() { timer_answer_3( 15 ) };
+			}
+		}
+		function showCorrectAnswerRC(id){
+			let  timerDisplay = document.getElementById(id);
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+
+			const lastNumber = id.substring(id.lastIndexOf('_') + 1);
+			const spoilerElement = document.querySelector("[id^='spoiler_'][id$='" + lastNumber + "']");
+			if (spoilerElement) {
+				const upRowElement = spoilerElement.closest('.upRow');
+				if (upRowElement && !upRowElement.classList.contains('show')) {
+					upRowElement.click();
+				}
+			}
+
+
+			if ($(timerContainer).hasClass('unactiveTimer')) {
+				if ("1"){
+					var state = $('.item.timer').hasClass('unactiveTimer') ? 'show': 'hide';
+
+					if (!"1" && typeof(Storage) !== "undefined") {
+						localStorage.setItem("GUEST_SHOW_TIMER_STATISTICS", state);
+						toggle_timer_statistics(state);
+					} else {
+						toggle_user_options(state, 'timer_statistics');
+					}
+				}
+			}
+		}
+		function showAnswerRCMessage(id){
+			let  timerDisplay = document.getElementById(id);
+			let  timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+			let  showAnswerMessage = timerContainer.querySelector('.showAnswerMessage');
+			showAnswerMessage.classList.add('active');
+		}
+        
+		window.addEventListener("load", function(){
+			$('.upRow').on('click', function(){
+				let spoilerElement = $(this).find(".downRow");
+				let id = spoilerElement.attr("id");
+				let questionNumber = id.split("_")[id.split("_").length - 1];
+				let timerDisplay = document.getElementById("timer_display_" + questionNumber);
+				let timerContainer = timerDisplay.parentElement.parentElement.parentElement;
+				let showAnswerBlock = timerContainer.querySelector('.showAnswer');
+				let optionButtonsBlock = timerContainer.querySelector('.buttons');
+				optionButtonsBlock.classList.add('hidden');
+				// showAnswerBlock.click();
+				showAnswerBlock.classList.add('hidden');
+				let  correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+				correctAnswerBlock.classList.remove('hidden');
+				if ($(this).hasClass('show')) {
+					toggle_user_options('show', 'timer_statistics');
+					if (timer_id_3 > 0 ){
+						timer_click_3(true)
+					}
+				}
+			if (!$(this).hasClass('show')) {
+				let  resetMessageBlock = timerContainer.querySelector('#reset_message');
+			         resetMessageBlock.classList.remove('active');
+				toggle_user_options('hide', 'timer_statistics');
+				if($(optionButtonsBlock).hasClass('hidden')){
+					$(showAnswerBlock).removeClass('hidden');
+					let correctAnswerBlock = timerContainer.querySelector('.correctAnswerBlock');
+					correctAnswerBlock.classList.add('hidden');
+				}
+			}
+			})
+		});
+	 function showMoreHistoryBtn (){
+			$('.historyTable').each(function() {
+				if ($(this).children().length > 4) {
+					$(this).css({
+						'height': '100px',
+					});
+					if (!$(this).next().hasClass('showMoreHistory')) {
+						let showMoreBtn = $('<button class="showMoreHistory">Show More</button>');
+						$(this).after(showMoreBtn);
+						showMoreBtn.on('click', function() {
+							if ($(this).prev().css('height') === '100px') {
+								$(this).prev().css('height', 'auto');
+								$(this).text('Show Less');
+							} else {
+								$(this).prev().css('height', '100px');
+								$(this).text('Show More');
+							}
+						});
+					}
+				}
+			});
+		};
+		window.addEventListener("load", showMoreHistoryBtn)
+	</script>
+	<div>
+		Question 3	</div>
+		<div class="itemRC item timer unactiveTimer">
+		<div class="timerBox">
+			<div class="logo">
+				<a href="/dailypractice" target="_blank"><img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_logo_new_small.svg" alt="">
+					<div class="logoPopup">GMAT Timer</div>
+				</a>
+			</div>
+			<div id="timer_play_3" class="timerBlock timerBlockPlay" onclick="timer_click_3()">
+				<div class="play">
+					<img id="timer_button_3" onmouseover="this.style.cursor='pointer';" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_play_btn.svg" alt="">
+				</div>
+				<div id="timer_display_3" class="time">
+					<!-- 01:20 -->
+					00:00
+									</div>
+				<div class="timerStartPopup">Start Timer</div>
+				<div class="timerPausePopup">Pause Timer</div>
+				<div class="timerResumePopup">Resume Timer</div>
+			</div>
+			<div class="timerBlock showAnswer" onclick="showCorrectAnswerRC('timer_display_3')">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 23 30" fill="none">
+				<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-show-answer"></use>
+			</svg>
+			Show Answer
+
+		</div>
+		<div class="correctAnswerBlock hidden">
+			<div class="statisticWrapExisting 
+			 selectedAnswer			"><span class="answerType">a</span><span class="answerPercentage">5%</span><div style="height:5%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+			 correctAnswer			"><span class="answerType">b</span><span class="answerPercentage">64%</span><div style="height:64%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">c</span><span class="answerPercentage">24%</span><div style="height:24%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">d</span><span class="answerPercentage">1%</span><div style="height:1%;" class="answerStatistic"></div></div>
+			<div class="statisticWrapExisting 
+						"><span class="answerType">e</span><span class="answerPercentage">6%</span><div style="height:6%;" class="answerStatistic"></div></div>
+		</div>
+		<div class="timerBlock correctAnswerBlock hidden">
+			Correct Answer: B		</div>
+		<div id="timer_abcde" class="buttons hidden">
+			<div class="statisticWrap statisticWrap_3">
+				<div id="timer_answer_a_3" onclick="timer_answer_3(11)" class="answerOption" style="height: 100%;">
+					A
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_3">
+				<div id="timer_answer_b_3" onclick="timer_answer_3(12)" class="answerOption" style="height: 100%;">
+					B
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_3">
+				<div id="timer_answer_c_3" onclick="timer_answer_3(13)" class="answerOption" style="height: 100%;">
+					C
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_3">
+				<div id="timer_answer_d_3" onclick="timer_answer_3(14)" class="answerOption" style="height: 100%;">
+					D
+				</div>
+			</div>
+			<div class="statisticWrap statisticWrap_3">
+				<div id="timer_answer_e_3" onclick="timer_answer_3(15)" class="answerOption" style="height: 100%;">
+					E
+				</div>
+			</div>
+		</div>
+		<div class="timerBlock history">
+			<div class="historyBtn hideTimer ">
+				<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-show-history"></use>
+				</svg>
+				<div class="historyBtnTexts">
+					<div class="hidenTimer" style="display: none;">Hide</div>
+					<div class="shownTimer" style="display: inline-block;">Show</div>
+					History
+				</div>
+			</div>
+			<div class="addNotesButton  enabled" id="wrap_btn_question_3">
+				<svg class="no-mistake" width="12" height="12" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-no-mistake"></use>
+				</svg>
+				<svg class="has-mistake" width="12" height="12" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-has-mistake"></use>
+				</svg>
+				<button data-popup-rc="" data-forum-name="137" data-note="" data-mistakes="[]" data-question-id="3" id="btn_question_3" data-timer-ind="2">
+												<span class="text">
+																										Tag Mistake
+																									</span>
+				</button>
+			</div>
+		</div>
+		<a href="/forum/analytics.php#error_log" class="errorLogBtn" target="_blank">
+			<svg width="36" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-error-log"></use>
+			</svg>
+			<div class="errorLogBtnPopup">Error Log</div>
+		</a>
+	</div>
+	<div class="showAnswerMessage">B</div>
+	<div class="workbookBlock" id="timer_message_3"></div>
+	<div id="reset_message">Be sure to select an answer first to save it in the Error Log before revealing the correct answer (OA)!</div>
+	<div class="timerResult">
+		<div class="timerResultLeft">
+			<div class="difficulty" id="timer_difficulty">
+								<p>Difficulty:</p>
+				<div>
+													<span class="difImg">
+																												<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_medium.svg" alt="">
+														<!-- <img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" />
+														<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_blue.png" alt="" />
+														<img src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_difficult_grey.png" alt="" /> -->
+																											</span>
+					<b>
+
+						35%					</b>
+					(medium)
+				</div>
+							</div>
+
+			<div class="question">
+				<p>Question Stats:</p>
+				<b>
+					<small>
+						64%
+					</small>
+				</b>
+				<small>
+					(00:58)
+				</small>
+				correct				<img class="sep" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_separator.png" alt=""> <span class="red"><b><small>36%</small></b>
+													<small>(01:16)</small></span> wrong				<img class="sep" src="/forum/styles/gmatclub_light/theme/images/viewtopic/timer_separator.png" alt="">
+				<span style="width:10px;">&nbsp;</span>
+				<span class="black">
+												based on													<b>788</b>
+												sessions												</span>
+			</div>
+		</div>
+		<div class="timerResultRight">
+			<p>History</p>
+			<div class="historyTable">
+				<div class="historyTableHead">
+					<div class="date">Date</div>
+					<div class="time">Time</div>
+					<div class="result">Result</div>
+				</div>
+								<div class="historyTableRow">
+					<div class="date">25 Sep 2025</div>
+					<div class="time green">01:20</div>
+					<div class="result">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+							<use href="/static/svg/sprite-viewtopic.svg?cb=4373#timer-status-3"></use>
+						</svg>
+												<div class="answersPopup">
+															<div class="answersPopupRow first">
+									My Answer: <span>A</span>
+								</div>
+															<div class="answersPopupRow">
+									Correct Answer: <span>B</span>
+								</div>
+							</div>
+					</div>
+				</div>
+							</div>
+		</div>
+	</div>
+	</div>
+</div><span style="font-weight: bold">3. ﻿The author of the passage mentions Turner and Herskovits in the highlighted text primarily in order to provide examples of historians who</span><br><br>A. provided provocative but flawed studies of the Native American past<br>B. failed to recount the experience of Native Americans in colonial America<br>C. carefully examined the logic of the exclusion of Native Americans from histories of the New World<br>D. recently revised their approach to the study of the history of colonial America<br>E. were unlike other historians in that they incorporated a "new world" theme into their works</div></div><br clear="all"></div></div>																<div class="item twoRowsBlock">
+									<div class="upRow" onclick="hideAnswer(this,'spoiler_3265734_1');">
+										<a href="javascript:void(0)">
+											<span class="show">Show</span><span class="hide">Hide</span> Answer Question #1										</a>
+										<div class="answer-block">
+											<a class="btn-show-answer text-white" role="button">
+												<span class="icon-svg icon-svg-forum-question-banks"></span>
+												<span class="tooltiptext">Official Answer</span>
+											</a>
+											<div id="spoiler_3265734_1" class="downRow">C</div>
+										</div>
+									</div>
+								</div>
+																<div class="item twoRowsBlock">
+									<div class="upRow" onclick="hideAnswer(this,'spoiler_3265734_2');">
+										<a href="javascript:void(0)">
+											<span class="show">Show</span><span class="hide">Hide</span> Answer Question #2										</a>
+										<div class="answer-block">
+											<a class="btn-show-answer text-white" role="button">
+												<span class="icon-svg icon-svg-forum-question-banks"></span>
+												<span class="tooltiptext">Official Answer</span>
+											</a>
+											<div id="spoiler_3265734_2" class="downRow">A</div>
+										</div>
+									</div>
+								</div>
+																<div class="item twoRowsBlock">
+									<div class="upRow" onclick="hideAnswer(this,'spoiler_3265734_3');">
+										<a href="javascript:void(0)">
+											<span class="show">Show</span><span class="hide">Hide</span> Answer Question #3										</a>
+										<div class="answer-block">
+											<a class="btn-show-answer text-white" role="button">
+												<span class="icon-svg icon-svg-forum-question-banks"></span>
+												<span class="tooltiptext">Official Answer</span>
+											</a>
+											<div id="spoiler_3265734_3" class="downRow">B</div>
+										</div>
+									</div>
+								</div>
+								                                    <script type="text/javascript">
+                                                window.addEventListener("load", function(){
+                                                    $('.itemRC.timer').on('click','.hideTimer',function(){
+
+                                                        var state = $('.itemRC.timer').hasClass('unactiveTimer') ? 'show': 'hide';
+
+                                                        if (!"1" && typeof(Storage) !== "undefined") {
+                                                            localStorage.setItem("GUEST_SHOW_TIMER_STATISTICS", state);
+                                                            toggle_timer_statistics(state);
+                                                        } else {
+                                                            toggle_user_options(state, 'timer_statistics');
+                                                        }
+
+                                                    })
+                                                });
+                                                                                                        var firstDiv = document.getElementById('timer_container_1');
+                                                        var secondDiv = document.getElementById('rc_timer_placeholder_1');
+                                                        if ((firstDiv) && (secondDiv))
+                                                        {
+                                                            secondDiv.innerHTML = firstDiv.innerHTML;
+                                                            firstDiv.innerHTML = "";
+                                                            firstDiv.style.display = "block";
+                                                        }
+                                                                                                            var firstDiv = document.getElementById('timer_container_2');
+                                                        var secondDiv = document.getElementById('rc_timer_placeholder_2');
+                                                        if ((firstDiv) && (secondDiv))
+                                                        {
+                                                            secondDiv.innerHTML = firstDiv.innerHTML;
+                                                            firstDiv.innerHTML = "";
+                                                            firstDiv.style.display = "block";
+                                                        }
+                                                                                                            var firstDiv = document.getElementById('timer_container_3');
+                                                        var secondDiv = document.getElementById('rc_timer_placeholder_3');
+                                                        if ((firstDiv) && (secondDiv))
+                                                        {
+                                                            secondDiv.innerHTML = firstDiv.innerHTML;
+                                                            firstDiv.innerHTML = "";
+                                                            firstDiv.style.display = "block";
+                                                        }
+                                                                                        </script>
+                                							</div>

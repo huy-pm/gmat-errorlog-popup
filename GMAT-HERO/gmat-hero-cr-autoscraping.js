@@ -41,48 +41,74 @@ javascript: (function() {
             var passage = "";
             var question = "";
             
-            // Find the question - look for specific question patterns
-            var questionIndex = -1;
-            for (var i = parts.length - 1; i >= 0; i--) {
-                var part = parts[i].trim();
-                if (part.length > 0) {
-                    // Look for common question patterns in CR questions
-                    var cleanPart = part
-                        .replace(/<[^>]*>/g, '')                 // Remove HTML tags
-                        .replace(/&ldquo;/g, '"')                // Convert HTML entities
-                        .replace(/&rdquo;/g, '"')
-                        .replace(/&amp;/g, '&')
-                        .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
-                        .trim();
-                    
-                    // Check for typical CR question patterns
-                    if (cleanPart.includes("?")) {
-                        var lowerPart = cleanPart.toLowerCase();
-                        if (lowerPart.includes("which") || 
-                            lowerPart.includes("what") || 
-                            lowerPart.includes("how") || 
-                            lowerPart.includes("why") ||
-                            lowerPart.includes("except") ||
-                            lowerPart.includes("vulnerable") ||
-                            lowerPart.includes("flaw") ||
-                            lowerPart.includes("assumption") ||
-                            lowerPart.includes("conclusion") ||
-                            lowerPart.includes("inference") ||
-                            lowerPart.includes("strengthen") ||
-                            lowerPart.includes("weaken")) {
-                            questionIndex = i;
-                            question = cleanPart;
-                            break;
-                        }
+            // New logic to handle both question-first and passage-first structures
+            // Check if the first part contains a question pattern (question-first structure)
+            var isFirstPartQuestion = false;
+            if (parts.length > 0) {
+                var firstPartClean = parts[0]
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/&ldquo;/g, '"')
+                    .replace(/&rdquo;/g, '"')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&[a-zA-Z0-9#]+;/g, '')
+                    .trim();
+                
+                // Check if first part is a question (contains question patterns)
+                if (firstPartClean.includes("?")) {
+                    var lowerFirst = firstPartClean.toLowerCase();
+                    if (lowerFirst.includes("which") || 
+                        lowerFirst.includes("what") || 
+                        lowerFirst.includes("how") || 
+                        lowerFirst.includes("why") ||
+                        lowerFirst.includes("except") ||
+                        lowerFirst.includes("vulnerable") ||
+                        lowerFirst.includes("flaw") ||
+                        lowerFirst.includes("assumption") ||
+                        lowerFirst.includes("conclusion") ||
+                        lowerFirst.includes("inference") ||
+                        lowerFirst.includes("strengthen") ||
+                        lowerFirst.includes("weaken") ||
+                        lowerFirst.includes("most logically completes") ||
+                        lowerFirst.includes("logically completes")) {
+                        isFirstPartQuestion = true;
+                        question = firstPartClean;
                     }
                 }
             }
             
-            // Fallback: if we didn't find a specific pattern, look for any text ending with ?
-            if (questionIndex === -1) {
+            if (isFirstPartQuestion) {
+                // Question-first structure: first part is question, rest is passage
+                // Combine all parts after the first as the passage
+                var passageParts = parts.slice(1);
+                passage = passageParts.join(" ").trim();
+                
+                // Clean up passage
+                passage = passage
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/&ldquo;/g, '"')
+                    .replace(/&rdquo;/g, '"')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&[a-zA-Z0-9#]+;/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                // Special handling for "most logically completes" questions
+                // These often have the answer as part of the passage that needs to be completed
+                if (question.toLowerCase().includes("most logically completes") || question.toLowerCase().includes("logically completes")) {
+                    // For these questions, the last part of the passage is usually what needs to be completed
+                    // We'll format it to show this clearly
+                    if (passage.endsWith(",")) {
+                        passage = passage.slice(0, -1) + "__________.";
+                    }
+                }
+            } else {
+                // Original logic for passage-first structure
+                // Find the question - look for specific question patterns
+                var questionIndex = -1;
                 for (var i = parts.length - 1; i >= 0; i--) {
                     var part = parts[i].trim();
                     if (part.length > 0) {
+                        // Look for common question patterns in CR questions
                         var cleanPart = part
                             .replace(/<[^>]*>/g, '')                 // Remove HTML tags
                             .replace(/&ldquo;/g, '"')                // Convert HTML entities
@@ -90,37 +116,86 @@ javascript: (function() {
                             .replace(/&amp;/g, '&')
                             .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
                             .trim();
+                        
+                        // Check for typical CR question patterns
                         if (cleanPart.includes("?")) {
-                            questionIndex = i;
-                            question = cleanPart;
-                            break;
+                            var lowerPart = cleanPart.toLowerCase();
+                            if (lowerPart.includes("which") || 
+                                lowerPart.includes("what") || 
+                                lowerPart.includes("how") || 
+                                lowerPart.includes("why") ||
+                                lowerPart.includes("except") ||
+                                lowerPart.includes("vulnerable") ||
+                                lowerPart.includes("flaw") ||
+                                lowerPart.includes("assumption") ||
+                                lowerPart.includes("conclusion") ||
+                                lowerPart.includes("inference") ||
+                                lowerPart.includes("strengthen") ||
+                                lowerPart.includes("weaken") ||
+                                lowerPart.includes("most logically completes") ||
+                                lowerPart.includes("logically completes")) {
+                                questionIndex = i;
+                                question = cleanPart;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            
-            // Build passage from parts before the question
-            if (questionIndex >= 0) {
-                var passageParts = parts.slice(0, questionIndex + 1); // Include the part with the question mark
-                passage = passageParts.join(" ").trim();
                 
-                // Remove the question from the passage
-                var questionWithTags = parts[questionIndex];
-                passage = passage.replace(questionWithTags, '').trim();
-            } else {
-                // If no question found, treat everything as passage
-                passage = stemContent;
+                // Fallback: if we didn't find a specific pattern, look for any text ending with ?
+                if (questionIndex === -1) {
+                    for (var i = parts.length - 1; i >= 0; i--) {
+                        var part = parts[i].trim();
+                        if (part.length > 0) {
+                            var cleanPart = part
+                                .replace(/<[^>]*>/g, '')                 // Remove HTML tags
+                                .replace(/&ldquo;/g, '"')                // Convert HTML entities
+                                .replace(/&rdquo;/g, '"')
+                                .replace(/&amp;/g, '&')
+                                .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
+                                .trim();
+                            if (cleanPart.includes("?")) {
+                                questionIndex = i;
+                                question = cleanPart;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Build passage from parts before the question
+                if (questionIndex >= 0) {
+                    var passageParts = parts.slice(0, questionIndex + 1); // Include the part with the question mark
+                    passage = passageParts.join(" ").trim();
+                    
+                    // Remove the question from the passage
+                    var questionWithTags = parts[questionIndex];
+                    passage = passage.replace(questionWithTags, '').trim();
+                } else {
+                    // If no question found, treat everything as passage
+                    passage = stemContent;
+                }
+                
+                // Clean up passage
+                passage = passage
+                    .replace(/<[^>]*>/g, '')                 // Remove HTML tags
+                    .replace(/&ldquo;/g, '"')                // Convert HTML entities
+                    .replace(/&rdquo;/g, '"')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
+                    .replace(/\s+/g, ' ')                   // Normalize whitespace
+                    .trim();
+                
+                // Special handling for "most logically completes" questions
+                // These often have the answer as part of the passage that needs to be completed
+                if (question.toLowerCase().includes("most logically completes") || question.toLowerCase().includes("logically completes")) {
+                    // For these questions, the last part of the passage is usually what needs to be completed
+                    // We'll format it to show this clearly
+                    if (passage.endsWith(",")) {
+                        passage = passage.slice(0, -1) + "__________.";
+                    }
+                }
             }
-            
-            // Clean up passage
-            passage = passage
-                .replace(/<[^>]*>/g, '')                 // Remove HTML tags
-                .replace(/&ldquo;/g, '"')                // Convert HTML entities
-                .replace(/&rdquo;/g, '"')
-                .replace(/&amp;/g, '&')
-                .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
-                .replace(/\s+/g, ' ')                   // Normalize whitespace
-                .trim();
             
             // Extract answer choices
             var answerChoices = [];

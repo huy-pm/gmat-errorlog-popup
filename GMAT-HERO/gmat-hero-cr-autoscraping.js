@@ -1,4 +1,7 @@
 javascript: (function() {
+    // Create popup window first
+    var popup = window.open("", "GMAT CR Extractor", "width=600,height=400,scrollbars=yes");
+    
     // Global variables to store extracted questions and control the process
     var extractedQuestions = [];
     var isRunning = false;
@@ -206,7 +209,7 @@ javascript: (function() {
         }
     }
     
-    // Function to start the extraction process
+
     function startExtraction() {
         if (isRunning) return;
         
@@ -215,10 +218,10 @@ javascript: (function() {
         extractedQuestions = [];
         
         // Update UI
-        document.getElementById('start-btn').disabled = true;
-        document.getElementById('stop-btn').disabled = false;
-        document.getElementById('status').textContent = 'Running...';
-        document.getElementById('status').style.color = 'green';
+        popup.document.getElementById('start-btn').disabled = true;
+        popup.document.getElementById('stop-btn').disabled = false;
+        popup.document.getElementById('status').textContent = 'Running...';
+        popup.document.getElementById('status').style.color = 'green';
         
         // Start the extraction loop
         intervalId = setInterval(function() {
@@ -228,7 +231,7 @@ javascript: (function() {
             var questionData = extractQuestionData();
             if (questionData) {
                 extractedQuestions.push(questionData);
-                document.getElementById('count').textContent = extractedQuestions.length;
+                popup.document.getElementById('count').textContent = extractedQuestions.length;
             }
             
             // Click next button
@@ -252,10 +255,12 @@ javascript: (function() {
         }
         
         // Update UI
-        document.getElementById('start-btn').disabled = false;
-        document.getElementById('stop-btn').disabled = true;
-        document.getElementById('status').textContent = 'Stopped';
-        document.getElementById('status').style.color = 'red';
+        if (popup && !popup.closed) {
+            popup.document.getElementById('start-btn').disabled = false;
+            popup.document.getElementById('stop-btn').disabled = true;
+            popup.document.getElementById('status').textContent = 'Stopped';
+            popup.document.getElementById('status').style.color = 'red';
+        }
         
         // Save questions to JSON
         if (extractedQuestions.length > 0) {
@@ -263,8 +268,7 @@ javascript: (function() {
         }
     }
     
-    // Create popup window
-    var popup = window.open("", "GMAT CR Extractor", "width=600,height=400,scrollbars=yes");
+    // Write the popup content
     popup.document.write(
         '<html>' +
         '<head>' +
@@ -296,31 +300,19 @@ javascript: (function() {
                 '</ol>' +
             '</div>' +
             '<div class="controls">' +
-                '<button id="start-btn" onclick="parent.startExtraction()">Start</button>' +
-                '<button id="stop-btn" onclick="parent.stopExtraction()" disabled>Stop</button>' +
+                '<button id="start-btn" onclick="window.opener.startExtraction()">Start</button>' +
+                '<button id="stop-btn" onclick="window.opener.stopExtraction()" disabled>Stop</button>' +
             '</div>' +
             '<div class="status">Status: <span id="status">Ready</span></div>' +
             '<div class="count">Questions Extracted: <span id="count">0</span></div>' +
-            '<script>' +
-                'window.onload = function() {' +
-                    'if (typeof parent.startExtraction === "undefined") {' +
-                        'parent.startExtraction = ' + startExtraction.toString() + ';' +
-                    '}' +
-                    'if (typeof parent.stopExtraction === "undefined") {' +
-                        'parent.stopExtraction = ' + stopExtraction.toString() + ';' +
-                    '}' +
-                    'if (typeof parent.extractQuestionData === "undefined") {' +
-                        'parent.extractQuestionData = ' + extractQuestionData.toString() + ';' +
-                    '}' +
-                    'if (typeof parent.clickNextButton === "undefined") {' +
-                        'parent.clickNextButton = ' + clickNextButton.toString() + ';' +
-                    '}' +
-                    'if (typeof parent.saveQuestionsToJSON === "undefined") {' +
-                        'parent.saveQuestionsToJSON = ' + saveQuestionsToJSON.toString() + ';' +
-                    '}' +
-                '};' +
-            '</script>' +
         '</body>' +
         '</html>'
     );
+    
+    // Attach functions to the window object so they can be accessed by the popup
+    window.startExtraction = startExtraction;
+    window.stopExtraction = stopExtraction;
+    window.extractQuestionData = extractQuestionData;
+    window.clickNextButton = clickNextButton;
+    window.saveQuestionsToJSON = saveQuestionsToJSON;
 })();

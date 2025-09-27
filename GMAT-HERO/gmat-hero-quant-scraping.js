@@ -17,21 +17,117 @@ javascript: (function() {
         // Get the innerHTML which contains the KaTeX math expressions
         var questionHTML = questionStem.innerHTML;
         
-        // Extract answer choices
+        // Extract answer choices with improved logic
         var answerChoices = [];
         var standardChoices = rightPanel.querySelector('.standard-choices.ng-star-inserted');
         
         if (standardChoices) {
-            var options = standardChoices.querySelectorAll('.option.ng-star-inserted');
+            // Try multiple selectors to find answer options
+            var options = standardChoices.querySelectorAll('.option.ng-star-inserted, .option');
+            
+            // If no options found with those selectors, try a more general approach
+            if (options.length === 0) {
+                options = standardChoices.querySelectorAll('[class*="option"]');
+            }
+            
             options.forEach(function(option) {
+                // Try different structures for finding answer content
+                var answerText = '';
+                
+                // Method 1: Look for label with span containing katex
                 var label = option.querySelector('label');
                 if (label) {
-                    var span = label.querySelector('span');
-                    if (span) {
-                        var answerText = span.textContent.trim();
-                        if (answerText) {
-                            answerChoices.push(answerText);
+                    // Check if label contains katex elements
+                    var katexElements = label.querySelectorAll('.katex');
+                    if (katexElements.length > 0) {
+                        // Extract math content from katex elements
+                        var tempDiv = document.createElement("div");
+                        tempDiv.innerHTML = label.innerHTML;
+                        
+                        // Process all Katex math expressions
+                        var katexElementsInLabel = tempDiv.querySelectorAll(".katex");
+                        katexElementsInLabel.forEach(function(katexElem) {
+                            var mathml = katexElem.querySelector(".katex-mathml");
+                            if (mathml) {
+                                var annotation = mathml.querySelector("annotation");
+                                if (annotation) {
+                                    var texContent = annotation.textContent;
+                                    var mathPlaceholder = document.createTextNode("$" + texContent + "$");
+                                    katexElem.replaceWith(mathPlaceholder);
+                                }
+                            }
+                        });
+                        
+                        answerText = tempDiv.textContent.trim();
+                    } else {
+                        // Fallback to regular text extraction
+                        var span = label.querySelector('span');
+                        if (span) {
+                            answerText = span.textContent.trim();
+                        } else {
+                            answerText = label.textContent.trim();
                         }
+                    }
+                } 
+                // Method 2: Direct text content if no label found
+                else {
+                    answerText = option.textContent.trim();
+                }
+                
+                // Method 3: Check for input and associated label
+                if (!answerText) {
+                    var input = option.querySelector('input');
+                    if (input && input.id) {
+                        var associatedLabel = document.querySelector('label[for="' + input.id + '"]');
+                        if (associatedLabel) {
+                            // Check if label contains katex elements
+                            var katexElements = associatedLabel.querySelectorAll('.katex');
+                            if (katexElements.length > 0) {
+                                // Extract math content from katex elements
+                                var tempDiv = document.createElement("div");
+                                tempDiv.innerHTML = associatedLabel.innerHTML;
+                                
+                                // Process all Katex math expressions
+                                var katexElementsInLabel = tempDiv.querySelectorAll(".katex");
+                                katexElementsInLabel.forEach(function(katexElem) {
+                                    var mathml = katexElem.querySelector(".katex-mathml");
+                                    if (mathml) {
+                                        var annotation = mathml.querySelector("annotation");
+                                        if (annotation) {
+                                            var texContent = annotation.textContent;
+                                            var mathPlaceholder = document.createTextNode("$" + texContent + "$");
+                                            katexElem.replaceWith(mathPlaceholder);
+                                        }
+                                    }
+                                });
+                                
+                                answerText = tempDiv.textContent.trim();
+                            } else {
+                                answerText = associatedLabel.textContent.trim();
+                            }
+                        }
+                    }
+                }
+                
+                if (answerText) {
+                    // Clean up the answer text by removing any leading characters that aren't part of the answer
+                    answerText = answerText.replace(/^[A-Ea-e][\.\)]\s*/, '').trim();
+                    answerChoices.push(answerText);
+                }
+            });
+        }
+        
+        // If we still don't have answer choices, try a different approach
+        if (answerChoices.length === 0) {
+            // Look for any elements that might contain answer choices
+            var possibleChoiceContainers = rightPanel.querySelectorAll('[class*="choice"], [class*="option"], [class*="answer"]');
+            possibleChoiceContainers.forEach(function(container) {
+                var text = container.textContent.trim();
+                // Check if this looks like an answer choice (starts with A, B, C, D, E followed by . or )
+                if (text.match(/^[A-Ea-e][\.\)]/)) {
+                    var cleanedText = text.replace(/^[A-Ea-e][\.\)]\s*/, '').trim();
+                    if (cleanedText && answerChoices.indexOf(cleanedText) === -1) {
+                        answerChoices.push(cleanedText);
                     }
                 }
             });

@@ -7,18 +7,7 @@ This bookmarklet extracts GMAT quantitative questions and their answer choices f
 - `gmat-hero-quant-scraping.js` - The bookmarklet script
 - `quant-test-bookmarklet.html` - Test HTML page
 - `quant-sample.html` - Sample GMAT quant question structure
-- `clipboard-test.html` - Test page for clipboard functionality
-- `copy-test.html` - Simple test for copy functionality
-- `final-copy-test.html` - Final test for copy functionality
-- `debug-popup.html` - Debug popup functionality
-- `test-copy-fix.html` - Test copy fix approach
-- `test-structure.html` - Test HTML structure
 - `math-renderer.html` - Full-featured math renderer for clipboard content
-- `simple-math-renderer.html` - Simple math renderer for clipboard content
-- `bookmarklet-output-example.html` - Example of bookmarklet output format
-- `debug-renderer.html` - Debug renderer for testing parsing
-- `test-your-question.html` - Test file for your specific question
-- `verify-parsing.html` - Verify parsing logic
 
 ## How to Use
 
@@ -109,6 +98,10 @@ To use any of these renderers:
 10. Open `debug-renderer.html` to debug parsing issues
 11. Open `test-your-question.html` to test your specific question format
 12. Open `verify-parsing.html` to verify the parsing logic
+13. Open `test-parsing-fix.html` to test the parsing fix for complex mathematical expressions
+14. Open `test-specific-case.html` to test the specific problematic case
+15. Open `verify-parsing-fix.html` to verify parsing improvements
+16. Open `gmat-hero-test-structure.html` to test with the GMAT Hero structure
 
 ## How It Works
 
@@ -132,3 +125,31 @@ The copy functionality now uses a fixed approach:
 6. Provides visual feedback when content is copied
 
 This approach ensures that the event listener is attached at the right time, after the DOM elements are available in the popup.
+
+## Parsing Improvements
+
+The latest version includes improved parsing logic for answer choices:
+
+1. Multiple selector strategies to find answer options
+2. Fallback methods for different HTML structures
+3. Better text extraction from various DOM elements
+4. Enhanced cleaning of answer text to remove formatting artifacts
+5. Improved handling of complex mathematical expressions in answer choices
+6. Special handling for Katex math expressions in answer choices
+
+These improvements ensure that answer choices with complex mathematical notation are properly extracted and formatted, including the specific case with expressions like:
+- $\sqrt{2-x}$
+- $2x-6 + \sqrt{2-x}$
+- $\sqrt{2-x} + x-3$
+- $2x-6 + \sqrt{x-2}$
+- $x + \sqrt{x-2}$
+
+## Recent Fixes
+
+### Fix for Complex Mathematical Answer Choices (v1.2)
+- Resolved issue where answer choices with complex Katex mathematical expressions were not being parsed correctly
+- Added special handling for Katex elements within answer choice labels
+- Improved extraction of mathematical notation from answer choices
+- Verified fix with the specific case that was causing issues
+
+The fix ensures that when the bookmarklet encounters answer choices with Katex mathematical expressions, it properly extracts the underlying LaTeX notation and formats it correctly for clipboard output.

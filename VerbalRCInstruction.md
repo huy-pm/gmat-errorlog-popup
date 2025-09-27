@@ -62,7 +62,6 @@
 
 # Features and Enhancements:
 # - Text enclosed in ** markers is displayed with a yellow background highlight for better visibility
-# - Answer choices are displayed without bullet points for cleaner formatting
 # - Periods are removed from answer choice letters for cleaner formatting
 # - Questions are properly extracted from `<span style="font-weight: bold">` tags
 # - Answer choices are parsed from text following the question span

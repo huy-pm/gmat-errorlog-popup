@@ -5,18 +5,29 @@ This bookmarklet extracts GMAT quantitative questions and their answer choices f
 ## Files
 
 - `gmat-hero-quant-scraping.js` - The bookmarklet script
-- `quant-test-bookmarklet.html` - Test HTML page
-- `quant-sample.html` - Sample GMAT quant question structure
+- `gmat-hero-quant-auto-scraping.js` - Automated version that extracts multiple questions
 - `math-renderer.html` - Full-featured math renderer for clipboard content
 
 ## How to Use
 
+### Manual Extraction (`gmat-hero-quant-scraping.js`)
 1. Open `gmat-hero-quant-scraping.js` and copy its entire content
 2. Create a new bookmark in your browser
 3. Paste the copied content as the URL of the bookmark
 4. Name the bookmark something like "GMAT Quant Extractor"
 5. Navigate to a page with a GMAT quant question that matches the expected structure
 6. Click the bookmark to extract the question and answer choices
+
+### Automated Extraction (`gmat-hero-quant-auto-scraping.js`)
+1. Open `gmat-hero-quant-auto-scraping.js` and copy its entire content
+2. Create a new bookmark in your browser
+3. Paste the copied content as the URL of the bookmark
+4. Name the bookmark something like "GMAT Quant Auto Extractor"
+5. Navigate to the first question in a series of GMAT quant questions
+6. Click the bookmark to open the automation control panel
+7. Click "Start" to begin the automated extraction process
+8. The script will automatically extract questions and navigate to the next one
+9. Click "Stop" at any time to halt the process and save all extracted questions
 
 ## Expected Structure
 
@@ -40,12 +51,33 @@ The bookmarklet looks for this specific structure:
 
 ## Features
 
+### Manual Extraction
 - Extracts questions that use KaTeX for mathematical expressions
 - Extracts all 5 answer choices
 - Displays content in a popup window with copy-to-clipboard functionality
 - Renders mathematical expressions using KaTeX in the popup
 - **Clipboard content formatted for KaTeX/MathJax rendering**
 - **Simplified and robust copy-to-clipboard implementation**
+
+### Automated Extraction
+- **Automated Extraction Process:**
+  - Click "Start" to begin the automated extraction
+  - The script will automatically extract the current question and click "Next"
+  - Waits 2 seconds between each extraction to allow the page to load
+  - Continues until there are no more questions
+- **Real-time Status Updates:**
+  - Shows the current status (Ready, Running, Stopped)
+  - Displays the count of questions extracted in real-time
+- **Stop and Save Functionality:**
+  - Click "Stop" at any time to halt the process
+  - Automatically saves all extracted questions to a JSON file named gmat-quant-{timestamp}.json
+- **User-Friendly Interface:**
+  - Clear instructions for use
+  - Visual feedback through color-coded status indicators
+  - Responsive button states (enabled/disabled as appropriate)
+- **Proper Question Formatting:**
+  - Processes KaTeX mathematical expressions in questions to extract clean LaTeX notation
+  - Maintains the same formatting logic as the manual extraction script
 
 ## Clipboard Format
 
@@ -68,6 +100,31 @@ E. 10
 
 This format can be directly used with KaTeX or MathJax libraries for rendering.
 
+## JSON Output Format
+
+The automated extraction script saves questions in the following JSON format:
+
+```
+{
+  "totalRecords": 25,
+  "questions": [
+    {
+      "question": "For any positive integer $n$, $n>1$, the \"length\" of $n$ is the number of positive primes (not necessarily distinct) whose product is $n$. For ex, the length of $50$ is $3$, since $50=2\\times 5 \\times 5$. Which of the following integers has length $3$?",
+      "answers": [
+        "A. 3",
+        "B. 15",
+        "C. 60",
+        "D. 64",
+        "E. 105"
+      ],
+      "link": "https://gmat-hero.com/question/12345"
+    }
+  ]
+}
+```
+
+Note that mathematical expressions in questions are now properly converted from KaTeX HTML to LaTeX format (e.g., `$n$`, `$n>1$`, `$50$`, `$3$`, `$50=2\\times 5 \\times 5$`).
+
 ## Rendering Your Saved Questions
 
 After extracting questions with the bookmarklet, you can view them with proper mathematical formatting using the renderer pages:
@@ -83,6 +140,38 @@ To use any of these renderers:
 2. Open the renderer HTML file in your browser
 3. Paste the content into the text area
 4. Click "Render" to see the properly formatted question
+
+### JSON File Upload Feature
+
+The `math-renderer.html` file now supports uploading JSON files containing multiple questions:
+
+1. Click the "Choose File" button to select a JSON file
+2. Click "Load Questions from JSON" to load and display all questions
+3. Questions will be displayed in a collapsible list format
+4. Click on any question header to expand/collapse its content
+5. Mathematical expressions are automatically rendered using MathJax/KaTeX
+
+Alternatively, you can simply select a file and it will automatically show a message prompting you to click the load button.
+
+The JSON file should follow the format generated by the automated extraction script:
+```json
+{
+  "totalRecords": 25,
+  "questions": [
+    {
+      "question": "For any positive integer $n$, $n>1$, the \"length\" of $n$ is the number of positive primes (not necessarily distinct) whose product is $n$. For ex, the length of $50$ is $3$, since $50=2\\times 5 \\times 5$. Which of the following integers has length $3$?",
+      "answers": [
+        "A. 3",
+        "B. 15",
+        "C. 60",
+        "D. 64",
+        "E. 105"
+      ],
+      "link": "https://gmat-hero.com/question/12345"
+    }
+  ]
+}
+```
 
 ## Testing
 
@@ -102,6 +191,7 @@ To use any of these renderers:
 14. Open `test-specific-case.html` to test the specific problematic case
 15. Open `verify-parsing-fix.html` to verify parsing improvements
 16. Open `gmat-hero-test-structure.html` to test with the GMAT Hero structure
+17. Open `test-auto-scraping-fix.html` to test the auto scraping fix
 
 ## How It Works
 
@@ -151,5 +241,11 @@ These improvements ensure that answer choices with complex mathematical notation
 - Added special handling for Katex elements within answer choice labels
 - Improved extraction of mathematical notation from answer choices
 - Verified fix with the specific case that was causing issues
+
+### Fix for Question Formatting in Auto-Scraping (v1.3)
+- Resolved issue where questions were being extracted as raw HTML with Katex elements instead of clean text with LaTeX notation
+- Applied the same processing logic used in the manual extraction script to convert Katex HTML to LaTeX format
+- Questions now properly display mathematical expressions as `$n$`, `$n>1$`, etc. instead of raw HTML
+- Maintains consistency between manual and automated extraction formats
 
 The fix ensures that when the bookmarklet encounters answer choices with Katex mathematical expressions, it properly extracts the underlying LaTeX notation and formats it correctly for clipboard output.

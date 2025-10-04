@@ -8,7 +8,7 @@
   const CONFIG = {
     apiUrl: 'https://gmat-errorlog.vercel.app',
     devUrl: 'http://localhost:5001',
-    version: '1.4.0' // Updated version to include status field support
+    version: '1.5.0' // Add mistake tags
   };
   
   const isLocalhost = window.location.hostname === 'localhost' || 
@@ -354,7 +354,54 @@
       ];
     }
   }
-  
+
+  // New function to fetch all tags from the server
+  async function fetchAllTags() {
+    try {
+      // Try to get tags from localStorage first (cache for 1 hour)
+      const cachedData = localStorage.getItem('gmatLoggerTags');
+      if (cachedData) {
+        const { timestamp, data } = JSON.parse(cachedData);
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        
+        // If cached data is less than 1 hour old, use it
+        if (Date.now() - timestamp < oneHour) {
+          return Array.isArray(data) ? data : [];
+        }
+      }
+      
+      // Fetch from API if no valid cache
+      console.log('Fetching tags from API');
+      const response = await fetch(`${baseUrl}/api/tags`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const tags = Array.isArray(data) ? data : data.tags || [];
+      
+      // Cache the fetched tags with current timestamp
+      localStorage.setItem('gmatLoggerTags', JSON.stringify({
+        timestamp: Date.now(),
+        data: tags
+      }));
+      
+      return tags;
+    } catch (error) {
+      console.warn('Error fetching tags:', error);
+      // Try to use cached tags even if API fails
+      const cachedData = localStorage.getItem('gmatLoggerTags');
+      if (cachedData) {
+        try {
+          const { data } = JSON.parse(cachedData);
+          return Array.isArray(data) ? data : [];
+        } catch (parseError) {
+          console.warn('Error parsing cached tags:', parseError);
+        }
+      }
+      
+      // Return empty array if everything fails
+      return [];
+    }
+  }
+
   async function createModal() {
     await fetchCategories();
     const existingModal = document.getElementById('gmat-logger-modal');
@@ -362,7 +409,7 @@
     
     const modal = document.createElement('div');
     modal.id = 'gmat-logger-modal';
-    modal.innerHTML = `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><div style="background:white;border-radius:12px;padding:24px;width:90%;max-width:500px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="margin:0;font-size:20px;font-weight:600;color:#1f2937">⚡ Quick Log</h2><button id="gmat-logger-close" style="background:none;border:none;font-size:24px;cursor:pointer;padding:4px;color:#6b7280">×</button></div><form id="gmat-logger-form"><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Question Link</label><input id="gmat-question-link" type="url" placeholder="https://gmatclub.com/forum/..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box"/></div><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Smart Notes</label><div style="position:relative"><textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;resize:vertical;min-height:80px;font-family:inherit;box-sizing:border-box"></textarea><div id="gmat-suggestions" style="position:absolute;z-index:10;width:100%;margin-top:1px;background:white;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:none"></div></div><p style="font-size:12px;color:#6b7280;margin-top:4px;margin-bottom:0">Type keywords: <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">weaken</code>, <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">hard</code> and press Tab to complete.</p></div><div id="gmat-parsed-preview" style="background:rgba(156,163,175,0.1);padding:16px;border-radius:8px;margin-bottom:16px;display:none"><h4 style="font-weight:500;font-size:14px;color:#6b7280;margin:0 0 8px 0">Parsed Information:</h4><div id="gmat-parsed-badges" style="display:flex;flex-wrap:wrap;gap:8px"></div><p id="gmat-parsed-notes" style="font-size:12px;color:#6b7280;margin:8px 0 0 0;display:none"></p></div><div style="display:flex;gap:12px;justify-content:flex-end"><button type="button" id="gmat-logger-cancel" style="padding:8px 16px;border:1px solid #d1d5db;background:white;color:#374151;border-radius:6px;font-size:14px;cursor:pointer">Cancel</button><button type="submit" id="gmat-logger-submit" style="padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500">Quick Add</button></div></form><div id="gmat-logger-status" style="margin-top:16px;padding:12px;border-radius:6px;font-size:14px;display:none"></div></div></div>`;
+    modal.innerHTML = `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><div style="background:white;border-radius:12px;width:90%;max-width:500px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);max-height:90vh;overflow-y:auto;"><div style="padding:24px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h2 style="margin:0;font-size:20px;font-weight:600;color:#1f2937">⚡ Quick Log</h2><button id="gmat-logger-close" style="background:none;border:none;font-size:24px;cursor:pointer;padding:4px;color:#6b7280">×</button></div><form id="gmat-logger-form" style="display:flex;flex-direction:column;"><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Question Link</label><input id="gmat-question-link" type="url" placeholder="https://gmatclub.com/forum/..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box"/></div><div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:500;color:#374151;margin-bottom:4px">Smart Notes</label><div style="position:relative"><textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;resize:vertical;min-height:80px;max-height:200px;font-family:inherit;box-sizing:border-box"></textarea><div id="gmat-suggestions" style="position:absolute;z-index:10;width:100%;margin-top:1px;background:white;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:none"></div></div><p style="font-size:12px;color:#6b7280;margin-top:4px;margin-bottom:0">Type keywords: <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">weaken</code>, <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px">hard</code> and press Tab to complete.</p></div><div style="margin-bottom:16px"><div id="gmat-tags-container" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div><div id="gmat-tags-section" style="margin-top:8px"><div style="display:flex;justify-content:flex-start;margin-bottom:4px"><button type="button" id="gmat-toggle-tags" style="background:none;border:none;color:#3b82f6;font-size:12px;cursor:pointer;padding:0">See all</button></div><div id="gmat-tags-list" style="display:flex;flex-wrap:wrap;gap:4px;max-height:150px;overflow-y:auto"></div><div id="gmat-tags-expanded" style="display:none;flex-wrap:wrap;gap:4px;max-height:200px;overflow-y:auto"></div></div></div><div id="gmat-parsed-preview" style="background:rgba(156,163,175,0.1);padding:16px;border-radius:8px;margin-bottom:16px;display:none"><h4 style="font-weight:500;font-size:14px;color:#6b7280;margin:0 0 8px 0">Parsed Information:</h4><div id="gmat-parsed-badges" style="display:flex;flex-wrap:wrap;gap:8px"></div><p id="gmat-parsed-notes" style="font-size:12px;color:#6b7280;margin:8px 0 0 0;display:none;max-height:200px;overflow-y:auto"></p></div><div style="padding:16px 0 0 0;border-top:1px solid #e5e7eb;display:flex;gap:12px;justify-content:flex-end;"><button type="button" id="gmat-logger-cancel" style="padding:8px 16px;border:1px solid #d1d5db;background:white;color:#374151;border-radius:6px;font-size:14px;cursor:pointer">Cancel</button><button type="submit" id="gmat-logger-submit" style="padding:8px 16px;background:#3b82f6;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500">Quick Add</button></div></form><div id="gmat-logger-status" style="margin-top:16px;padding:12px;border-radius:6px;font-size:14px;display:none"></div></div></div></div>`;
     
     document.body.appendChild(modal);
     document.getElementById('gmat-question-link').value = window.location.href;
@@ -376,15 +423,114 @@
     const cancelBtn = document.getElementById('gmat-logger-cancel');
     const questionLinkInput = document.getElementById('gmat-question-link');
     const notesTextarea = document.getElementById('gmat-notes');
+    const tagsContainer = document.getElementById('gmat-tags-container');
+    const toggleTagsBtn = document.getElementById('gmat-toggle-tags');
+    const tagsList = document.getElementById('gmat-tags-list');
+    const tagsExpanded = document.getElementById('gmat-tags-expanded');
     const suggestionsDiv = document.getElementById('gmat-suggestions');
     
     let currentSuggestions = [];
     let cursorPosition = 0;
-    
+    let tags = [];
+    let allTags = [];
+
+    // Function to render tags
+    function renderTags() {
+      tagsContainer.innerHTML = '';
+      tags.forEach((tag, index) => {
+        const tagElement = document.createElement('span');
+        tagElement.style.cssText = 'display:inline-block;padding:2px 8px;font-size:12px;font-weight:500;border-radius:9999px;background:#e5e7eb;border:1px solid #d1d5db;color:#374151;margin-right:4px;margin-bottom:4px;cursor:pointer';
+        tagElement.innerHTML = `${tag} <span style="margin-left:4px;cursor:pointer;font-weight:bold">×</span>`;
+        tagElement.querySelector('span').addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          console.log('Bookmarklet: Removing tag at index:', index, 'tag:', tag);
+          tags.splice(index, 1);
+          renderTags();
+        });
+        tagsContainer.appendChild(tagElement);
+      });
+      console.log('Bookmarklet: Current tags in state:', tags);
+    }
+
+    // Function to add a tag
+    function addTag(tag) {
+      const trimmedTag = tag.trim();
+      if (trimmedTag && !tags.includes(trimmedTag)) {
+        tags.push(trimmedTag);
+        renderTags();
+        console.log('Bookmarklet: Added tag:', trimmedTag, 'Current tags:', tags);
+      } else {
+        console.log('Bookmarklet: Skipped adding tag (empty or duplicate):', trimmedTag);
+      }
+    }
+
+    // Function to render tags with collapsible interface
+    function renderTagList(tags) {
+      tagsList.innerHTML = '';
+      tagsExpanded.innerHTML = '';
+      
+      // Show first 6 tags in collapsed view
+      const visibleTags = tags.slice(0, 6);
+      
+      visibleTags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.style.cssText = 'display:inline-block;padding:2px 8px;font-size:12px;font-weight:500;border-radius:9999px;background:#f3f4f6;border:1px solid #d1d5db;color:#374151;margin-right:4px;margin-bottom:4px;cursor:pointer';
+        tagElement.textContent = tag.name || tag;
+        tagElement.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          addTag(tag.name || tag);
+        });
+        tagsList.appendChild(tagElement);
+      });
+      
+      // Add all tags to expanded view
+      tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.style.cssText = 'display:inline-block;padding:2px 8px;font-size:12px;font-weight:500;border-radius:9999px;background:#f3f4f6;border:1px solid #d1d5db;color:#374151;margin-right:4px;margin-bottom:4px;cursor:pointer';
+        tagElement.textContent = tag.name || tag;
+        tagElement.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          addTag(tag.name || tag);
+        });
+        tagsExpanded.appendChild(tagElement);
+      });
+    }
+
+    // Toggle tags visibility
+    let tagsExpandedState = false;
+    toggleTagsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      tagsExpandedState = !tagsExpandedState;
+      if (tagsExpandedState) {
+        tagsList.style.display = 'none';
+        tagsExpanded.style.display = 'flex';
+        toggleTagsBtn.innerHTML = 'See less';
+      } else {
+        tagsList.style.display = 'flex';
+        tagsExpanded.style.display = 'none';
+        toggleTagsBtn.innerHTML = 'See all';
+      }
+    });
+
     const closeModal = () => modal.remove();
-    closeBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal();
+    });
+    cancelBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeModal();
+    });
+    modal.addEventListener('click', (e) => { 
+      if (e.target === modal) {
+        e.preventDefault();
+        closeModal();
+      }
+    });
     
     function updateSuggestions() {
       const input = notesTextarea.value;
@@ -396,7 +542,11 @@
         suggestionsDiv.innerHTML = suggestions.map(suggestion => `<button type="button" class="suggestion-item" style="width:100%;padding:12px 16px;text-align:left;background:rgba(156,163,175,0.1);border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="font-weight:500">${suggestion.fullName}</span><span style="color:#6b7280;font-size:12px">Tab</span></button>`).join('');
         suggestionsDiv.style.display = 'block';
         suggestionsDiv.querySelectorAll('.suggestion-item').forEach((item, index) => {
-          item.addEventListener('mousedown', (e) => { e.preventDefault(); applySuggestionToTextarea(index); });
+          item.addEventListener('mousedown', (e) => { 
+            e.preventDefault(); 
+            e.stopPropagation();
+            applySuggestionToTextarea(index); 
+          });
         });
       } else {
         suggestionsDiv.style.display = 'none';
@@ -416,24 +566,50 @@
       }
     }
     
-    notesTextarea.addEventListener('input', (e) => { cursorPosition = e.target.selectionStart; updateSuggestions(); });
-    notesTextarea.addEventListener('keyup', (e) => { cursorPosition = e.target.selectionStart; });
-    notesTextarea.addEventListener('click', (e) => { cursorPosition = e.target.selectionStart; updateSuggestions(); });
+    notesTextarea.addEventListener('input', (e) => { 
+      cursorPosition = e.target.selectionStart; 
+      updateSuggestions(); 
+    });
+    notesTextarea.addEventListener('keyup', (e) => { 
+      cursorPosition = e.target.selectionStart; 
+    });
+    notesTextarea.addEventListener('click', (e) => { 
+      cursorPosition = e.target.selectionStart; 
+      updateSuggestions(); 
+    });
     notesTextarea.addEventListener('keydown', (e) => {
       cursorPosition = e.target.selectionStart;
       if (currentSuggestions.length > 0) {
         switch (e.key) {
-          case 'Tab': case 'Enter': e.preventDefault(); applySuggestionToTextarea(0); break;
-          case 'Escape': suggestionsDiv.style.display = 'none'; break;
+          case 'Tab': 
+          case 'Enter': 
+            e.preventDefault(); 
+            applySuggestionToTextarea(0); 
+            break;
+          case 'Escape': 
+            suggestionsDiv.style.display = 'none'; 
+            break;
         }
       }
     });
-    notesTextarea.addEventListener('blur', () => { setTimeout(() => suggestionsDiv.style.display = 'none', 150); });
+    notesTextarea.addEventListener('blur', () => { 
+      setTimeout(() => suggestionsDiv.style.display = 'none', 150); 
+    });
     questionLinkInput.addEventListener('input', () => updateParsedPreview(questionLinkInput.value, notesTextarea.value));
-    form.addEventListener('submit', async (e) => { e.preventDefault(); await submitQuestionData(); });
+    form.addEventListener('submit', async (e) => { 
+      e.preventDefault(); 
+      await submitQuestionData(); 
+    });
+    
+    // Fetch all tags and render them
+    fetchAllTags().then(fetchedTags => {
+      allTags = fetchedTags;
+      renderTagList(allTags);
+    });
+    
     updateParsedPreview(questionLinkInput.value, notesTextarea.value);
   }
-  
+
   function updateParsedPreview(questionLink, notes) {
     const parsed = parseNotesAndLink(notes, questionLink);
     const previewDiv = document.getElementById('gmat-parsed-preview');
@@ -459,7 +635,7 @@
     }
     if (parsed.category) badgesDiv.appendChild(createBadge(`Category: ${parsed.category}`, 'default'));
     if (parsed.difficulty) badgesDiv.appendChild(createBadge(`Difficulty: ${parsed.difficulty.charAt(0).toUpperCase() + parsed.difficulty.slice(1)}`, 'default'));
-    
+      
     if (parsed.extractedNotes) {
       notesP.innerHTML = `<strong>Notes:</strong><br><pre style="white-space: pre-wrap; font-family: inherit; margin: 4px 0 0 0; font-size: inherit;">${parsed.extractedNotes}</pre>`;
       notesP.style.display = 'block';
@@ -484,6 +660,18 @@
     
     if (!questionLink && !notes) { showStatus('Please enter either a question link or notes.', 'error'); return; }
     
+    // Get tags from the DOM
+    const tagsContainer = document.getElementById('gmat-tags-container');
+    const tagElements = tagsContainer.querySelectorAll('span');
+    const tags = Array.from(tagElements).map(tagEl => {
+      // Extract tag text (remove the × character)
+      let tagText = tagEl.textContent.replace(/\s*×\s*$/, '').trim();
+      console.log('Bookmarklet: Extracted tag text:', tagText);
+      return tagText;
+    }).filter(tag => tag && tag.trim() !== ''); // Filter out empty tags
+    
+    console.log('Bookmarklet: Final tags to submit:', tags);
+    
     const parsed = parseNotesAndLink(notes, questionLink);
     const payload = {
       question: questionLink || '',
@@ -492,7 +680,8 @@
       category: parsed.category || '',
       difficulty: parsed.difficulty || '',
       notes: parsed.extractedNotes || notes || '',
-      status: 'Must Review'
+      status: 'Must Review',
+      tags: tags // Send tags directly as array
     };
     submitBtn.disabled = true;
     submitBtn.textContent = 'Adding...';
@@ -503,12 +692,12 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      
+        
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Network error' }));
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
-      
+        
       showStatus('✅ Question added successfully!', 'success');
       setTimeout(() => document.getElementById('gmat-logger-modal').remove(), 1500);
     } catch (error) {
@@ -518,7 +707,7 @@
       submitBtn.textContent = 'Quick Add';
     }
   }
-  
+
   function showStatus(message, type) {
     const statusDiv = document.getElementById('gmat-logger-status');
     statusDiv.style.display = 'block';

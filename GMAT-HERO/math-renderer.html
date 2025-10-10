@@ -39,6 +39,9 @@
             margin-bottom: 20px;
             resize: vertical;
         }
+        .button-group {
+            margin-bottom: 20px;
+        }
         button {
             background-color: #3498db;
             color: white;
@@ -48,7 +51,7 @@
             cursor: pointer;
             font-size: 16px;
             margin-right: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         button:hover {
             background-color: #2980b9;
@@ -93,6 +96,47 @@
         .rendering-info li {
             margin-bottom: 5px;
         }
+        .file-upload {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .file-upload label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .question-list {
+            margin-top: 20px;
+        }
+        .question-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            background-color: #fff;
+        }
+        .question-item h3 {
+            margin-top: 0;
+            color: #333;
+            cursor: pointer;
+        }
+        .question-item h3:hover {
+            color: #3498db;
+        }
+        .question-content {
+            display: none;
+        }
+        .active .question-content {
+            display: block;
+        }
+        .question-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +149,7 @@
                 <li>Copy a GMAT question from the clipboard (using the bookmarklet)</li>
                 <li>Paste it into the text area below</li>
                 <li>Click "Render Question" to display with proper math formatting</li>
+                <li>Or upload a JSON file containing multiple questions</li>
                 <li>Use "Clear" to reset the form</li>
             </ul>
             <p><strong>Supported formats:</strong> Standard text with $inline$ and $$display$$ math expressions</p>
@@ -112,12 +157,21 @@
         
         <textarea id="question-input" placeholder="Paste your GMAT question here...&#10;&#10;Example:&#10;n is the product of the first 5 prime numbers. If $\dfrac{12!}{n}$ is divisible by $2^k$, what is the greatest value of a positive integer $k$?&#10;&#10;A. 6&#10;B. 7&#10;C. 8&#10;D. 9&#10;E. 10"></textarea>
         
-        <button id="render-btn">Render Question</button>
-        <button id="clear-btn">Clear</button>
-        <button id="sample-btn">Load Sample</button>
+        <div class="button-group">
+            <button id="render-btn">Render Question</button>
+            <button id="clear-btn">Clear</button>
+            <button id="sample-btn">Load Sample</button>
+        </div>
+        
+        <div class="file-upload">
+            <label for="json-file">Upload JSON File with Questions:</label>
+            <input type="file" id="json-file" accept=".json">
+            <button id="upload-btn">Load Questions from JSON</button>
+            <p id="file-status" style="margin-top: 10px; font-size: 14px; color: #666;"></p>
+        </div>
         
         <div id="question-display">
-            <p style="color: #666; text-align: center; font-style: italic;">Question will be displayed here after rendering...</p>
+            <p style="color: #666; text-align: center; font-style: italic;">Questions will be displayed here after rendering...</p>
         </div>
     </div>
 
@@ -128,6 +182,9 @@
         const clearBtn = document.getElementById('clear-btn');
         const sampleBtn = document.getElementById('sample-btn');
         const questionDisplay = document.getElementById('question-display');
+        const jsonFileInput = document.getElementById('json-file');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileStatus = document.getElementById('file-status');
         
         // Sample question
         const sampleQuestion = `n is the product of the first 5 prime numbers. If $\\dfrac{12!}{n}$ is divisible by $2^k$, what is the greatest value of a positive integer $k$?
@@ -136,15 +193,26 @@ A. 6
 B. 7
 C. 8
 D. 9
-E. 10`;
+E. 10
+
+Sample with currency: A television manufacturer produces 600 units of a certain model each month at a cost to the manufacturer of $90 per unit and all of the produced units are sold each month. What is the minimum selling price per unit that will ensure that the monthly profit (revenue from sales minus the manufacturer's cost to produce) on the sales of these units will be at least $42,000?`;
         
         // Event listeners
-        renderBtn.addEventListener('click', renderQuestion);
+        renderBtn.addEventListener('click', renderSingleQuestion);
         clearBtn.addEventListener('click', clearForm);
         sampleBtn.addEventListener('click', loadSample);
+        uploadBtn.addEventListener('click', loadQuestionsFromJSON);
+        jsonFileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileStatus.textContent = `Selected file: ${this.files[0].name}. Click "Load Questions from JSON" to load.`;
+                fileStatus.style.color = '#666';
+            } else {
+                fileStatus.textContent = '';
+            }
+        });
         
-        // Render question function
-        function renderQuestion() {
+        // Render single question function
+        function renderSingleQuestion() {
             const inputText = questionInput.value.trim();
             if (!inputText) {
                 alert('Please paste a question first!');
@@ -155,15 +223,36 @@ E. 10`;
                 // Parse the input text
                 const parsedContent = parseQuestion(inputText);
                 
+                // Escape currency dollar signs before rendering
+                const escapedQuestion = escapeCurrencyDollars(parsedContent.question);
+                const escapedAnswers = parsedContent.answers.map(answer => escapeCurrencyDollars(answer));
+                
                 // Render the content
                 questionDisplay.innerHTML = `
                     <div class="question-section">
                         <h2>Question</h2>
-                        <div id="question-content">${parsedContent.question}</div>
+                        <div id="question-content">${escapedQuestion}</div>
                     </div>
                     <div class="question-section">
                         <h2>Answer Choices</h2>
-                        <div class="answer-choices">${parsedContent.answers}</div>
+                        <div class="answer-choices">${escapedAnswers.map((answer, index) => {
+                            // Check if answer already has a label prefix
+                            let formattedAnswer = answer;
+                            let label = '';
+                            
+                            // Check if answer starts with a label like "A.", "B.", etc.
+                            const labelMatch = answer.match(/^([A-Ea-e])\.\s*(.*)/);
+                            if (labelMatch) {
+                                label = labelMatch[1].toUpperCase();
+                                formattedAnswer = labelMatch[2];
+                            } else {
+                                // No label found, use default labeling
+                                const labels = ['A', 'B', 'C', 'D', 'E'];
+                                label = index < labels.length ? labels[index] : String.fromCharCode(65 + index);
+                            }
+                            
+                            return `<div class="answer-choice"><strong>${label}.</strong> ${formattedAnswer}</div>`;
+                        }).join('')}</div>
                     </div>
                 `;
                 
@@ -191,81 +280,56 @@ E. 10`;
             }
         }
         
-        // Parse question function - simplified and more robust version
-        function parseQuestion(text) {
-            // Split the text into lines
-            const lines = text.split('\n');
+        // Escape currency dollar signs (but not math delimiters)
+        function escapeCurrencyDollars(text) {
+            if (!text) return text;
             
-            // Find where answer choices start
-            let answerStartIndex = -1;
+            // This function carefully distinguishes between:
+            // 1. Mathematical expressions: $$...$$ or $...$ (should NOT be escaped)
+            // 2. Currency values: $90, $400, etc. (should be escaped)
             
-            // Look for various patterns that indicate start of answer choices
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                // Check if line starts with a letter followed by a period or parenthesis
-                if (/^[A-E][\.\)]/.test(line)) {
-                    answerStartIndex = i;
-                    break;
-                }
-                // Check if this line is a header like "Answer Choices:" and the next non-empty line starts with A.
-                if (line.toLowerCase().includes("answer") && line.toLowerCase().includes("choice")) {
-                    // Look for the first actual answer choice after this header
-                    for (let j = i + 1; j < lines.length; j++) {
-                        if (/^[A-E][\.\)]/.test(lines[j].trim())) {
-                            answerStartIndex = j;
-                            break;
-                        }
-                    }
-                    if (answerStartIndex !== -1) break;
-                }
-            }
+            // First, let's identify and protect mathematical expressions
+            let result = text;
             
-            let question = '';
-            let answers = '';
+            // Protect display math $$...$$
+            result = result.replace(/\$\$([^$]+)\$\$/g, function(match, content) {
+                return '__DISPLAY_MATH__' + content + '__DISPLAY_MATH__';
+            });
             
-            if (answerStartIndex === -1) {
-                // No answer choices found, treat everything as question
-                question = lines.join('<br>');
-                answers = '<p style="color: #666; font-style: italic;">No answer choices found</p>';
-            } else {
-                // Split into question and answers
-                // Question is everything before the first answer choice
-                const questionLines = lines.slice(0, answerStartIndex);
-                question = questionLines.join('<br>');
-                
-                // Remove any "Answer Choices:" headers from the question
-                question = question.replace(/<br>\s*Answer\s+Choices\s*:?\s*<br>/gi, '<br>');
-                question = question.replace(/\s*Answer\s+Choices\s*:?\s*/gi, '');
-                
-                // Collect answer choices
-                const answerChoices = [];
-                for (let i = answerStartIndex; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (/^[A-E][\.\)]/.test(line)) {
-                        answerChoices.push(line);
-                    } else if (line && answerChoices.length > 0) {
-                        // This is a continuation of the last answer choice
-                        answerChoices[answerChoices.length - 1] += ' ' + line;
-                    }
-                }
-                
-                // Format answers
-                answers = answerChoices.map(choice => 
-                    `<div class="answer-choice">${choice}</div>`
-                ).join('');
-            }
+            // Protect inline math $...$ (avoiding $$...$$)
+            // We do this by first marking all $$...$$ as protected, then handling $...$
+            let tempResult = result.replace(/\$\$/g, '__DOUBLE_DOLLAR__');
             
-            return {
-                question: question,
-                answers: answers || '<p style="color: #666; font-style: italic;">No answer choices found</p>'
-            };
+            // Now handle single dollar signs (inline math)
+            tempResult = tempResult.replace(/\$([^$]*)\$/g, function(match, content) {
+                return '__INLINE_MATH__' + content + '__INLINE_MATH__';
+            });
+            
+            // Restore double dollars
+            tempResult = tempResult.replace(/__DOUBLE_DOLLAR__/g, '$$');
+            
+            // Now escape currency dollar signs (those not protected)
+            tempResult = tempResult.replace(/\$/g, '\\$');
+            
+            // Restore mathematical expressions
+            tempResult = tempResult.replace(/__DISPLAY_MATH__([^_]+)__DISPLAY_MATH__/g, function(match, content) {
+                return '$$' + content + '$$';
+            });
+            
+            tempResult = tempResult.replace(/__INLINE_MATH__([^_]+)__INLINE_MATH__/g, function(match, content) {
+                return '$' + content + '$';
+            });
+            
+            return tempResult;
         }
         
         // Clear form function
         function clearForm() {
             questionInput.value = '';
-            questionDisplay.innerHTML = '<p style="color: #666; text-align: center; font-style: italic;">Question will be displayed here after rendering...</p>';
+            questionDisplay.innerHTML = '<p style="color: #666; text-align: center; font-style: italic;">Questions will be displayed here after rendering...</p>';
             questionInput.focus();
+            jsonFileInput.value = '';
+            fileStatus.textContent = '';
         }
         
         // Load sample function
@@ -273,14 +337,187 @@ E. 10`;
             questionInput.value = sampleQuestion;
         }
         
-        // Auto-render math when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        // Load questions from JSON file
+        function loadQuestionsFromJSON() {
+            const file = jsonFileInput.files[0];
+            if (!file) {
+                alert('Please select a JSON file first!');
+                return;
+            }
+            
+            if (!file.name.endsWith('.json')) {
+                alert('Please select a valid JSON file!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    renderQuestionsFromJSON(jsonData);
+                    fileStatus.textContent = `Loaded ${jsonData.totalRecords || (jsonData.questions ? jsonData.questions.length : 0)} questions from ${file.name}`;
+                    fileStatus.style.color = 'green';
+                } catch (error) {
+                    console.error('Error parsing JSON file:', error);
+                    fileStatus.textContent = 'Error parsing JSON file: ' + error.message;
+                    fileStatus.style.color = 'red';
+                }
+            };
+            reader.onerror = function() {
+                console.error('Error reading file');
+                fileStatus.textContent = 'Error reading file';
+                fileStatus.style.color = 'red';
+            };
+            reader.readAsText(file);
+        }
+        
+        // Render questions from JSON data
+        function renderQuestionsFromJSON(jsonData) {
+            if (!jsonData || !jsonData.questions || !Array.isArray(jsonData.questions)) {
+                throw new Error('Invalid JSON format: Expected "questions" array');
+            }
+            
+            // Create a list of questions
+            let html = '<div class="question-list">';
+            
+            jsonData.questions.forEach((question, index) => {
+                const questionId = `question-${index}`;
+                
+                // Escape currency dollar signs in question and answers
+                const escapedQuestion = escapeCurrencyDollars(question.question || 'No question text provided');
+                const escapedAnswers = (question.answers || []).map(answer => escapeCurrencyDollars(answer));
+                
+                html += `
+                    <div class="question-item" id="${questionId}">
+                        <h3 onclick="toggleQuestion('${questionId}')">Question ${index + 1}${question.link ? ' - <a href="' + question.link + '" target="_blank">View Original</a>' : ''}</h3>
+                        <div class="question-meta">
+                            ${question.link ? 'Source: ' + question.link : ''}
+                        </div>
+                        <div class="question-content">
+                            <div class="question-section">
+                                <h2>Question</h2>
+                                <div class="question-text">${escapedQuestion}</div>
+                            </div>
+                            <div class="question-section">
+                                <h2>Answer Choices</h2>
+                                <div class="answer-choices">
+                                    ${renderAnswerChoices(escapedAnswers)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            questionDisplay.innerHTML = html;
+            
+            // Render math with MathJax
             if (typeof MathJax !== 'undefined') {
-                MathJax.startup.promise.then(() => {
-                    console.log('MathJax loaded');
+                MathJax.typesetPromise([questionDisplay]).then(() => {
+                    console.log('MathJax rendering complete');
+                }).catch((err) => {
+                    console.error('MathJax rendering error:', err);
                 });
             }
-        });
+            
+            // Render math with KaTeX as fallback
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(questionDisplay, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ]
+                });
+            }
+        }
+        
+        // Render answer choices
+        function renderAnswerChoices(answers) {
+            if (!answers || !Array.isArray(answers) || answers.length === 0) {
+                return '<p>No answer choices provided</p>';
+            }
+            
+            let html = '';
+            const labels = ['A', 'B', 'C', 'D', 'E'];
+            
+            answers.forEach((answer, index) => {
+                // Check if answer already has a label prefix
+                let formattedAnswer = answer;
+                let label = '';
+                
+                // Check if answer starts with a label like "A.", "B.", etc.
+                const labelMatch = answer.match(/^([A-Ea-e])\.\s*(.*)/);
+                if (labelMatch) {
+                    label = labelMatch[1].toUpperCase();
+                    formattedAnswer = labelMatch[2];
+                } else {
+                    // No label found, use default labeling
+                    label = index < labels.length ? labels[index] : String.fromCharCode(65 + index);
+                }
+                
+                html += `<div class="answer-choice"><strong>${label}.</strong> ${formattedAnswer}</div>`;
+            });
+            
+            return html;
+        }
+        
+        // Toggle question visibility
+        function toggleQuestion(questionId) {
+            const questionElement = document.getElementById(questionId);
+            questionElement.classList.toggle('active');
+        }
+        
+        // Parse question function (for single question rendering)
+        function parseQuestion(inputText) {
+            // Split the input into lines
+            const lines = inputText.split('\n');
+            
+            // Find where answer choices begin
+            let answerStartIndex = -1;
+            const answerPrefixes = ['A.', 'B.', 'C.', 'D.', 'E.', 'A)', 'B)', 'C)', 'D)', 'E)'];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (answerPrefixes.some(prefix => line.startsWith(prefix))) {
+                    answerStartIndex = i;
+                    break;
+                }
+            }
+            
+            // If no answer choices found, treat entire text as question
+            if (answerStartIndex === -1) {
+                return {
+                    question: inputText,
+                    answers: []
+                };
+            }
+            
+            // Extract question text (everything before answer choices)
+            const questionText = lines.slice(0, answerStartIndex).join('\n').trim();
+            
+            // Extract answer choices
+            const answers = [];
+            for (let i = answerStartIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.length > 0) {
+                    // Remove the prefix (A., B., etc.) and trim
+                    let answer = line;
+                    for (const prefix of answerPrefixes) {
+                        if (line.startsWith(prefix)) {
+                            answer = line.substring(prefix.length).trim();
+                            break;
+                        }
+                    }
+                    answers.push(answer);
+                }
+            }
+            
+            return {
+                question: questionText,
+                answers: answers
+            };
+        }
     </script>
 </body>
 </html>

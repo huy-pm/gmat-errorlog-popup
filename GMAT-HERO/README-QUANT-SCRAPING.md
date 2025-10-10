@@ -248,4 +248,24 @@ These improvements ensure that answer choices with complex mathematical notation
 - Questions now properly display mathematical expressions as `$n$`, `$n>1$`, etc. instead of raw HTML
 - Maintains consistency between manual and automated extraction formats
 
-The fix ensures that when the bookmarklet encounters answer choices with Katex mathematical expressions, it properly extracts the underlying LaTeX notation and formats it correctly for clipboard output.
+### Fix for Currency Dollar Signs in Questions (v1.4)
+- Resolved issue where dollar signs representing currency (e.g., "$90") were being interpreted as math delimiters by MathJax/KaTeX
+- Added proper escaping for currency dollar signs while preserving mathematical expressions
+- Questions with currency values now render correctly without breaking the text formatting
+- Both single question rendering and JSON batch rendering now handle currency values properly
+- Improved regex compatibility across different browsers
+
+### JSON File Upload Enhancement (v1.5)
+- Added support for uploading JSON files containing multiple questions
+- Implemented collapsible list view for displaying multiple questions
+- Added automatic file selection feedback
+- Enhanced user experience with better status messages
+
+### Improved Math Expression Handling (v1.6)
+- Enhanced the distinction between mathematical expressions and currency values
+- Fixed duplicate labeling issue in answer choices
+- Improved protection of mathematical expressions during currency escaping
+- Better handling of both display math ($$...$$) and inline math ($...$) expressions
+- More robust parsing of answer choices with pre-existing labels
+
+The fixes ensure that when the bookmarklet encounters answer choices with Katex mathematical expressions, it properly extracts the underlying LaTeX notation and formats it correctly for clipboard output.

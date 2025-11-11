@@ -90,12 +90,8 @@ javascript: (function() {
         
         // Build passage from parts before the question
         if (questionIndex >= 0) {
-            var passageParts = parts.slice(0, questionIndex + 1); // Include the part with the question mark
+            var passageParts = parts.slice(0, questionIndex); // Only include parts BEFORE the question
             passage = passageParts.join(" ").trim();
-            
-            // Remove the question from the passage
-            var questionWithTags = parts[questionIndex];
-            passage = passage.replace(questionWithTags, '').trim();
         } else {
             // If no question found, treat everything as passage
             passage = stemContent;

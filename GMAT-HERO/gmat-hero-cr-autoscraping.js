@@ -165,12 +165,8 @@ javascript: (function() {
                 
                 // Build passage from parts before the question
                 if (questionIndex >= 0) {
-                    var passageParts = parts.slice(0, questionIndex + 1); // Include the part with the question mark
+                    var passageParts = parts.slice(0, questionIndex); // Only include parts BEFORE the question
                     passage = passageParts.join(" ").trim();
-                    
-                    // Remove the question from the passage
-                    var questionWithTags = parts[questionIndex];
-                    passage = passage.replace(questionWithTags, '').trim();
                 } else {
                     // If no question found, treat everything as passage
                     passage = stemContent;
@@ -218,16 +214,16 @@ javascript: (function() {
             }
             
             // Format answers as A. [choice], B. [choice], etc.
-            var formattedAnswers = answerChoices.map(function(choice, index) {
-                var letter = String.fromCharCode(65 + index); // A, B, C, D, E
-                return letter + ". " + choice;
-            });
+            // var formattedAnswers = answerChoices.map(function(choice, index) {
+            //     var letter = String.fromCharCode(65 + index); // A, B, C, D, E
+            //     return letter + ". " + choice;
+            // });
             
             // Return extracted data
             return {
                 passage: passage,
                 question: question,
-                answers: formattedAnswers
+                answer_chocies: answerChoices
             };
         } catch (error) {
             console.error("Error occurred while extracting question data: " + (error.message || error));

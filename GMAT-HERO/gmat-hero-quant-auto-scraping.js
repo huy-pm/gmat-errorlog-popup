@@ -168,10 +168,10 @@ javascript: (function() {
             }
             
             // Format answers as A. [choice], B. [choice], etc.
-            var formattedAnswers = answerChoices.map(function(choice, index) {
-                var letter = String.fromCharCode(65 + index); // A, B, C, D, E
-                return letter + ". " + choice;
-            });
+            // var formattedAnswers = answerChoices.map(function(choice, index) {
+            //     var letter = String.fromCharCode(65 + index); // A, B, C, D, E
+            //     return letter + ". " + choice;
+            // });
             
             // Get current page URL as question link
             var questionLink = window.location.href;
@@ -179,7 +179,7 @@ javascript: (function() {
             // Return extracted data
             return {
                 question: questionText,
-                answers: formattedAnswers,
+                answer_choices: answerChoices,
                 link: questionLink
             };
         } catch (error) {

@@ -291,6 +291,16 @@ Sample with currency: A television manufacturer produces 600 units of a certain 
             // First, let's identify and protect mathematical expressions
             let result = text;
             
+            // Handle escaped backslashes that might be present in JSON
+            // This is important for expressions like \\( x \\)
+            result = result.replace(/\\\\\(/g, '\\(');
+            result = result.replace(/\\\\\)/g, '\\)');
+            result = result.replace(/\\\\\[/g, '\\[');
+            result = result.replace(/\\\\\]/g, '\\]');
+            result = result.replace(/\\\\left/g, '\\left');
+            result = result.replace(/\\\\right/g, '\\right');
+            result = result.replace(/\\\\frac/g, '\\frac');
+            
             // Protect display math $$...$$
             result = result.replace(/\$\$([^$]+)\$\$/g, function(match, content) {
                 return '__DISPLAY_MATH__' + content + '__DISPLAY_MATH__';
@@ -354,8 +364,19 @@ Sample with currency: A television manufacturer produces 600 units of a certain 
             reader.onload = function(e) {
                 try {
                     const jsonData = JSON.parse(e.target.result);
-                    renderQuestionsFromJSON(jsonData);
-                    fileStatus.textContent = `Loaded ${jsonData.totalRecords || (jsonData.questions ? jsonData.questions.length : 0)} questions from ${file.name}`;
+                    // Handle both formats: direct array or object with questions property
+                    let questionsData;
+                    if (Array.isArray(jsonData)) {
+                        // Direct array format
+                        questionsData = { questions: jsonData };
+                    } else if (jsonData && jsonData.questions && Array.isArray(jsonData.questions)) {
+                        // Object with questions property
+                        questionsData = jsonData;
+                    } else {
+                        throw new Error('Invalid JSON format: Expected either an array of questions or an object with a "questions" array');
+                    }
+                    renderQuestionsFromJSON(questionsData);
+                    fileStatus.textContent = `Loaded ${questionsData.questions.length} questions from ${file.name}`;
                     fileStatus.style.color = 'green';
                 } catch (error) {
                     console.error('Error parsing JSON file:', error);
@@ -385,7 +406,10 @@ Sample with currency: A television manufacturer produces 600 units of a certain 
                 
                 // Escape currency dollar signs in question and answers
                 const escapedQuestion = escapeCurrencyDollars(question.question || 'No question text provided');
-                const escapedAnswers = (question.answers || []).map(answer => escapeCurrencyDollars(answer));
+                
+                // Handle both 'answers' and 'answer_choices' properties
+                const answers = question.answers || question.answer_choices || [];
+                const escapedAnswers = answers.map(answer => escapeCurrencyDollars(answer));
                 
                 html += `
                     <div class="question-item" id="${questionId}">
@@ -470,6 +494,36 @@ Sample with currency: A television manufacturer produces 600 units of a certain 
         
         // Parse question function (for single question rendering)
         function parseQuestion(inputText) {
+            // Check if input is JSON
+            try {
+                const jsonData = JSON.parse(inputText);
+                // Handle array format
+                if (Array.isArray(jsonData) && jsonData.length > 0) {
+                    const question = jsonData[0];
+                    return {
+                        question: question.question || '',
+                        answers: question.answers || question.answer_choices || []
+                    };
+                }
+                // Handle object format with questions array
+                else if (jsonData.questions && Array.isArray(jsonData.questions) && jsonData.questions.length > 0) {
+                    const question = jsonData.questions[0];
+                    return {
+                        question: question.question || '',
+                        answers: question.answers || question.answer_choices || []
+                    };
+                }
+                // Handle single question object format
+                else if (jsonData.question) {
+                    return {
+                        question: jsonData.question || '',
+                        answers: jsonData.answers || jsonData.answer_choices || []
+                    };
+                }
+            } catch (e) {
+                // Not JSON, continue with text parsing
+            }
+            
             // Split the input into lines
             const lines = inputText.split('\n');
             

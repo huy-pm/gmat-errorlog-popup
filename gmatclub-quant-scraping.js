@@ -31,25 +31,34 @@ javascript:(function() {
     // Convert the clone to HTML string for easier manipulation
     let htmlContent = clone.innerHTML;
     
-    // Find the first answer choice to split question from answers
-    // Look for any pattern that starts with a letter in parentheses or followed by a period
+    // Improved answer choice extraction logic
+    // First, try to find a clear separator between question and answers
     let answerStartIndex = -1;
-    let firstAnswerLetter = '';
     
-    // Patterns to match answer choices: (A), A., A), etc.
-    let patterns = [
-      /\(\s*[A-E]\s*\)/,  // (A), (B), etc.
-      /[A-E]\s*\./,       // A., B., etc.
-      /[A-E]\s*\)/,       // A), B), etc.
+    // Look for common separators that typically come before answer choices
+    let separators = [
+      '<br><br>',  // Double line break
+      '<br/>\\s*<br/>',  // XHTML double line break
+      '\\n\\s*\\n'   // Double newline
     ];
     
-    for (let pattern of patterns) {
-      let match = htmlContent.match(pattern);
+    for (let separator of separators) {
+      let regex = new RegExp(separator, 'i');
+      let match = htmlContent.match(regex);
       if (match) {
-        answerStartIndex = match.index;
-        firstAnswerLetter = match[0].match(/[A-E]/)[0];
-        break;
+        // Look for answer choices after this separator
+        let afterSeparator = htmlContent.substring(match.index + match[0].length);
+        if (hasValidAnswerChoices(afterSeparator)) {
+          answerStartIndex = match.index + match[0].length;
+          break;
+        }
       }
+    }
+    
+    // If we didn't find a separator, try to find answer choices directly
+    if (answerStartIndex === -1) {
+      // Look for a block that contains consecutive answer choices
+      answerStartIndex = findAnswerBlockStart(htmlContent);
     }
     
     let questionHTML = '';
@@ -60,36 +69,121 @@ javascript:(function() {
       questionHTML = htmlContent.substring(0, answerStartIndex).trim();
       let answersPart = htmlContent.substring(answerStartIndex).trim();
       
-      // Extract all answer choices
-      let answerChoices = [];
-      let answerRegex = /(?:(?:\(\s*([A-E])\s*\))|(?:([A-E])\s*\.?)|(?:([A-E])\s*\)))/g;
-      let match;
-      let lastMatchEnd = 0;
+      // Extract all answer choices using improved logic
+      let answerChoices = extractAnswerChoices(answersPart);
       
-      while ((match = answerRegex.exec(answersPart)) !== null) {
-        let letter = match[1] || match[2] || match[3]; // Get the letter from any of the capture groups
-        if (letter) {
-          if (answerChoices.length > 0) {
-            // Set the content for the previous answer choice
-            answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd, match.index).trim();
-          }
-          // Add new answer choice
-          answerChoices.push({letter: letter, content: ''});
-          lastMatchEnd = match.index + match[0].length;
-        }
-      }
-      
-      // Set content for the last answer choice
-      if (answerChoices.length > 0) {
-        answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd).trim();
-      }
-      
-      // Format answers for display - ALWAYS in format "A. [Answer choice]"
+      // Format answers for display
       answersHTML = answerChoices.map(choice => `${choice.letter}. ${choice.content}`).join("<br>");
     } else {
       // Fallback: if we can't find answer choices, treat everything as question
       questionHTML = htmlContent;
       answersHTML = "No answer choices found";
+    }
+    
+    // Helper function to check if a block has valid answer choices
+    function hasValidAnswerChoices(content) {
+      // Split content into lines
+      let lines = content.split(/<br\s*\/?>|\n/);
+      
+      // Look for consecutive answer choices starting with A
+      let consecutiveCount = 0;
+      let foundA = false;
+      
+      for (let i = 0; i < Math.min(lines.length, 10); i++) {  // Check first 10 lines
+        let line = lines[i].trim();
+        if (line.match(/^\s*\(\s*A\s*\)/) || line.match(/^\s*A\s*\./) || line.match(/^\s*A\s*\)/)) {
+          foundA = true;
+          consecutiveCount = 1;
+          
+          // Check next lines for B, C, D, E
+          for (let j = 1; j < 5; j++) {
+            if (i + j < lines.length) {
+              let nextLine = lines[i + j].trim();
+              let expectedLetter = String.fromCharCode(65 + j);  // B, C, D, E
+              if (nextLine.match(new RegExp(`^\\s*\\(\\s*${expectedLetter}\\s*\\)`, 'i')) || 
+                  nextLine.match(new RegExp(`^\\s*${expectedLetter}\\s*\\.`, 'i')) || 
+                  nextLine.match(new RegExp(`^\\s*${expectedLetter}\\s*\\)`, 'i'))) {
+                consecutiveCount++;
+              } else {
+                break;
+              }
+            }
+          }
+          break;
+        }
+      }
+      
+      // We need at least 2 consecutive answer choices to be confident
+      return consecutiveCount >= 2;
+    }
+    
+    // Helper function to find the start of the answer block
+    function findAnswerBlockStart(content) {
+      // Split content into lines
+      let lines = content.split(/<br\s*\/?>|\n/);
+      
+      // Look for consecutive answer choices
+      for (let i = 0; i < lines.length - 1; i++) {
+        let line = lines[i].trim();
+        // Check if this line starts with answer choice A
+        if (line.match(/^\s*\(\s*A\s*\)/) || line.match(/^\s*A\s*\./) || line.match(/^\s*A\s*\)/)) {
+          // Check if next line starts with answer choice B
+          let nextLine = lines[i + 1].trim();
+          if (nextLine.match(/^\s*\(\s*B\s*\)/) || nextLine.match(/^\s*B\s*\./) || nextLine.match(/^\s*B\s*\)/)) {
+            // Found consecutive answer choices, calculate the start index
+            let upToIndex = 0;
+            for (let j = 0; j < i; j++) {
+              upToIndex += lines[j].length + 1;  // +1 for the newline/br
+            }
+            return upToIndex;
+          }
+        }
+      }
+      
+      return -1;  // Not found
+    }
+    
+    // Helper function to extract answer choices
+    function extractAnswerChoices(content) {
+      let answerChoices = [];
+      let lines = content.split(/<br\s*\/?>|\n/);
+      let capturing = false;
+      let currentChoice = null;
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        
+        // Check if this line starts an answer choice
+        let match = line.match(/^\s*[\(\[]?\s*([A-E])\s*[\.\)]?\s*/i);
+        if (match) {
+          let letter = match[1].toUpperCase();
+          
+          // If we were already capturing a choice, save it
+          if (currentChoice) {
+            answerChoices.push(currentChoice);
+          }
+          
+          // Start capturing new choice
+          capturing = true;
+          let contentStart = match[0].length;
+          currentChoice = {
+            letter: letter,
+            content: line.substring(contentStart).trim()
+          };
+        } else if (capturing && currentChoice) {
+          // Continue adding content to the current choice
+          if (line.length > 0) {
+            currentChoice.content += " " + line;
+          }
+        }
+      }
+      
+      // Don't forget the last choice
+      if (currentChoice) {
+        answerChoices.push(currentChoice);
+      }
+      
+      return answerChoices;
     }
     
     // Create overlay

@@ -1,4 +1,11 @@
 javascript:(function() {
+  // Function to decode HTML entities
+  function decodeHtmlEntities(text) {
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+  }
+
   // Function to detect the GMAT section
   function detectSection() {
     let section = "Unknown";
@@ -110,7 +117,53 @@ javascript:(function() {
       answersHTML = "No answer choices found";
     }
     
-    // Create overlay
+    // Create JSON structure for Quant question
+    let jsonData = {
+      "question_link": "",
+      "source": "",
+      "difficulty": "",
+      "type": "Quant",
+      "content": {
+        "question_text": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
+        "answer_choices": [], // Changed from object to array
+        "correct_answer": "",
+        "subtype": "Problem Solving"
+      }
+    };
+    
+    // Populate answer choices if found
+    if (answerStartIndex !== -1) {
+      let answerChoices = [];
+      let answerRegex = /(?:(?:\(\s*([A-E])\s*\))|(?:([A-E])\s*\.?)|(?:([A-E])\s*\)))/g;
+      let match;
+      let lastMatchEnd = 0;
+      let answersPart = htmlContent.substring(answerStartIndex).trim();
+      
+      while ((match = answerRegex.exec(answersPart)) !== null) {
+        let letter = match[1] || match[2] || match[3]; // Get the letter from any of the capture groups
+        if (letter) {
+          if (answerChoices.length > 0) {
+            // Set the content for the previous answer choice
+            answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd, match.index).trim();
+          }
+          // Add new answer choice
+          answerChoices.push({letter: letter, content: ''});
+          lastMatchEnd = match.index + match[0].length;
+        }
+      }
+      
+      // Set content for the last answer choice
+      if (answerChoices.length > 0) {
+        answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd).trim();
+      }
+      
+      // Map answer choices to the JSON structure (as array)
+      jsonData.content.answer_choices = answerChoices.map(choice => 
+        decodeHtmlEntities(choice.content.replace(/<[^>]*>/g, '').trim())
+      );
+    }
+    
+    // Create overlay with JSON display
     let overlay = document.createElement('div');
     overlay.style.position = 'fixed';
     overlay.style.top = '8%';
@@ -127,22 +180,20 @@ javascript:(function() {
     overlay.style.boxShadow = '0 0 15px rgba(0,0,0,0.3)';
     overlay.style.fontFamily = 'Arial, sans-serif';
     overlay.innerHTML = `
-      <h2 style="margin-bottom: 15px;">Question</h2>
-      <div id="bookmarklet-question" style="margin-bottom: 20px; line-height: 1.6;">${questionHTML}</div>
-      <h2 style="margin-bottom: 15px;">Answer Choices</h2>
-      <div id="bookmarklet-answers" style="line-height: 1.8;">${answersHTML}</div>
+      <h2 style="margin-bottom: 15px;">Quant Question JSON</h2>
+      <pre id="bookmarklet-json" style="background: #f4f4f4; padding: 15px; border-left: 4px solid #333; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px;">${JSON.stringify(jsonData, null, 2)}</pre>
       <button id="bookmarklet-copy" style="margin-top:20px;padding:8px 15px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Copy to Clipboard</button>
       <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:8px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">Close</button>
     `;
     
     document.body.appendChild(overlay);
-    
+    console.log(JSON.stringify(jsonData, null, 2))
     // Close button
     document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
     
     // Copy button
     document.getElementById("bookmarklet-copy").onclick = () => {
-      let copyText = "Question:\n" + questionHTML.replace(/<[^>]*>/g, '') + "\n\nAnswer Choices:\n" + answersHTML.replace(/<[^>]*>/g, '\n').replace(/\n+/g, '\n').trim();
+      let copyText = JSON.stringify(jsonData, null, 2);
       navigator.clipboard.writeText(copyText).then(() => {
         let btn = document.getElementById("bookmarklet-copy");
         let originalText = btn.innerText;
@@ -363,6 +414,9 @@ javascript:(function() {
         .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
         .trim();
       
+      // Apply HTML entity decoding
+      passage = decodeHtmlEntities(passage);
+
       // Clean up question
       question = question
         .replace(/<br\s*\/?>/gi, ' ')            // Convert <br> to spaces
@@ -373,6 +427,9 @@ javascript:(function() {
         .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
         .trim();
       
+      // Apply HTML entity decoding
+      question = decodeHtmlEntities(question);
+
       // Clean up answers
       var cleanAnswers = answersHTML
         .replace(/<br\s*\/?>/gi, '\n')
@@ -383,70 +440,81 @@ javascript:(function() {
         .replace(/&[a-zA-Z0-9#]+;/g, '')
         .trim();
       
-      // Create popup window
-      var popup = window.open("", "Extracted Data", "width=800,height=700,scrollbars=yes");
-      popup.document.write(
-        '<html>' +
-        '<head>' +
-          '<title>Extracted Data</title>' +
-          '<style>' +
-            'body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }' +
-            'h2 { color: #333; border-bottom: 2px solid #333; padding-bottom: 5px; }' +
-            'pre { background: #f4f4f4; padding: 15px; border-left: 4px solid #333; white-space: pre-wrap; word-wrap: break-word; }' +
-            '.section { margin-bottom: 30px; }' +
-            'button { padding: 10px 15px; margin: 5px; background-color: #2196F3; color: white; border: none; cursor: pointer; }' +
-            'button:hover { background-color: #0b7dda; }' +
-          '</style>' +
-        '</head>' +
-        '<body>' +
-          '<button onclick="copyToClipboard()">Copy to Clipboard</button>' +
-          '<div class="section">' +
-            '<h2>Passage</h2>' +
-            '<pre id="passage">' + passage + '</pre>' +
-          '</div>' +
-          '<div class="section">' +
-            '<h2>Question</h2>' +
-            '<pre id="question">' + question + '</pre>' +
-          '</div>' +
-          '<div class="section">' +
-            '<h2>Answer Choices</h2>' +
-            '<pre id="answers">' + cleanAnswers + '</pre>' +
-          '</div>' +
-          '<script>' +
-            'function copyToClipboard() {' +
-              'var passage = document.getElementById("passage").textContent;' +
-              'var question = document.getElementById("question").textContent;' +
-              'var answers = document.getElementById("answers").textContent;' +
-              'var content = passage + "\\n\\n" + question + "\\n\\n" + answers;' +
-              'navigator.clipboard.writeText(content).then(function() {' +
-                'showToast("Content copied to clipboard");' +
-              '}).catch(function(err) {' +
-                'console.error("Failed to copy: ", err);' +
-                'showToast("Failed to copy content to clipboard");' +
-              '});' +
-            '}' +
-            'function showToast(message) {' +
-              'var toast = document.createElement("div");' +
-              'toast.textContent = message;' +
-              'toast.style.cssText = "position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); " +' +
-                '"background-color: #333; color: white; padding: 16px; border-radius: 4px; " +' +
-                '"z-index: 1000; font-family: Arial, sans-serif; font-size: 16px; " +' +
-                '"box-shadow: 0 2px 8px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s;";' +
-              'document.body.appendChild(toast);' +
-              'setTimeout(function() {' +
-                'toast.style.opacity = "1";' +
-              '}, 100);' +
-              'setTimeout(function() {' +
-                'toast.style.opacity = "0";' +
-                'setTimeout(function() {' +
-                  'document.body.removeChild(toast);' +
-                '}, 300);' +
-              '}, 3000);' +
-            '}' +
-          '</script>' +
-        '</body>' +
-        '</html>'
-      );
+      // Apply HTML entity decoding
+      cleanAnswers = decodeHtmlEntities(cleanAnswers);
+
+      // Parse answer choices into structured format
+      var answerChoicesArray = []; // Changed from object to array
+      
+      // Split clean answers by newlines and parse each line
+      var answerLines = cleanAnswers.split("\n");
+      answerLines.forEach(function(line) {
+        var match = line.match(/^([A-E])\.\s*(.*)/);
+        if (match) {
+          // Add choice to array instead of mapping to letter keys
+          answerChoicesArray.push(match[2].trim());
+        }
+      });
+      
+      // Create JSON structure for CR question
+      var jsonData = {
+        "question_link": "",
+        "source": "",
+        "difficulty": "",
+        "type": "CR",
+        "content": {
+          "passage": passage,
+          "question_text": question,
+          "answer_choices": answerChoicesArray, // Changed from object to array
+          "correct_answer": "",
+          "subtype": "Assumption"
+        }
+      };
+      
+      // Create overlay with JSON display
+      var overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '8%';
+      overlay.style.left = '8%';
+      overlay.style.width = '84%';
+      overlay.style.height = '84%';
+      overlay.style.background = 'white';
+      overlay.style.color = 'black';
+      overlay.style.overflow = 'auto';
+      overlay.style.zIndex = 999999;
+      overlay.style.padding = '20px';
+      overlay.style.border = '2px solid black';
+      overlay.style.borderRadius = '8px';
+      overlay.style.boxShadow = '0 0 15px rgba(0,0,0,0.3)';
+      overlay.style.fontFamily = 'Arial, sans-serif';
+      overlay.innerHTML = `
+        <h2 style="margin-bottom: 15px;">Critical Reasoning Question JSON</h2>
+        <pre id="bookmarklet-json" style="background: #f4f4f4; padding: 15px; border-left: 4px solid #333; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px;">${JSON.stringify(jsonData, null, 2)}</pre>
+        <button id="bookmarklet-copy" style="margin-top:20px;padding:8px 15px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Copy to Clipboard</button>
+        <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:8px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">Close</button>
+      `;
+      
+      document.body.appendChild(overlay);
+      
+      // Close button
+      document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
+      
+      // Copy button
+      document.getElementById("bookmarklet-copy").onclick = () => {
+        let copyText = JSON.stringify(jsonData, null, 2);
+        navigator.clipboard.writeText(copyText).then(() => {
+          let btn = document.getElementById("bookmarklet-copy");
+          let originalText = btn.innerText;
+          btn.innerText = "Copied!";
+          btn.style.background = "#8BC34A";
+          setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#4CAF50";
+          }, 2000);
+        }).catch(err => {
+          alert("Copy failed: " + err);
+        });
+      };
       
     } catch (s) {
       alert("Error occurred: " + (s.message || s));
@@ -499,6 +567,9 @@ javascript:(function() {
       // Clean up other HTML tags but preserve the marked content
       let passageText = passageHTML.replace(/<[^>]*>/g, '');
       
+      // Apply HTML entity decoding
+      passageText = decodeHtmlEntities(passageText);
+
       // Step 2: Locate and extract questions and answers
       let questions = [];
       
@@ -526,6 +597,9 @@ javascript:(function() {
               questionText = questionText.replace(/^\d+\.\s*/, '');
             }
             
+            // Apply HTML entity decoding
+            questionText = decodeHtmlEntities(questionText);
+
             // Find answer choices by parsing the content after the question
             let choices = {};
             
@@ -551,6 +625,9 @@ javascript:(function() {
             // Remove all other HTML tags
             let choicesText = choicesHTML.replace(/<[^>]*>/g, '');
             
+            // Apply HTML entity decoding
+            choicesText = decodeHtmlEntities(choicesText);
+            
             // Split by newlines and parse each line
             let lines = choicesText.split('\n');
             
@@ -563,7 +640,8 @@ javascript:(function() {
                   let letter = choiceMatch[1].toUpperCase();
                   let text = choiceMatch[2].trim();
                   if (text) {
-                    choices[letter] = text;
+                    // Apply HTML entity decoding to the answer choice text
+                    choices[letter] = decodeHtmlEntities(text);
                   }
                 }
               }
@@ -582,13 +660,41 @@ javascript:(function() {
         });
       }
       
-      // Step 3: Compile and format the final output
-      let outputData = {
-        passage: passageText,
-        questions: questions
+      // Step 3: Compile and format the final output as JSON
+      // Create structured questions array
+      let structuredQuestions = [];
+      questions.forEach(q => {
+        // Convert choices object to array
+        let choicesArray = [];
+        let letters = ["A", "B", "C", "D", "E"];
+        letters.forEach(letter => {
+          if (q.choices[letter]) {
+            choicesArray.push(decodeHtmlEntities(q.choices[letter]));
+          }
+        });
+        
+        let structuredQuestion = {
+          "question_text": decodeHtmlEntities(q.question_text),
+          "answer_choices": choicesArray, // Changed from object to array
+          "correct_answer": ""
+        };
+        structuredQuestions.push(structuredQuestion);
+      });
+      
+      // Create JSON structure for RC question
+      let jsonData = {
+        "question_link": "",
+        "source": "",
+        "difficulty": "",
+        "type": "RC",
+        "content": {
+          "passage_title": "",
+          "passage_text": passageText,
+          "questions": structuredQuestions
+        }
       };
       
-      // Create overlay
+      // Create overlay with JSON display
       let overlay = document.createElement('div');
       overlay.style.position = 'fixed';
       overlay.style.top = '5%';
@@ -604,35 +710,9 @@ javascript:(function() {
       overlay.style.borderRadius = '8px';
       overlay.style.boxShadow = '0 0 15px rgba(0,0,0,0.3)';
       overlay.style.fontFamily = 'Arial, sans-serif';
-      
-      // Format the output for display
-      // Highlight text enclosed in ** with yellow background
-      let formattedPassage = passageText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<span style="background-color: yellow;">$1</span>');
-      let formattedQuestions = '';
-      
-      questions.forEach((q, index) => {
-        formattedQuestions += `<h3>Question ${index + 1}</h3>`;
-        formattedQuestions += `<p><strong>${q.question_text}</strong></p>`;
-        for (let letter in q.choices) {
-          formattedQuestions += `<div><strong>${letter}</strong> ${q.choices[letter]}</div>`;
-        }
-        formattedQuestions += '<br>';
-      });
-      
       overlay.innerHTML = `
-        <h2 style="margin-bottom: 15px; color: #333;">Reading Comprehension Passage and Questions</h2>
-        <div style="margin-bottom: 20px;">
-          <h3>Passage</h3>
-          <div style="padding: 15px; border-left: 4px solid #3498db; margin-bottom: 20px; line-height: 1.6;">
-            ${formattedPassage}
-          </div>
-        </div>
-        <div style="margin-bottom: 20px;">
-          <h3>Questions</h3>
-          <div style="line-height: 1.8;">
-            ${formattedQuestions || 'No questions found.'}
-          </div>
-        </div>
+        <h2 style="margin-bottom: 15px; color: #333;">Reading Comprehension Question JSON</h2>
+        <pre id="bookmarklet-json" style="background: #f4f4f4; padding: 15px; border-left: 4px solid #333; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 20px;">${JSON.stringify(jsonData, null, 2)}</pre>
         <button id="bookmarklet-copy" style="margin-top:20px;padding:10px 15px;background:#2196F3;color:white;border:none;border-radius:4px;cursor:pointer;font-size:16px;">Copy to Clipboard</button>
         <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:10px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;font-size:16px;">Close</button>
       `;
@@ -644,15 +724,7 @@ javascript:(function() {
       
       // Copy button
       document.getElementById("bookmarklet-copy").onclick = () => {
-        // Format data for copying
-        let copyText = "Passage:\n" + passageText + "\n\nQuestions:\n";
-        questions.forEach((q, index) => {
-          copyText += `\n${index + 1}. ${q.question_text}\n`;
-          for (let letter in q.choices) {
-            copyText += `   ${letter} ${q.choices[letter]}\n`;
-          }
-        });
-        
+        let copyText = JSON.stringify(jsonData, null, 2);
         navigator.clipboard.writeText(copyText).then(() => {
           let btn = document.getElementById("bookmarklet-copy");
           let originalText = btn.innerText;

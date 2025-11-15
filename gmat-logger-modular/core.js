@@ -438,7 +438,7 @@ async function submitQuestionData() {
     difficulty: parsed.difficulty || '',
     notes: parsed.extractedNotes || notes || '',
     status: 'Must Review',
-    tags: tags
+    mistakeTypes: tags
   };
 
   submitBtn.disabled = true;

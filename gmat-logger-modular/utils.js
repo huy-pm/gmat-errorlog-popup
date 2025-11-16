@@ -14,7 +14,7 @@ export const CONFIG = {
 const isLocalhost = window.location.hostname === 'localhost' ||
                    window.location.hostname === '127.0.0.1' ||
                    window.location.href.includes('localhost');
-export const baseUrl = CONFIG.devUrl//isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
+export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
 
 // Mappings for parsing
 export const sectionMappings = {

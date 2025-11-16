@@ -14,7 +14,7 @@ export const CONFIG = {
 const isLocalhost = window.location.hostname === 'localhost' ||
                    window.location.hostname === '127.0.0.1' ||
                    window.location.href.includes('localhost');
-export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
+export const baseUrl = CONFIG.devUrl//isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
 
 // Mappings for parsing
 export const sectionMappings = {
@@ -185,18 +185,18 @@ export function loadScript(url) {
 /**
  * Enrich question JSON with bookmarklet data
  */
-export function enrichQuestionJSON(questionJson, payload) {
-  if (!questionJson) return null;
+export function enrichquestionData(questionData, payload) {
+  if (!questionData) return null;
 
   // Map bookmarklet data to question JSON
-  questionJson.question_link = payload.question || questionJson.question_link;
-  questionJson.difficulty = payload.difficulty || questionJson.difficulty;
-  questionJson.source = payload.source || questionJson.source;
+  questionData.question_link = payload.question || questionData.question_link;
+  questionData.difficulty = payload.difficulty || questionData.difficulty;
+  questionData.source = payload.source || questionData.source;
 
   // Map category to category (if content exists)
-  if (questionJson.content && payload.category) {
-    questionJson.content.category = payload.category;
+  if (questionData.content && payload.category) {
+    questionData.content.category = payload.category;
   }
 
-  return questionJson;
+  return questionData;
 }

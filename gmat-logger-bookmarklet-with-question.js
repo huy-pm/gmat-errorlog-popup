@@ -1001,7 +1001,7 @@
   // UNIFIED EXTRACTION FUNCTIONS
   // ============================================================================
 
-  async function extractQuestionJSON(questionLink) {
+  async function extractquestionData(questionLink) {
     const source = detectQuestionSource(questionLink);
     console.log("Detected question source:", source);
 
@@ -1015,20 +1015,20 @@
     return null;
   }
 
-  function enrichQuestionJSON(questionJson, payload) {
-    if (!questionJson) return null;
+  function enrichquestionData(questionData, payload) {
+    if (!questionData) return null;
 
     // Map bookmarklet data to question JSON
-    questionJson.question_link = payload.question || questionJson.question_link;
-    questionJson.difficulty = payload.difficulty || questionJson.difficulty;
-    questionJson.source = payload.source || questionJson.source;
+    questionData.question_link = payload.question || questionData.question_link;
+    questionData.difficulty = payload.difficulty || questionData.difficulty;
+    questionData.source = payload.source || questionData.source;
 
     // Map category to category (if content exists)
-    if (questionJson.content && payload.category) {
-      questionJson.content.category = payload.category;
+    if (questionData.content && payload.category) {
+      questionData.content.category = payload.category;
     }
 
-    return questionJson;
+    return questionData;
   }
 
   // ============================================================================
@@ -1507,17 +1507,17 @@
     try {
       // NEW: Extract question JSON
       console.log('Attempting to extract question from page...');
-      const questionJson = await extractQuestionJSON(questionLink);
+      const questionData = await extractquestionData(questionLink);
 
-      if (questionJson) {
-        console.log('Question extracted successfully:', questionJson);
+      if (questionData) {
+        console.log('Question extracted successfully:', questionData);
 
         // Enrich with bookmarklet data
-        const enrichedJson = enrichQuestionJSON(questionJson, payload);
+        const enrichedJson = enrichquestionData(questionData, payload);
         console.log('Enriched question JSON:', enrichedJson);
 
         // Add to payload
-        payload.question_json = enrichedJson;
+        payload.questionData = enrichedJson;
 
         submitBtn.textContent = 'Adding...';
       } else {

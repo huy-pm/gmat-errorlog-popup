@@ -70,7 +70,7 @@ document.head.appendChild(s);
 2. **Loading**: Loads `core.js` + `utils.js` + appropriate extractor
 3. **Extraction**: Extracts question content from the page
 4. **Enrichment**: Merges your input with extracted data
-5. **Submission**: Sends to API with `question_json` field
+5. **Submission**: Sends to API with `question_data` field
 
 ### Loading Behavior
 
@@ -162,7 +162,7 @@ The modular version sends the same payload as the monolithic version:
   "notes": "My notes here",
   "status": "Must Review",
   "tags": ["tag1", "tag2"],
-  "question_json": {
+  "questionData": {
     "question_link": "https://...",
     "source": "GMATClub",
     "difficulty": "hard",

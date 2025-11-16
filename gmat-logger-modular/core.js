@@ -15,7 +15,7 @@ import {
   detectQuestionSource,
   createBadge,
   showStatus,
-  enrichQuestionJSON
+  enrichquestionData
 } from './utils.js';
 
 // State
@@ -448,17 +448,17 @@ async function submitQuestionData() {
     // Extract question JSON if extractor is available
     if (extractQuestionFn) {
       console.log('Attempting to extract question from page...');
-      const questionJson = await extractQuestionFn();
+      const questionData = await extractQuestionFn();
 
-      if (questionJson) {
-        console.log('Question extracted successfully:', questionJson);
+      if (questionData) {
+        console.log('Question extracted successfully:', questionData);
 
         // Enrich with bookmarklet data
-        const enrichedJson = enrichQuestionJSON(questionJson, payload);
+        const enrichedJson = enrichquestionData(questionData, payload);
         console.log('Enriched question JSON:', enrichedJson);
 
         // Add to payload
-        payload.question_json = enrichedJson;
+        payload.questionData = enrichedJson;
 
         submitBtn.textContent = 'Adding...';
       } else {

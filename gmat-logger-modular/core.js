@@ -74,7 +74,7 @@ function parseNotes(notes) {
 
     if (categoryWords.length > 1) {
       for (let i = 0; i <= words.length - categoryWords.length; i++) {
-        const wordIndices = Array.from({length: categoryWords.length}, (_, idx) => i + idx);
+        const wordIndices = Array.from({ length: categoryWords.length }, (_, idx) => i + idx);
         if (wordIndices.some(idx => usedWords.has(idx))) continue;
 
         const matchesCategory = categoryWords.every((catWord, idx) =>
@@ -691,5 +691,42 @@ export async function createModal() {
 
   document.body.appendChild(modal);
   document.getElementById('gmat-question-link').value = window.location.href;
+
+  // Auto-populate notes with extracted difficulty and category
+  const notesTextarea = document.getElementById('gmat-notes');
+  if (extractQuestionFn) {
+    try {
+      console.log('Attempting to extract tags for auto-population...');
+      const questionData = await extractQuestionFn();
+
+      if (questionData) {
+        let autoNotes = '';
+
+        // Add category if available (for CR questions)
+        if (questionData.content && questionData.content.category) {
+          autoNotes += questionData.content.category;
+        }
+
+        // Add difficulty if available
+        if (questionData.difficulty) {
+          if (autoNotes) autoNotes += ' ';
+          autoNotes += questionData.difficulty.toLowerCase();
+        }
+
+        // Set the notes field with auto-detected values
+        if (autoNotes) {
+          notesTextarea.value = autoNotes + '\n';
+          console.log('Auto-populated notes:', autoNotes);
+        }
+      }
+    } catch (error) {
+      console.warn('Error auto-populating notes:', error);
+    }
+  }
+
   setupEventListeners();
+
+  // Focus on the notes textarea and position cursor at the end
+  notesTextarea.focus();
+  notesTextarea.setSelectionRange(notesTextarea.value.length, notesTextarea.value.length);
 }

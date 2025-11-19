@@ -13,6 +13,73 @@ function decodeHtmlEntities(text) {
 }
 
 /**
+ * Difficulty mapping: GMATClub tag_id -> difficulty level
+ */
+const DIFFICULTY_MAPPING = {
+  "1518": "Easy",  // Sub 505 Level
+  "227": "Easy",   // 505-555 Level
+  "226": "Medium",   // 555-605 Level
+  "1525": "Medium", // 605-655 Level
+  "168": "Hard",   // 655-705 Level
+  "1532": "Hard",  // 705-805 Level
+  "1539": "Hard"   // 805+ Level
+};
+
+/**
+ * Category mapping: GMATClub tag_id -> system category
+ */
+const CATEGORY_MAPPING = {
+  "115": "Assumption",
+  "119": "Boldface",
+  "203": "Complete Argument",
+  "116": "Other",
+  "171": "Other",
+  "207": "Evaluate",
+  "120": "Inference",
+  "201": "Flaw",
+  "121": "Inference",
+  "247": "Other",
+  "486": "Other",
+  "1236": "Other",
+  "123": "Paradox",
+  "202": "Other",
+  "118": "Strengthen",
+  "117": "Weaken",
+  "2073": "Other",
+  "2074": "Other"
+};
+
+/**
+ * Extract tag IDs from GMATClub page and map to difficulty and category
+ */
+function extractTagsFromPage() {
+  const tagList = document.querySelector('#taglist');
+  if (!tagList) {
+    return { difficulty: "", category: "" };
+  }
+
+  const tagLinks = tagList.querySelectorAll('a.tag_css_link');
+  let difficulty = "";
+  let category = "";
+
+  tagLinks.forEach(link => {
+    const tagId = link.getAttribute('data-title') || link.href.match(/tag_id=(\d+)/)?.[1];
+    if (tagId) {
+      // Check if it's a difficulty tag
+      if (DIFFICULTY_MAPPING[tagId] && !difficulty) {
+        difficulty = DIFFICULTY_MAPPING[tagId];
+      }
+      // Check if it's a category tag
+      if (CATEGORY_MAPPING[tagId] && !category) {
+        category = CATEGORY_MAPPING[tagId];
+      }
+    }
+  });
+
+  return { difficulty, category };
+}
+
+/**
  * Detect GMAT section from GMATClub page DOM
  */
 function detectGMATClubSection() {
@@ -498,15 +565,37 @@ export function extractGMATClubQuestion() {
   const section = detectGMATClubSection();
   console.log("Detected GMATClub section:", section);
 
+  // Extract tags (difficulty and category) from the page
+  const tags = extractTagsFromPage();
+  console.log("Extracted tags:", tags);
+
+  let questionData = null;
+
   switch (section) {
     case "Quant":
-      return extractGMATClubQuantContent();
+      questionData = extractGMATClubQuantContent();
+      break;
     case "Critical Reasoning":
-      return extractGMATClubCRContent();
+      questionData = extractGMATClubCRContent();
+      break;
     case "Reading":
-      return extractGMATClubRCContent();
+      questionData = extractGMATClubRCContent();
+      break;
     default:
       console.warn("Unsupported GMATClub question type:", section);
       return null;
   }
+
+  // Merge extracted tags into the question data
+  if (questionData) {
+    if (tags.difficulty) {
+      questionData.difficulty = tags.difficulty;
+    }
+    if (tags.category && section === "Critical Reasoning") {
+      // Only apply category mapping for CR questions
+      questionData.content.category = tags.category;
+    }
+  }
+
+  return questionData;
 }

@@ -54,8 +54,8 @@ function extractGMATClubQuantContent() {
     let span = document.createElement('span');
     // Check if it's display math based on parent or script attributes
     if (script.parentElement.classList.contains('MathJax_Display') ||
-        script.getAttribute("mode") === "display" ||
-        script.type.includes("display")) {
+      script.getAttribute("mode") === "display" ||
+      script.type.includes("display")) {
       span.textContent = "$$" + tex + "$$";   // block math
     } else {
       span.textContent = "$" + tex + "$";   // inline math
@@ -106,7 +106,7 @@ function extractGMATClubQuantContent() {
         if (answerChoices.length > 0) {
           answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd, match.index).trim();
         }
-        answerChoices.push({letter: letter, content: ''});
+        answerChoices.push({ letter: letter, content: '' });
         lastMatchEnd = match.index + match[0].length;
       }
     }
@@ -177,7 +177,7 @@ function extractGMATClubCRContent() {
     }
 
     var o = n.cloneNode(true);
-    o.querySelectorAll('.item.twoRowsBlock,.post_signature').forEach(function(e) {
+    o.querySelectorAll('.item.twoRowsBlock,.post_signature').forEach(function (e) {
       e.remove();
     });
 
@@ -189,7 +189,9 @@ function extractGMATClubCRContent() {
       "<br><br>\\(",
       "<br><br>[A-Za-z][.:;)/]",
       "<br><br>[A-Za-z]\\s",
-      "<br><br>&lt;[A-Za-z]&gt;"
+      "<br><br>&lt;[A-Za-z]&gt;",
+      "<br><br><ul>",
+      "<ul>\\([A-Za-z]\\)"
     ];
 
     for (var i = 0; i < answerPatterns.length; i++) {
@@ -207,6 +209,9 @@ function extractGMATClubCRContent() {
       questionHTML = h.substring(0, answerSectionStart).trim();
       var answersPart = h.substring(answerSectionStart).trim();
 
+      // Clean up <ul> tags if present in the answer section
+      answersPart = answersPart.replace(/<\/?ul>/g, "");
+
       var answerLines = answersPart.split("<br>");
       var answerChoices = [];
 
@@ -219,7 +224,7 @@ function extractGMATClubCRContent() {
         }
       }
 
-      answersHTML = answerChoices.map(function(choice) {
+      answersHTML = answerChoices.map(function (choice) {
         return choice
           .replace(/^\(([A-Za-z])\)/, '$1.')
           .replace(/^([A-Za-z])[:;)/]/, '$1.')
@@ -245,10 +250,10 @@ function extractGMATClubCRContent() {
       if (part.length === 0) continue;
 
       if ((part.includes("?") && (part.toLowerCase().includes("which") ||
-                                 part.toLowerCase().includes("what") ||
-                                 part.toLowerCase().includes("how") ||
-                                 part.toLowerCase().includes("why") ||
-                                 part.toLowerCase().includes("except:")))) {
+        part.toLowerCase().includes("what") ||
+        part.toLowerCase().includes("how") ||
+        part.toLowerCase().includes("why") ||
+        part.toLowerCase().includes("except:")))) {
         questionIndex = i;
         question = part;
         break;
@@ -311,7 +316,7 @@ function extractGMATClubCRContent() {
     var answerChoicesArray = [];
 
     var answerLines = cleanAnswers.split("\n");
-    answerLines.forEach(function(line) {
+    answerLines.forEach(function (line) {
       var match = line.match(/^([A-E])\.\s*(.*)/);
       if (match) {
         answerChoicesArray.push(match[2].trim());

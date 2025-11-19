@@ -32,7 +32,9 @@ javascript: (function() {
             "<br><br>\\(", // For (A) format
             "<br><br>[A-Za-z][.:;)/]", // For A., A), A:, A;, A/, A) formats (both uppercase and lowercase)
             "<br><br>[A-Za-z]\\s", // For A followed by space
-            "<br><br>&lt;[A-Za-z]&gt;" // For <A> format
+            "<br><br>&lt;[A-Za-z]&gt;", // For <A> format
+            "<br><br><ul>", // For <ul> format
+            "<ul>\\([A-Za-z]\\)" // For <ul>(A) format
         ];
         
         // Try to find the first occurrence of any answer pattern
@@ -51,6 +53,9 @@ javascript: (function() {
             // Split content at the answer choices
             questionHTML = h.substring(0, answerSectionStart).trim();
             var answersPart = h.substring(answerSectionStart).trim();
+
+            // Clean up <ul> tags if present in the answer section
+            answersPart = answersPart.replace(/<\/?ul>/g, "");
             
             // Extract answer choices by splitting on <br> and filtering
             var answerLines = answersPart.split("<br>");

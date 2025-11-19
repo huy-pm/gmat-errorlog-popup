@@ -1,4 +1,4 @@
-javascript:(function() {
+javascript: (function () {
   // Function to decode HTML entities
   function decodeHtmlEntities(text) {
     const textArea = document.createElement('textarea');
@@ -11,13 +11,13 @@ javascript:(function() {
     let section = "Unknown";
     const td = document.querySelector('td a[href*="/forum/"]')?.closest('td');
     if (td) {
-      if (td.querySelector('a[href*="quantitative-questions-7"]')) 
+      if (td.querySelector('a[href*="quantitative-questions-7"]'))
         section = "Quant";
-      else if (td.querySelector('a[href*="critical-reasoning-cr-139"]')) 
+      else if (td.querySelector('a[href*="critical-reasoning-cr-139"]'))
         section = "Critical Reasoning";
-      else if (td.querySelector('a[href*="reading-comprehension-rc-137"]')) 
+      else if (td.querySelector('a[href*="reading-comprehension-rc-137"]'))
         section = "Reading";
-      else if (td.querySelector('a[href*="data-insights-questions-177"]')) 
+      else if (td.querySelector('a[href*="data-insights-questions-177"]'))
         section = "Data Insights";
     }
     return section;
@@ -31,43 +31,43 @@ javascript:(function() {
       return;
     }
     let clone = container.cloneNode(true);
-    
+
     // Remove unwanted blocks
     clone.querySelectorAll('.twoRowsBlock, .post_signature, .spoiler').forEach(el => el.remove());
-    
+
     // Remove existing MathJax rendered HTML but preserve the script tags with math content
     clone.querySelectorAll('.MathJax_Preview, .mjx-chtml, .MJX_Assistive_MathML, .MathJax, .MathJax_Display').forEach(el => el.remove());
-    
+
     // Replace TeX scripts with proper delimiters for MathJax
     clone.querySelectorAll('script[type="math/tex"]').forEach(script => {
       let tex = script.textContent.trim();
       let span = document.createElement('span');
       // Check if it's display math based on parent or script attributes
-      if (script.parentElement.classList.contains('MathJax_Display') || 
-          script.getAttribute("mode") === "display" || 
-          script.type.includes("display")) {
+      if (script.parentElement.classList.contains('MathJax_Display') ||
+        script.getAttribute("mode") === "display" ||
+        script.type.includes("display")) {
         span.textContent = "$$" + tex + "$$";   // block math
       } else {
         span.textContent = "$" + tex + "$";   // inline math
       }
       script.parentNode.replaceChild(span, script);
     });
-    
+
     // Convert the clone to HTML string for easier manipulation
     let htmlContent = clone.innerHTML;
-    
+
     // Find the first answer choice to split question from answers
     // Look for any pattern that starts with a letter in parentheses or followed by a period
     let answerStartIndex = -1;
     let firstAnswerLetter = '';
-    
+
     // Patterns to match answer choices: (A), A., A), etc.
     let patterns = [
       /\(\s*[A-E]\s*\)/,  // (A), (B), etc.
       /[A-E]\s*\./,       // A., B., etc.
       /[A-E]\s*\)/,       // A), B), etc.
     ];
-    
+
     for (let pattern of patterns) {
       let match = htmlContent.match(pattern);
       if (match) {
@@ -76,21 +76,21 @@ javascript:(function() {
         break;
       }
     }
-    
+
     let questionHTML = '';
     let answersHTML = '';
-    
+
     if (answerStartIndex !== -1) {
       // Split content into question and answers
       questionHTML = htmlContent.substring(0, answerStartIndex).trim();
       let answersPart = htmlContent.substring(answerStartIndex).trim();
-      
+
       // Extract all answer choices
       let answerChoices = [];
       let answerRegex = /(?:(?:\(\s*([A-E])\s*\))|(?:([A-E])\s*\.?)|(?:([A-E])\s*\)))/g;
       let match;
       let lastMatchEnd = 0;
-      
+
       while ((match = answerRegex.exec(answersPart)) !== null) {
         let letter = match[1] || match[2] || match[3]; // Get the letter from any of the capture groups
         if (letter) {
@@ -99,16 +99,16 @@ javascript:(function() {
             answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd, match.index).trim();
           }
           // Add new answer choice
-          answerChoices.push({letter: letter, content: ''});
+          answerChoices.push({ letter: letter, content: '' });
           lastMatchEnd = match.index + match[0].length;
         }
       }
-      
+
       // Set content for the last answer choice
       if (answerChoices.length > 0) {
         answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd).trim();
       }
-      
+
       // Format answers for display - ALWAYS in format "A. [Answer choice]"
       answersHTML = answerChoices.map(choice => `${choice.letter}. ${choice.content}`).join("<br>");
     } else {
@@ -116,7 +116,7 @@ javascript:(function() {
       questionHTML = htmlContent;
       answersHTML = "No answer choices found";
     }
-    
+
     // Create JSON structure for Quant question
     let jsonData = {
       "question_link": "",
@@ -130,7 +130,7 @@ javascript:(function() {
         "subtype": "Problem Solving"
       }
     };
-    
+
     // Populate answer choices if found
     if (answerStartIndex !== -1) {
       let answerChoices = [];
@@ -138,7 +138,7 @@ javascript:(function() {
       let match;
       let lastMatchEnd = 0;
       let answersPart = htmlContent.substring(answerStartIndex).trim();
-      
+
       while ((match = answerRegex.exec(answersPart)) !== null) {
         let letter = match[1] || match[2] || match[3]; // Get the letter from any of the capture groups
         if (letter) {
@@ -147,22 +147,22 @@ javascript:(function() {
             answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd, match.index).trim();
           }
           // Add new answer choice
-          answerChoices.push({letter: letter, content: ''});
+          answerChoices.push({ letter: letter, content: '' });
           lastMatchEnd = match.index + match[0].length;
         }
       }
-      
+
       // Set content for the last answer choice
       if (answerChoices.length > 0) {
         answerChoices[answerChoices.length - 1].content = answersPart.substring(lastMatchEnd).trim();
       }
-      
+
       // Map answer choices to the JSON structure (as array)
-      jsonData.content.answer_choices = answerChoices.map(choice => 
+      jsonData.content.answer_choices = answerChoices.map(choice =>
         decodeHtmlEntities(choice.content.replace(/<[^>]*>/g, '').trim())
       );
     }
-    
+
     // Create overlay with JSON display
     let overlay = document.createElement('div');
     overlay.style.position = 'fixed';
@@ -185,12 +185,12 @@ javascript:(function() {
       <button id="bookmarklet-copy" style="margin-top:20px;padding:8px 15px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Copy to Clipboard</button>
       <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:8px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">Close</button>
     `;
-    
+
     document.body.appendChild(overlay);
     console.log(JSON.stringify(jsonData, null, 2))
     // Close button
     document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
-    
+
     // Copy button
     document.getElementById("bookmarklet-copy").onclick = () => {
       let copyText = JSON.stringify(jsonData, null, 2);
@@ -207,7 +207,7 @@ javascript:(function() {
         alert("Copy failed: " + err);
       });
     };
-    
+
     // Configure and load MathJax
     function configureMathJax() {
       window.MathJax = {
@@ -224,7 +224,7 @@ javascript:(function() {
         }
       };
     }
-    
+
     // Typeset the overlay content with MathJax
     function typesetOverlay() {
       if (window.MathJax && window.MathJax.typeset) {
@@ -238,19 +238,19 @@ javascript:(function() {
         });
       }
     }
-    
+
     // Check if MathJax is loaded
     if (typeof MathJax === "undefined" || !MathJax.typeset) {
       // Configure MathJax before loading
       configureMathJax();
-      
+
       // Load MathJax 3
       let script = document.createElement("script");
       script.type = "text/javascript";
       script.id = "MathJax-script";
       script.async = true;
       script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
-      script.onload = function() {
+      script.onload = function () {
         // Wait a bit for MathJax to initialize, then typeset
         setTimeout(typesetOverlay, 1000);
       };
@@ -270,26 +270,26 @@ javascript:(function() {
         alert("Could not find the first post wrapper!");
         return;
       }
-      
+
       var t = e.querySelector('.post-info.add-bookmark');
       if (!t) {
         alert("Could not find the post-info add-bookmark section!");
         return;
       }
-      
+
       var n = t.querySelector('.item.text');
       if (!n) {
         alert("Could not find the item text div!");
         return;
       }
-      
+
       var o = n.cloneNode(true);
-      o.querySelectorAll('.item.twoRowsBlock,.post_signature').forEach(function(e) {
+      o.querySelectorAll('.item.twoRowsBlock,.post_signature').forEach(function (e) {
         e.remove();
       });
-      
+
       var h = o.innerHTML.replace(/\r?\n|\r/g, "");
-      
+
       // Find where answer choices begin - look for multiple patterns
       // More comprehensive pattern matching for answer sections
       var answerSectionStart = -1;
@@ -297,9 +297,11 @@ javascript:(function() {
         "<br><br>\\(", // For (A) format
         "<br><br>[A-Za-z][.:;)/]", // For A., A), A:, A;, A/, A) formats (both uppercase and lowercase)
         "<br><br>[A-Za-z]\\s", // For A followed by space
-        "<br><br>&lt;[A-Za-z]&gt;" // For <A> format
+        "<br><br>&lt;[A-Za-z]&gt;", // For <A> format
+        "<br><br><ul>", // For <ul> format
+        "<ul>\\([A-Za-z]\\)" // For <ul>(A) format
       ];
-      
+
       // Try to find the first occurrence of any answer pattern
       for (var i = 0; i < answerPatterns.length; i++) {
         var pattern = new RegExp(answerPatterns[i]);
@@ -308,23 +310,26 @@ javascript:(function() {
           answerSectionStart = match;
         }
       }
-      
+
       var questionHTML = '';
       var answersHTML = '';
-      
+
       if (answerSectionStart !== -1) {
         // Split content at the answer choices
         questionHTML = h.substring(0, answerSectionStart).trim();
         var answersPart = h.substring(answerSectionStart).trim();
-        
+
+        // Clean up <ul> tags if present in the answer section
+        answersPart = answersPart.replace(/<\/?ul>/g, "");
+
         // Extract answer choices by splitting on <br> and filtering
         var answerLines = answersPart.split("<br>");
         var answerChoices = [];
-        
+
         // More comprehensive regex for answer detection
         // Matches: (A), (a), A., a., A), a), A:, a:, A;, a;, A/, a/, A, a followed by space or content
         var answerRegex = /^\([A-Za-z]\)|^[A-Za-z][.:;)/]?|^([A-Za-z])\s+|^&lt;[A-Za-z]&gt;/;
-        
+
         for (var i = 0; i < answerLines.length; i++) {
           var line = answerLines[i].trim();
           // Check for answer patterns with more comprehensive regex
@@ -332,9 +337,9 @@ javascript:(function() {
             answerChoices.push(line);
           }
         }
-        
+
         // Format answers for display - ALWAYS in format "A. [Answer choice]"
-        answersHTML = answerChoices.map(function(choice) {
+        answersHTML = answerChoices.map(function (choice) {
           // Comprehensive conversion to standard A. format
           return choice
             // Convert (A) format to A.
@@ -355,34 +360,34 @@ javascript:(function() {
         questionHTML = h;
         answersHTML = "No answer choices found";
       }
-      
+
       // Extract passage and question
       var passage = "";
       var question = "";
-      
+
       // Robust approach: Split by <br> and intelligently identify the question
       var parts = questionHTML.split("<br>");
       var questionIndex = -1;
-      
+
       // Look for the question part - it's typically the last meaningful part with a question mark
       // or contains key question words
       for (var i = parts.length - 1; i >= 0; i--) {
         var part = parts[i].trim();
         // Skip empty parts
         if (part.length === 0) continue;
-        
+
         // Look for question patterns
-        if ((part.includes("?") && (part.toLowerCase().includes("which") || 
-                                   part.toLowerCase().includes("what") || 
-                                   part.toLowerCase().includes("how") || 
-                                   part.toLowerCase().includes("why") || 
-                                   part.toLowerCase().includes("except:")))) {
+        if ((part.includes("?") && (part.toLowerCase().includes("which") ||
+          part.toLowerCase().includes("what") ||
+          part.toLowerCase().includes("how") ||
+          part.toLowerCase().includes("why") ||
+          part.toLowerCase().includes("except:")))) {
           questionIndex = i;
           question = part;
           break;
         }
       }
-      
+
       // Fallback: if we didn't find a specific pattern, look for any text ending with ?
       if (questionIndex === -1) {
         for (var i = parts.length - 1; i >= 0; i--) {
@@ -394,7 +399,7 @@ javascript:(function() {
           }
         }
       }
-      
+
       if (questionIndex >= 0) {
         // Build passage from parts before the question
         var passageParts = parts.slice(0, questionIndex);
@@ -403,7 +408,7 @@ javascript:(function() {
         // If no question found, treat everything as passage
         passage = questionHTML;
       }
-      
+
       // Clean up passage - remove HTML tags and normalize
       passage = passage
         .replace(/<br\s*\/?>/gi, '\n')          // Convert <br> to newlines
@@ -413,7 +418,7 @@ javascript:(function() {
         .replace(/&amp;/g, '&')
         .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
         .trim();
-      
+
       // Apply HTML entity decoding
       passage = decodeHtmlEntities(passage);
 
@@ -426,7 +431,7 @@ javascript:(function() {
         .replace(/&amp;/g, '&')
         .replace(/&[a-zA-Z0-9#]+;/g, '')        // Remove any remaining HTML entities
         .trim();
-      
+
       // Apply HTML entity decoding
       question = decodeHtmlEntities(question);
 
@@ -439,23 +444,23 @@ javascript:(function() {
         .replace(/&amp;/g, '&')
         .replace(/&[a-zA-Z0-9#]+;/g, '')
         .trim();
-      
+
       // Apply HTML entity decoding
       cleanAnswers = decodeHtmlEntities(cleanAnswers);
 
       // Parse answer choices into structured format
       var answerChoicesArray = []; // Changed from object to array
-      
+
       // Split clean answers by newlines and parse each line
       var answerLines = cleanAnswers.split("\n");
-      answerLines.forEach(function(line) {
+      answerLines.forEach(function (line) {
         var match = line.match(/^([A-E])\.\s*(.*)/);
         if (match) {
           // Add choice to array instead of mapping to letter keys
           answerChoicesArray.push(match[2].trim());
         }
       });
-      
+
       // Create JSON structure for CR question
       var jsonData = {
         "question_link": "",
@@ -467,10 +472,10 @@ javascript:(function() {
           "question_text": question,
           "answer_choices": answerChoicesArray, // Changed from object to array
           "correct_answer": "",
-          "subtype": "Assumption"
+          "subtype": ""
         }
       };
-      
+
       // Create overlay with JSON display
       var overlay = document.createElement('div');
       overlay.style.position = 'fixed';
@@ -493,12 +498,12 @@ javascript:(function() {
         <button id="bookmarklet-copy" style="margin-top:20px;padding:8px 15px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">Copy to Clipboard</button>
         <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:8px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">Close</button>
       `;
-      
+
       document.body.appendChild(overlay);
-      
+
       // Close button
       document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
-      
+
       // Copy button
       document.getElementById("bookmarklet-copy").onclick = () => {
         let copyText = JSON.stringify(jsonData, null, 2);
@@ -515,7 +520,7 @@ javascript:(function() {
           alert("Copy failed: " + err);
         });
       };
-      
+
     } catch (s) {
       alert("Error occurred: " + (s.message || s));
     }
@@ -530,22 +535,22 @@ javascript:(function() {
         alert('No question container found.');
         return;
       }
-      
+
       let clone = container.cloneNode(true);
-      
+
       // Remove unwanted blocks
       clone.querySelectorAll('.twoRowsBlock, .post_signature, .spoiler').forEach(el => el.remove());
-      
+
       // Convert the clone to HTML string for easier manipulation
       let htmlContent = clone.innerHTML;
-      
+
       // Find bbcodeBoxOut element
       let bbcodeBoxOut = clone.querySelector('.bbcodeBoxOut');
       if (!bbcodeBoxOut) {
         alert('No bbcodeBoxOut found.');
         return;
       }
-      
+
       // Step 1: Locate the passage content
       // Find the first bbcodeBoxIn within bbcodeBoxOut
       let bbcodeBoxIns = bbcodeBoxOut.querySelectorAll('.bbcodeBoxIn');
@@ -553,39 +558,39 @@ javascript:(function() {
         alert('No bbcodeBoxIn elements found.');
         return;
       }
-      
+
       let passageBox = bbcodeBoxIns[0];
       let passageHTML = passageBox.innerHTML;
-      
+
       // Process passage content
       // Convert <br> tags to newlines
       passageHTML = passageHTML.replace(/<br\s*\/?>/gi, '\n');
-      
+
       // Find <span> tags and enclose their content with ** markers
       passageHTML = passageHTML.replace(/<span[^>]*>(.*?)<\/span>/gi, '**$1**');
-      
+
       // Clean up other HTML tags but preserve the marked content
       let passageText = passageHTML.replace(/<[^>]*>/g, '');
-      
+
       // Apply HTML entity decoding
       passageText = decodeHtmlEntities(passageText);
 
       // Step 2: Locate and extract questions and answers
       let questions = [];
-      
+
       if (bbcodeBoxIns.length >= 2) {
         let questionsBox = bbcodeBoxIns[1];
         let questionWrappers = questionsBox.querySelectorAll('.question_wrapper');
-        
+
         questionWrappers.forEach((wrapper, index) => {
           try {
             // Clone the wrapper to avoid modifying the original
             let wrapperClone = wrapper.cloneNode(true);
-            
+
             // Find question text in <span> tags with style="font-weight: bold"
             let questionSpan = wrapperClone.querySelector('span[style*="font-weight: bold"]');
             let questionText = '';
-            
+
             if (questionSpan) {
               questionText = questionSpan.textContent.trim();
               // Remove the question number prefix (e.g., "1. ")
@@ -596,16 +601,16 @@ javascript:(function() {
               // Remove the question number prefix if present
               questionText = questionText.replace(/^\d+\.\s*/, '');
             }
-            
+
             // Apply HTML entity decoding
             questionText = decodeHtmlEntities(questionText);
 
             // Find answer choices by parsing the content after the question
             let choices = {};
-            
+
             // Get the HTML content of the wrapper
             let wrapperHTML = wrapper.innerHTML;
-            
+
             // Extract content after the question span
             let choicesHTML = '';
             if (questionSpan && questionSpan.outerHTML) {
@@ -618,19 +623,19 @@ javascript:(function() {
                 choicesHTML = choicesHTML.replace(questionSpan.outerHTML, '');
               }
             }
-            
+
             // Parse answer choices from the HTML
             // Convert <br> tags to newlines for easier parsing
             choicesHTML = choicesHTML.replace(/<br\s*\/?>/gi, '\n');
             // Remove all other HTML tags
             let choicesText = choicesHTML.replace(/<[^>]*>/g, '');
-            
+
             // Apply HTML entity decoding
             choicesText = decodeHtmlEntities(choicesText);
-            
+
             // Split by newlines and parse each line
             let lines = choicesText.split('\n');
-            
+
             lines.forEach(line => {
               let cleanLine = line.trim();
               if (cleanLine) {
@@ -646,7 +651,7 @@ javascript:(function() {
                 }
               }
             });
-            
+
             // Only add question if we have text
             if (questionText) {
               questions.push({
@@ -659,7 +664,7 @@ javascript:(function() {
           }
         });
       }
-      
+
       // Step 3: Compile and format the final output as JSON
       // Create structured questions array
       let structuredQuestions = [];
@@ -672,7 +677,7 @@ javascript:(function() {
             choicesArray.push(decodeHtmlEntities(q.choices[letter]));
           }
         });
-        
+
         let structuredQuestion = {
           "question_text": decodeHtmlEntities(q.question_text),
           "answer_choices": choicesArray, // Changed from object to array
@@ -680,7 +685,7 @@ javascript:(function() {
         };
         structuredQuestions.push(structuredQuestion);
       });
-      
+
       // Create JSON structure for RC question
       let jsonData = {
         "question_link": "",
@@ -693,7 +698,7 @@ javascript:(function() {
           "questions": structuredQuestions
         }
       };
-      
+
       // Create overlay with JSON display
       let overlay = document.createElement('div');
       overlay.style.position = 'fixed';
@@ -716,12 +721,12 @@ javascript:(function() {
         <button id="bookmarklet-copy" style="margin-top:20px;padding:10px 15px;background:#2196F3;color:white;border:none;border-radius:4px;cursor:pointer;font-size:16px;">Copy to Clipboard</button>
         <button id="bookmarklet-close" style="margin-top:20px;margin-left:10px;padding:10px 15px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;font-size:16px;">Close</button>
       `;
-      
+
       document.body.appendChild(overlay);
-      
+
       // Close button
       document.getElementById("bookmarklet-close").onclick = () => overlay.remove();
-      
+
       // Copy button
       document.getElementById("bookmarklet-copy").onclick = () => {
         let copyText = JSON.stringify(jsonData, null, 2);
@@ -738,7 +743,7 @@ javascript:(function() {
           alert("Copy failed: " + err);
         });
       };
-      
+
     } catch (error) {
       alert("Error occurred: " + error.message);
     }
@@ -748,7 +753,7 @@ javascript:(function() {
   try {
     const section = detectSection();
     // Removed alert for detected question type
-    
+
     switch (section) {
       case "Quant":
         extractQuantContent();

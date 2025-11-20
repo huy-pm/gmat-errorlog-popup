@@ -72,14 +72,14 @@ function extractGMATHeroQuantContent() {
 
     // Process all Katex math expressions
     var katexElements = tempDiv.querySelectorAll(".katex");
-    katexElements.forEach(function(katexElem) {
+    katexElements.forEach(function (katexElem) {
       var mathml = katexElem.querySelector(".katex-mathml");
       if (mathml) {
         var annotation = mathml.querySelector("annotation");
         if (annotation) {
           var texContent = annotation.textContent;
           var isDisplay = texContent.includes("\\dfrac") || texContent.includes("\\frac") ||
-                         texContent.includes("\\int") || texContent.includes("\\sum");
+            texContent.includes("\\int") || texContent.includes("\\sum");
           var mathPlaceholder = document.createTextNode(isDisplay ? "$$" + texContent + "$$" : "$" + texContent + "$");
           katexElem.replaceWith(mathPlaceholder);
         }
@@ -95,7 +95,7 @@ function extractGMATHeroQuantContent() {
     if (standardChoices) {
       var options = standardChoices.querySelectorAll('.option.ng-star-inserted, .option');
 
-      options.forEach(function(option) {
+      options.forEach(function (option) {
         var answerText = '';
 
         var label = option.querySelector('label');
@@ -106,7 +106,7 @@ function extractGMATHeroQuantContent() {
             tempDiv.innerHTML = label.innerHTML;
 
             var katexElementsInLabel = tempDiv.querySelectorAll(".katex");
-            katexElementsInLabel.forEach(function(katexElem) {
+            katexElementsInLabel.forEach(function (katexElem) {
               var mathml = katexElem.querySelector(".katex-mathml");
               if (mathml) {
                 var annotation = mathml.querySelector("annotation");
@@ -204,17 +204,17 @@ function extractGMATHeroCRContent() {
         if (cleanPart.includes("?")) {
           var lowerPart = cleanPart.toLowerCase();
           if (lowerPart.includes("which") ||
-              lowerPart.includes("what") ||
-              lowerPart.includes("how") ||
-              lowerPart.includes("why") ||
-              lowerPart.includes("except") ||
-              lowerPart.includes("vulnerable") ||
-              lowerPart.includes("flaw") ||
-              lowerPart.includes("assumption") ||
-              lowerPart.includes("conclusion") ||
-              lowerPart.includes("inference") ||
-              lowerPart.includes("strengthen") ||
-              lowerPart.includes("weaken")) {
+            lowerPart.includes("what") ||
+            lowerPart.includes("how") ||
+            lowerPart.includes("why") ||
+            lowerPart.includes("except") ||
+            lowerPart.includes("vulnerable") ||
+            lowerPart.includes("flaw") ||
+            lowerPart.includes("assumption") ||
+            lowerPart.includes("conclusion") ||
+            lowerPart.includes("inference") ||
+            lowerPart.includes("strengthen") ||
+            lowerPart.includes("weaken")) {
             questionIndex = i;
             question = cleanPart;
             break;
@@ -268,7 +268,7 @@ function extractGMATHeroCRContent() {
 
     if (standardChoices) {
       var options = standardChoices.querySelectorAll('.option.ng-star-inserted');
-      options.forEach(function(option) {
+      options.forEach(function (option) {
         var label = option.querySelector('label');
         if (label) {
           var span = label.querySelector('span');
@@ -292,8 +292,8 @@ function extractGMATHeroCRContent() {
         "passage": passage,
         "question_text": question,
         "answer_choices": answerChoices,
-        "correct_answer": "",
-        "category": "Assumption"
+        "correct_answer": ""
+        // Note: category left empty - focus on text content only
       }
     };
 

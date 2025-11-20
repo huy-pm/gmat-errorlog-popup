@@ -400,8 +400,8 @@ function extractGMATClubCRContent() {
         "passage": passage,
         "question_text": question,
         "answer_choices": answerChoicesArray,
-        "correct_answer": "",
-        "category": ""
+        "correct_answer": ""
+        // Note: category will be added from tag extraction if available
       }
     };
 
@@ -588,13 +588,15 @@ export function extractGMATClubQuestion() {
 
   // Merge extracted tags into the question data
   if (questionData) {
+    // Only set difficulty if successfully extracted
     if (tags.difficulty) {
       questionData.difficulty = tags.difficulty;
     }
+    // Only set category if successfully extracted (for CR questions only)
     if (tags.category && section === "Critical Reasoning") {
-      // Only apply category mapping for CR questions
       questionData.content.category = tags.category;
     }
+    // If category wasn't extracted, don't set any default - focus on text content only
   }
 
   return questionData;

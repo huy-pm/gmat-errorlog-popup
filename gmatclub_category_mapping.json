@@ -1,0 +1,92 @@
+{
+  "115": {
+    "gmatClubLabel": "Assumption",
+    "apiCategoryName": "Assumption",
+    "id": 115
+  },
+  "119": {
+    "gmatClubLabel": "Bold Face CR",
+    "apiCategoryName": "Boldface",
+    "id": 119
+  },
+  "203": {
+    "gmatClubLabel": "Complete the Passage",
+    "apiCategoryName": "Complete Argument",
+    "id": 203
+  },
+  "116": {
+    "gmatClubLabel": "Conclusion",
+    "apiCategoryName": "Other",
+    "id": 116
+  },
+  "171": {
+    "gmatClubLabel": "Debatable OA",
+    "apiCategoryName": "Other",
+    "id": 171
+  },
+  "207": {
+    "gmatClubLabel": "Evaluate Argument",
+    "apiCategoryName": "Evaluate",
+    "id": 207
+  },
+  "120": {
+    "gmatClubLabel": "Inference",
+    "apiCategoryName": "Inference",
+    "id": 120
+  },
+  "201": {
+    "gmatClubLabel": "Logical Flaw",
+    "apiCategoryName": "Flaw",
+    "id": 201
+  },
+  "121": {
+    "gmatClubLabel": "Must be True",
+    "apiCategoryName": "Inference",
+    "id": 121
+  },
+  "247": {
+    "gmatClubLabel": "Method of Reasoning",
+    "apiCategoryName": "Other",
+    "id": 247
+  },
+  "486": {
+    "gmatClubLabel": "Out of Scope - Too Hard",
+    "apiCategoryName": "Other",
+    "id": 486
+  },
+  "1236": {
+    "gmatClubLabel": "Poor Quality",
+    "apiCategoryName": "Other",
+    "id": 1236
+  },
+  "123": {
+    "gmatClubLabel": "Resolve Paradox",
+    "apiCategoryName": "Paradox",
+    "id": 123
+  },
+  "202": {
+    "gmatClubLabel": "Similar Reasoning",
+    "apiCategoryName": "Other",
+    "id": 202
+  },
+  "118": {
+    "gmatClubLabel": "Strengthen",
+    "apiCategoryName": "Strengthen",
+    "id": 118
+  },
+  "117": {
+    "gmatClubLabel": "Weaken",
+    "apiCategoryName": "Weaken",
+    "id": 117
+  },
+  "2073": {
+    "gmatClubLabel": "Resources",
+    "apiCategoryName": "Other",
+    "id": 2073
+  },
+  "2074": {
+    "gmatClubLabel": "Discussions",
+    "apiCategoryName": "Other",
+    "id": 2074
+  }
+}

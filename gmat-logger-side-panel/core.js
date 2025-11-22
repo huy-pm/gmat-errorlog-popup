@@ -1358,17 +1358,22 @@ export async function createSidebar() {
 
           // Add selected and correct answers if available
           let isIncorrect = false;
-          if (questionData.selectedAnswer && questionData.correctAnswer) {
+          if (questionData.selectedAnswer) {
             if (autoNotes) autoNotes += ' ';
-            autoNotes += `Selected:${questionData.selectedAnswer} Correct:${questionData.correctAnswer}`;
+            autoNotes += `Selected:${questionData.selectedAnswer}`;
+            console.log('[Debug] Auto-populate: Found selected answer:', questionData.selectedAnswer);
 
-            // Check if answer is incorrect
-            if (questionData.selectedAnswer !== questionData.correctAnswer) {
-              isIncorrect = true;
-              console.log('[Debug] Auto-populate: Incorrect answer detected');
+            // Add correct answer if available
+            if (questionData.correctAnswer) {
+              autoNotes += ` Correct:${questionData.correctAnswer}`;
+              console.log('[Debug] Auto-populate: Found correct answer:', questionData.correctAnswer);
+
+              // Check if answer is incorrect
+              if (questionData.selectedAnswer !== questionData.correctAnswer) {
+                isIncorrect = true;
+                console.log('[Debug] Auto-populate: Incorrect answer detected');
+              }
             }
-
-            console.log('[Debug] Auto-populate: Found answers - Selected:', questionData.selectedAnswer, 'Correct:', questionData.correctAnswer);
           }
 
           // Add time spent if available

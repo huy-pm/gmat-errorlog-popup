@@ -48,6 +48,105 @@ function detectGMATHeroSection() {
 }
 
 /**
+ * Extract metadata from GMAT Hero page (category, difficulty, selected/correct answers, time spent)
+ * Similar to extractGmatHeroData from bookmarklet
+ */
+function extractGMATHeroMetadata() {
+  const metadata = {
+    isReviewMode: false,
+    category: null,
+    selectedAnswer: null,
+    difficulty: null,
+    timeSpent: null,
+    correctAnswer: null
+  };
+
+  // 1. Check is this review-mode
+  const reviewModeEl = document.querySelector('.review-mode');
+  metadata.isReviewMode = !!reviewModeEl;
+
+  // 2. Extract category from .hide-small.centered
+  const categoryEl = document.querySelector('.hide-small.centered');
+  if (categoryEl) {
+    const fullText = categoryEl.textContent.trim();
+    const parts = fullText.split('-');
+    if (parts.length > 1) {
+      metadata.category = parts[parts.length - 1].trim();
+    } else {
+      metadata.category = fullText;
+    }
+  }
+
+  // 3. Extract selected answer
+  // Priority 1: Check for selected-answer class (most reliable for current selection)
+  const selectedLabel = document.querySelector('.selected-answer');
+  if (selectedLabel) {
+    const forAttr = selectedLabel.getAttribute('for');
+    if (forAttr) {
+      const parts = forAttr.split('-');
+      metadata.selectedAnswer = parts[parts.length - 1];
+
+      // Check if it is correct (parent standard-choices has 'has-answered-correctly')
+      const standardChoices = selectedLabel.closest('.standard-choices');
+      if (standardChoices && standardChoices.classList.contains('has-answered-correctly')) {
+        metadata.correctAnswer = metadata.selectedAnswer;
+      }
+    }
+  }
+
+  // Priority 2: Fallback to round-div (history) if selected-answer not found
+  if (!metadata.selectedAnswer) {
+    const roundDivs = document.querySelectorAll('.round-div');
+    if (roundDivs.length > 0) {
+      const lastRoundDiv = roundDivs[roundDivs.length - 1];
+      metadata.selectedAnswer = lastRoundDiv.textContent.trim();
+
+      // Check if selected answer is correct (has 'green' class)
+      if (lastRoundDiv.classList.contains('green')) {
+        metadata.correctAnswer = metadata.selectedAnswer;
+      }
+    }
+  }
+
+  // 3. Extract difficulty from .level-badge and map to easy/medium/hard
+  const levelBadgeEl = document.querySelector('.level-badge');
+  if (levelBadgeEl) {
+    const difficultyText = levelBadgeEl.textContent.trim();
+    const difficultyNum = parseInt(difficultyText, 10);
+
+    if (!isNaN(difficultyNum)) {
+      if (difficultyNum < 600) {
+        metadata.difficulty = 'easy';
+      } else if (difficultyNum < 700) {
+        metadata.difficulty = 'medium';
+      } else {
+        metadata.difficulty = 'hard';
+      }
+    }
+  }
+
+  // 4. Extract time spent from .pi-clock
+  const clockIcon = document.querySelector('.pi-clock');
+  if (clockIcon && clockIcon.nextElementSibling) {
+    metadata.timeSpent = clockIcon.nextElementSibling.textContent.trim();
+  }
+
+  // 5. Extract correct answer (only if we haven't found it yet)
+  if (!metadata.correctAnswer) {
+    const correctAnswerLabel = document.querySelector('.correct-answer');
+    if (correctAnswerLabel) {
+      const forAttr = correctAnswerLabel.getAttribute('for');
+      if (forAttr) {
+        const parts = forAttr.split('-');
+        metadata.correctAnswer = parts[parts.length - 1];
+      }
+    }
+  }
+
+  return metadata;
+}
+
+/**
  * Extract Quant question from GMAT Hero
  */
 function extractGMATHeroQuantContent() {
@@ -138,17 +237,23 @@ function extractGMATHeroQuantContent() {
       });
     }
 
+    // Extract metadata (category, difficulty, selected/correct answers, time)
+    const metadata = extractGMATHeroMetadata();
+
     // Create JSON structure for Quant question
     var jsonData = {
       "question_link": "",
       "source": "",
-      "difficulty": "",
+      "difficulty": metadata.difficulty || "",
       "section": "Quant",
+      "selectedAnswer": metadata.selectedAnswer || "",
+      "correctAnswer": metadata.correctAnswer || "",
+      "timeSpent": metadata.timeSpent || "",
       "content": {
         "question_text": decodeHtmlEntities(questionText),
         "answer_choices": answerChoices,
-        "correct_answer": "",
-        "category": ""
+        "correct_answer": metadata.correctAnswer || "",
+        "category": metadata.category || ""
       }
     };
 
@@ -282,18 +387,24 @@ function extractGMATHeroCRContent() {
       });
     }
 
+    // Extract metadata (category, difficulty, selected/correct answers, time)
+    const metadata = extractGMATHeroMetadata();
+
     // Create JSON structure for CR question
     var jsonData = {
       "question_link": "",
       "source": "",
-      "difficulty": "",
+      "difficulty": metadata.difficulty || "",
       "section": "CR",
+      "selectedAnswer": metadata.selectedAnswer || "",
+      "correctAnswer": metadata.correctAnswer || "",
+      "timeSpent": metadata.timeSpent || "",
       "content": {
         "passage": passage,
         "question_text": question,
         "answer_choices": answerChoices,
-        "correct_answer": ""
-        // Note: category left empty - focus on text content only
+        "correct_answer": metadata.correctAnswer || "",
+        "category": metadata.category || ""
       }
     };
 

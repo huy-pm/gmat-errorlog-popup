@@ -538,6 +538,138 @@ function clearFormValues(root) {
   console.log('[Debug] Form cleared successfully');
 }
 
+async function refreshData(root) {
+  console.log('[Debug] refreshData called');
+
+  if (!state.extractQuestionFn) {
+    console.log('[Debug] No extractor available for this page');
+    showStatus('⚠️ No extractor available for this page', 'error', root);
+    return;
+  }
+
+  const notesTextarea = root.getElementById('gmat-notes');
+  const refreshBtn = root.getElementById('btn-refresh');
+
+  if (!notesTextarea || !refreshBtn) {
+    console.error('[Debug] Required elements not found');
+    return;
+  }
+
+  try {
+    // Show loading state
+    const originalIcon = refreshBtn.innerHTML;
+    refreshBtn.innerHTML = ICONS.loader;
+    refreshBtn.disabled = true;
+    console.log('[Debug] Extracting fresh data from page...');
+
+    // Extract fresh data from page
+    const questionData = await state.extractQuestionFn();
+
+    if (!questionData) {
+      console.log('[Debug] No question data extracted');
+      showStatus('⚠️ Could not extract data from page', 'error', root);
+      refreshBtn.innerHTML = originalIcon;
+      refreshBtn.disabled = false;
+      return;
+    }
+
+    console.log('[Debug] Fresh data extracted:', questionData);
+
+    // Parse current notes to preserve user's custom text
+    const currentNotes = notesTextarea.value;
+    const questionLinkInput = root.getElementById('gmat-question-link');
+    const parsed = parseNotesAndLink(currentNotes, questionLinkInput?.value || '');
+
+    // Build new auto-populated notes
+    let autoNotes = '';
+
+    // Add category if available
+    if (questionData.content && questionData.content.category) {
+      autoNotes += questionData.content.category;
+    }
+
+    // Add difficulty if available
+    if (questionData.difficulty) {
+      if (autoNotes) autoNotes += ' ';
+      autoNotes += questionData.difficulty;
+    }
+
+    // Add selected and correct answers if available
+    let isIncorrect = false;
+    if (questionData.selectedAnswer) {
+      if (autoNotes) autoNotes += ' ';
+      autoNotes += `Selected:${questionData.selectedAnswer}`;
+
+      // Add correct answer if available
+      if (questionData.correctAnswer) {
+        autoNotes += ` Correct:${questionData.correctAnswer}`;
+
+        // Check if answer is incorrect
+        if (questionData.selectedAnswer !== questionData.correctAnswer) {
+          isIncorrect = true;
+        }
+      }
+    }
+
+    // Add time spent if available
+    if (questionData.timeSpent) {
+      if (autoNotes) autoNotes += ' ';
+      autoNotes += `Time:${questionData.timeSpent}`;
+    }
+
+    // Preserve user's custom notes (text that's not auto-generated)
+    let customNotes = '';
+    if (parsed.extractedNotes) {
+      customNotes = parsed.extractedNotes;
+    }
+
+    // Combine: auto-notes + custom notes
+    let finalNotes = autoNotes;
+    if (customNotes && customNotes.trim()) {
+      if (finalNotes) finalNotes += ' - ';
+      finalNotes += customNotes;
+    }
+
+    // Add reflection prompt if answer is incorrect
+    if (isIncorrect && !finalNotes.includes('Why did I choose')) {
+      finalNotes += `\n\nWhy did I choose ${questionData.selectedAnswer}?\n`;
+    } else if (!isIncorrect && finalNotes) {
+      finalNotes += '\n';
+    }
+
+    // Update the notes field
+    notesTextarea.value = finalNotes;
+    state.logData.notes = finalNotes;
+
+    // Position cursor at the end
+    const cursorPos = finalNotes.length;
+    notesTextarea.setSelectionRange(cursorPos, cursorPos);
+
+    // Trigger update of suggestions and parsed preview
+    const event = new Event('input', { bubbles: true });
+    notesTextarea.dispatchEvent(event);
+
+    // Show success feedback
+    showStatus('✓ Data refreshed from page', 'success', root);
+    console.log('[Debug] Data refreshed successfully');
+
+    // Restore button state
+    setTimeout(() => {
+      refreshBtn.innerHTML = originalIcon;
+      refreshBtn.disabled = false;
+    }, 300);
+
+  } catch (error) {
+    console.error('[Debug] Refresh error:', error);
+    showStatus('❌ Error refreshing data', 'error', root);
+    const refreshBtn = root.getElementById('btn-refresh');
+    if (refreshBtn) {
+      refreshBtn.innerHTML = ICONS.refresh;
+      refreshBtn.disabled = false;
+    }
+  }
+}
+
 async function submitQuestionData(root) {
   console.log('[Debug] submitQuestionData called');
 
@@ -940,6 +1072,9 @@ function render() {
       <h2 class="font-bold text-lg">Smart Log</h2>
     </div>
     <div class="flex items-center gap-2">
+      <button id="btn-refresh" class="text-gray-400 hover:text-blue-600 transition p-1" title="Refresh data from page">
+         ${ICONS.refresh}
+      </button>
       <button id="btn-settings" class="text-gray-400 hover:text-gray-600 transition p-1" title="Settings">
          ${ICONS.settings}
       </button>
@@ -1001,6 +1136,11 @@ function attachEvents(root) {
     }
     state.isCollapsed = true;
     updateSidebarLayout();
+  });
+  root.getElementById('btn-refresh')?.addEventListener('click', () => {
+    if (state.activeTab === 'log') {
+      refreshData(root);
+    }
   });
   root.getElementById('btn-settings')?.addEventListener('click', () => {
     // Save form values before switching tabs
@@ -1276,8 +1416,8 @@ export async function createSidebar() {
       isResizing = false;
       document.body.style.userSelect = '';
       document.body.style.cursor = '';
-      sidebarContainer.style.transition = 'transform 0.3s ease-in-out';
-      document.body.style.transition = 'margin-right 0.3s ease-in-out';
+      sidebarContainer.style.transition = 'transform 0.2s ease-in-out';
+      document.body.style.transition = 'margin-right 0.2s ease-in-out';
     }
   });
 
@@ -1297,8 +1437,9 @@ export async function createSidebar() {
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     .animate-spin { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .fade-in { animation: fadeIn 0.3s ease-in; }
+    .fade-in { animation: fadeIn 0.2s ease-in; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
   `;
   shadow.appendChild(customStyles);
 

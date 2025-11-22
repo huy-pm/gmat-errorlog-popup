@@ -37,7 +37,8 @@ const state = {
   aiReasoning: null,
   categories: [],
   allTags: [],
-  extractQuestionFn: null
+  extractQuestionFn: null,
+  lastUrl: window.location.href
 };
 
 // ============================================================================
@@ -538,28 +539,55 @@ function clearFormValues(root) {
   console.log('[Debug] Form cleared successfully');
 }
 
-async function refreshData(root) {
-  console.log('[Debug] refreshData called');
+function handleUrlChange(root) {
+  const currentUrl = window.location.href;
+
+  if (currentUrl !== state.lastUrl) {
+    console.log('[Debug] URL changed from', state.lastUrl, 'to', currentUrl);
+    state.lastUrl = currentUrl;
+
+    // Update the question link field
+    const questionLinkInput = root.getElementById('gmat-question-link');
+    if (questionLinkInput) {
+      questionLinkInput.value = currentUrl;
+      state.logData.url = currentUrl;
+    }
+
+    // Automatically refresh data from new page
+    if (state.extractQuestionFn && state.activeTab === 'log') {
+      console.log('[Debug] Auto-refreshing data for new URL');
+      refreshData(root, true); // Pass true to indicate auto-refresh (skip some UI updates)
+    }
+  }
+}
+
+async function refreshData(root, isAutoRefresh = false) {
+  console.log('[Debug] refreshData called', isAutoRefresh ? '(auto)' : '(manual)');
 
   if (!state.extractQuestionFn) {
     console.log('[Debug] No extractor available for this page');
-    showStatus('⚠️ No extractor available for this page', 'error', root);
+    if (!isAutoRefresh) {
+      showStatus('⚠️ No extractor available for this page', 'error', root);
+    }
     return;
   }
 
   const notesTextarea = root.getElementById('gmat-notes');
   const refreshBtn = root.getElementById('btn-refresh');
 
-  if (!notesTextarea || !refreshBtn) {
-    console.error('[Debug] Required elements not found');
+  if (!notesTextarea) {
+    console.error('[Debug] Notes textarea not found');
     return;
   }
 
   try {
-    // Show loading state
-    const originalIcon = refreshBtn.innerHTML;
-    refreshBtn.innerHTML = ICONS.loader;
-    refreshBtn.disabled = true;
+    // Show loading state (only for manual refresh)
+    let originalIcon;
+    if (!isAutoRefresh && refreshBtn) {
+      originalIcon = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = ICONS.loader;
+      refreshBtn.disabled = true;
+    }
     console.log('[Debug] Extracting fresh data from page...');
 
     // Extract fresh data from page
@@ -567,9 +595,13 @@ async function refreshData(root) {
 
     if (!questionData) {
       console.log('[Debug] No question data extracted');
-      showStatus('⚠️ Could not extract data from page', 'error', root);
-      refreshBtn.innerHTML = originalIcon;
-      refreshBtn.disabled = false;
+      if (!isAutoRefresh) {
+        showStatus('⚠️ Could not extract data from page', 'error', root);
+        if (refreshBtn) {
+          refreshBtn.innerHTML = originalIcon;
+          refreshBtn.disabled = false;
+        }
+      }
       return;
     }
 
@@ -620,7 +652,10 @@ async function refreshData(root) {
     // Preserve user's custom notes (text that's not auto-generated)
     let customNotes = '';
     if (parsed.extractedNotes) {
-      customNotes = parsed.extractedNotes;
+      // Remove old reflection prompts before preserving custom notes
+      customNotes = parsed.extractedNotes
+        .replace(/\n*Why did I choose [A-E]\?\s*/g, '')  // Remove old prompts
+        .trim();
     }
 
     // Combine: auto-notes + custom notes
@@ -630,8 +665,8 @@ async function refreshData(root) {
       finalNotes += customNotes;
     }
 
-    // Add reflection prompt if answer is incorrect
-    if (isIncorrect && !finalNotes.includes('Why did I choose')) {
+    // Add/update reflection prompt if answer is incorrect
+    if (isIncorrect) {
       finalNotes += `\n\nWhy did I choose ${questionData.selectedAnswer}?\n`;
     } else if (!isIncorrect && finalNotes) {
       finalNotes += '\n';
@@ -649,23 +684,29 @@ async function refreshData(root) {
     const event = new Event('input', { bubbles: true });
     notesTextarea.dispatchEvent(event);
 
-    // Show success feedback
-    showStatus('✓ Data refreshed from page', 'success', root);
-    console.log('[Debug] Data refreshed successfully');
+    // Show success feedback (only for manual refresh)
+    if (!isAutoRefresh) {
+      showStatus('✓ Data refreshed from page', 'success', root);
+    }
+    console.log('[Debug] Data refreshed successfully', isAutoRefresh ? '(auto)' : '(manual)');
 
-    // Restore button state
-    setTimeout(() => {
-      refreshBtn.innerHTML = originalIcon;
-      refreshBtn.disabled = false;
-    }, 300);
+    // Restore button state (only for manual refresh)
+    if (!isAutoRefresh && refreshBtn) {
+      setTimeout(() => {
+        refreshBtn.innerHTML = originalIcon;
+        refreshBtn.disabled = false;
+      }, 300);
+    }
 
   } catch (error) {
     console.error('[Debug] Refresh error:', error);
-    showStatus('❌ Error refreshing data', 'error', root);
-    const refreshBtn = root.getElementById('btn-refresh');
-    if (refreshBtn) {
-      refreshBtn.innerHTML = ICONS.refresh;
-      refreshBtn.disabled = false;
+    if (!isAutoRefresh) {
+      showStatus('❌ Error refreshing data', 'error', root);
+      const refreshBtn = root.getElementById('btn-refresh');
+      if (refreshBtn) {
+        refreshBtn.innerHTML = ICONS.refresh;
+        refreshBtn.disabled = false;
+      }
     }
   }
 }
@@ -825,12 +866,18 @@ function renderLogTab(parent, root) {
   const notesGroup = document.createElement('div');
   notesGroup.className = "space-y-2";
   notesGroup.innerHTML = `
-    <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">${ICONS.fileText} Smart Notes</label>
+    <div class="flex items-center justify-between">
+      <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">${ICONS.fileText} Smart Notes</label>
+      <button id="btn-refresh" class="text-gray-400 hover:text-blue-600 transition p-1 flex items-center gap-1 text-xs font-medium" title="Refresh data from page">
+        ${ICONS.refresh}
+        <span class="hidden sm:inline">Refresh</span>
+      </button>
+    </div>
     <div class="relative">
       <textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." class="w-full p-3 border border-gray-300 rounded-lg text-sm h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none font-mono text-gray-700 leading-relaxed">${notesValue}</textarea>
       <div id="gmat-suggestions" style="position:absolute;z-index:10;width:100%;margin-top:1px;background:white;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:none"></div>
     </div>
-    <p class="text-xs text-gray-500">Type keywords: <code class="bg-gray-100 px-1.5 py-0.5 rounded">weaken</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded">hard</code> and press Tab to complete.</p>
+    <p class="text-xs text-gray-500">💡 Click refresh to update after revealing answer. Or type keywords: <code class="bg-gray-100 px-1.5 py-0.5 rounded">weaken</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded">hard</code> and press Tab.</p>
   `;
   parent.appendChild(notesGroup);
 
@@ -1072,9 +1119,6 @@ function render() {
       <h2 class="font-bold text-lg">Smart Log</h2>
     </div>
     <div class="flex items-center gap-2">
-      <button id="btn-refresh" class="text-gray-400 hover:text-blue-600 transition p-1" title="Refresh data from page">
-         ${ICONS.refresh}
-      </button>
       <button id="btn-settings" class="text-gray-400 hover:text-gray-600 transition p-1" title="Settings">
          ${ICONS.settings}
       </button>
@@ -1556,4 +1600,33 @@ export async function createSidebar() {
   } else {
     console.log('[Debug] Auto-populate: No extractor available for this page');
   }
+
+  // ============================================================================
+  // URL CHANGE MONITORING
+  // ============================================================================
+
+  // Monitor URL changes and auto-refresh data
+  console.log('[Debug] Setting up URL change monitoring');
+
+  // Listen for browser navigation (back/forward buttons)
+  window.addEventListener('popstate', () => {
+    console.log('[Debug] Popstate event detected');
+    handleUrlChange(shadow);
+  });
+
+  // Listen for hash changes
+  window.addEventListener('hashchange', () => {
+    console.log('[Debug] Hashchange event detected');
+    handleUrlChange(shadow);
+  });
+
+  // Backup: Poll for URL changes every 500ms (catches SPA navigation)
+  const urlCheckInterval = setInterval(() => {
+    handleUrlChange(shadow);
+  }, 500);
+
+  // Store interval ID for cleanup if needed
+  window.__SMARTLOG_URL_CHECK_INTERVAL__ = urlCheckInterval;
+
+  console.log('[Debug] URL change monitoring active');
 }

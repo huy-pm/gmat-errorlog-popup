@@ -57,8 +57,38 @@ export function setQuestionExtractor(extractorFn) {
 // ============================================================================
 
 function parseNotes(notes) {
-  const originalNotes = notes;
-  const normalizedNotes = notes.toLowerCase().trim();
+  let originalNotes = notes;
+  let selectedAnswer, correctAnswer, timeSpent;
+
+  // Extract and remove selected answer, correct answer, and time using regex
+  const selectedMatch = originalNotes.match(/Selected:\s*([A-E])/i);
+  if (selectedMatch) {
+    selectedAnswer = selectedMatch[1].toUpperCase();
+    // Remove "Selected: X" from the notes
+    originalNotes = originalNotes.replace(/Selected:\s*[A-E],?\s*/i, '');
+  }
+
+  const correctMatch = originalNotes.match(/Correct:\s*([A-E])/i);
+  if (correctMatch) {
+    correctAnswer = correctMatch[1].toUpperCase();
+    // Remove "Correct: X" from the notes
+    originalNotes = originalNotes.replace(/Correct:\s*[A-E],?\s*/i, '');
+  }
+
+  const timeMatch = originalNotes.match(/Time:\s*(\d{2}:\d{2})/);
+  if (timeMatch) {
+    timeSpent = timeMatch[1];
+    // Remove "Time: XX:XX" from the notes
+    originalNotes = originalNotes.replace(/Time:\s*\d{2}:\d{2},?\s*/i, '');
+  }
+
+  // Clean up any remaining " - " or extra commas
+  originalNotes = originalNotes.replace(/\s*-\s*,\s*/g, ' - ');
+  originalNotes = originalNotes.replace(/\s+-\s*$/gm, ''); // Remove trailing " -" at end of lines (with any preceding whitespace)
+  originalNotes = originalNotes.replace(/\s*-\s*\n+/g, '\n'); // Remove " - " before one or more newlines
+  originalNotes = originalNotes.trim();
+
+  const normalizedNotes = originalNotes.toLowerCase().trim();
   const words = normalizedNotes.split(/\s+/);
   let section, category, difficulty, source;
   const usedWords = new Set();
@@ -152,7 +182,7 @@ function parseNotes(notes) {
 
   // Extract remaining words as notes
   if (usedWords.size === 0) {
-    return { section, category, difficulty, source, extractedNotes: originalNotes || undefined };
+    return { section, category, difficulty, source, selectedAnswer, correctAnswer, timeSpent, extractedNotes: originalNotes || undefined };
   }
 
   const allParts = originalNotes.split(/(\s+)/);
@@ -174,7 +204,11 @@ function parseNotes(notes) {
   extractedNotes = extractedNotes.replace(/^[ \t]+/, '');
   extractedNotes = extractedNotes.replace(/[ \t]+$/, '');
 
-  return { section, category, difficulty, source, extractedNotes: extractedNotes || undefined };
+  // Remove any remaining standalone dashes with surrounding whitespace
+  extractedNotes = extractedNotes.replace(/^\s*-\s*/gm, ''); // Remove leading dash on any line
+  extractedNotes = extractedNotes.trim();
+
+  return { section, category, difficulty, source, selectedAnswer, correctAnswer, timeSpent, extractedNotes: extractedNotes || undefined };
 }
 
 function parseNotesAndLink(notes, questionLink) {
@@ -405,7 +439,7 @@ function updateParsedPreview(questionLink, notes, root) {
   const badgesDiv = root.getElementById('gmat-parsed-badges');
   const notesP = root.getElementById('gmat-parsed-notes');
 
-  if (!parsed.source && !parsed.section && !parsed.category && !parsed.difficulty && !parsed.extractedNotes) {
+  if (!parsed.source && !parsed.section && !parsed.category && !parsed.difficulty && !parsed.selectedAnswer && !parsed.correctAnswer && !parsed.timeSpent && !parsed.extractedNotes) {
     previewDiv.style.display = 'none';
     return;
   }
@@ -424,6 +458,22 @@ function updateParsedPreview(questionLink, notes, root) {
   }
   if (parsed.category) badgesDiv.appendChild(createBadge(`Category: ${parsed.category}`, 'default'));
   if (parsed.difficulty) badgesDiv.appendChild(createBadge(`Difficulty: ${parsed.difficulty.charAt(0).toUpperCase() + parsed.difficulty.slice(1)}`, 'default'));
+
+  // Add selected answer badge
+  if (parsed.selectedAnswer) {
+    badgesDiv.appendChild(createBadge(`Selected: ${parsed.selectedAnswer}`, 'default'));
+  }
+
+  // Add correct answer badge (with different color if incorrect)
+  if (parsed.correctAnswer) {
+    const isIncorrect = parsed.selectedAnswer && parsed.selectedAnswer !== parsed.correctAnswer;
+    badgesDiv.appendChild(createBadge(`Correct: ${parsed.correctAnswer}`, isIncorrect ? 'red' : 'green'));
+  }
+
+  // Add time spent badge
+  if (parsed.timeSpent) {
+    badgesDiv.appendChild(createBadge(`Time: ${parsed.timeSpent}`, 'default'));
+  }
 
   if (parsed.extractedNotes) {
     notesP.innerHTML = `<strong>Notes:</strong><br><pre style="white-space: pre-wrap; font-family: inherit; margin: 4px 0 0 0; font-size: inherit;">${parsed.extractedNotes}</pre>`;
@@ -510,6 +560,19 @@ async function submitQuestionData(root) {
   console.log('[Debug] Final tags to submit:', tags);
 
   const parsed = parseNotesAndLink(notes, questionLink);
+
+  // Convert time from MM:SS to seconds
+  let timeInSeconds = null;
+  if (parsed.timeSpent) {
+    const timeParts = parsed.timeSpent.split(':');
+    if (timeParts.length === 2) {
+      const minutes = parseInt(timeParts[0], 10);
+      const seconds = parseInt(timeParts[1], 10);
+      timeInSeconds = (minutes * 60) + seconds;
+      console.log('[Debug] Converted time:', parsed.timeSpent, '->', timeInSeconds, 'seconds');
+    }
+  }
+
   const payload = {
     question: questionLink || '',
     source: parsed.source || '',
@@ -520,6 +583,14 @@ async function submitQuestionData(root) {
     status: 'Must Review',
     mistakeTypes: tags
   };
+
+  // Add selected answer and time to payload
+  if (parsed.selectedAnswer) {
+    payload.selectedAnswer = parsed.selectedAnswer;
+  }
+  if (timeInSeconds !== null) {
+    payload.timeSpent = timeInSeconds;
+  }
 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Extracting...';
@@ -536,6 +607,17 @@ async function submitQuestionData(root) {
         // Enrich with bookmarklet data
         const enrichedJson = enrichquestionData(questionData, payload);
         console.log('Enriched question JSON:', enrichedJson);
+
+        // Remove the extracted answer/time fields from questionData (they're now in notes/payload)
+        delete enrichedJson.selectedAnswer;
+        delete enrichedJson.correctAnswer;
+        delete enrichedJson.timeSpent;
+
+        // Add correct answer to questionData.content if available from parsed notes
+        if (parsed.correctAnswer && enrichedJson.content) {
+          enrichedJson.content.correctAnswer = parsed.correctAnswer;
+          console.log('[Debug] Added correct answer to questionData.content.correctAnswer:', parsed.correctAnswer);
+        }
 
         // Add to payload
         payload.questionData = enrichedJson;
@@ -1270,15 +1352,15 @@ export async function createSidebar() {
           // Add difficulty if available
           if (questionData.difficulty) {
             if (autoNotes) autoNotes += ' ';
-            autoNotes += questionData.difficulty.toLowerCase();
+            autoNotes += questionData.difficulty;
             console.log('[Debug] Auto-populate: Found difficulty:', questionData.difficulty);
           }
 
           // Add selected and correct answers if available
           let isIncorrect = false;
           if (questionData.selectedAnswer && questionData.correctAnswer) {
-            if (autoNotes) autoNotes += ' - ';
-            autoNotes += `Selected: ${questionData.selectedAnswer}, Correct: ${questionData.correctAnswer}`;
+            if (autoNotes) autoNotes += ' ';
+            autoNotes += `Selected:${questionData.selectedAnswer} Correct:${questionData.correctAnswer}`;
 
             // Check if answer is incorrect
             if (questionData.selectedAnswer !== questionData.correctAnswer) {
@@ -1291,8 +1373,8 @@ export async function createSidebar() {
 
           // Add time spent if available
           if (questionData.timeSpent) {
-            if (autoNotes) autoNotes += ', ';
-            autoNotes += `Time: ${questionData.timeSpent}`;
+            if (autoNotes) autoNotes += ' ';
+            autoNotes += `Time:${questionData.timeSpent}`;
             console.log('[Debug] Auto-populate: Found time spent:', questionData.timeSpent);
           }
 

@@ -231,16 +231,15 @@ function extractGMATClubQuantContent() {
 
     // Create JSON structure for Quant question
     let jsonData = {
-      "question_link": "",
+      "questionLink": "",
       "source": "",
       "difficulty": "",
       "section": "Quant",
       "content": {
-        "question_text": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
-        "answer_choices": answerChoices.map(choice =>
+        "questionText": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
+        "answerChoices": answerChoices.map(choice =>
           decodeHtmlEntities(choice.content.replace(/<[^>]*>/g, '').trim())
         ),
-        "correct_answer": "",
         "category": "Problem Solving"
       }
     };
@@ -251,14 +250,13 @@ function extractGMATClubQuantContent() {
     questionHTML = htmlContent;
 
     let jsonData = {
-      "question_link": "",
+      "questionLink": "",
       "source": "",
       "difficulty": "",
       "section": "Quant",
       "content": {
-        "question_text": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
-        "answer_choices": [],
-        "correct_answer": "",
+        "questionText": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
+        "answerChoices": [],
         "category": "Problem Solving"
       }
     };
@@ -439,15 +437,14 @@ function extractGMATClubCRContent() {
 
     // Create JSON structure for CR question
     var jsonData = {
-      "question_link": "",
+      "questionLink": "",
       "source": "",
       "difficulty": "",
       "section": "CR",
       "content": {
         "passage": passage,
-        "question_text": question,
-        "answer_choices": answerChoicesArray,
-        "correct_answer": ""
+        "questionText": question,
+        "answerChoices": answerChoicesArray
         // Note: category will be added from tag extraction if available
       }
     };
@@ -577,22 +574,21 @@ function extractGMATClubRCContent() {
       });
 
       let structuredQuestion = {
-        "question_text": decodeHtmlEntities(q.question_text),
-        "answer_choices": choicesArray,
-        "correct_answer": ""
+        "questionText": decodeHtmlEntities(q.question_text),
+        "answerChoices": choicesArray
       };
       structuredQuestions.push(structuredQuestion);
     });
 
     // Create JSON structure for RC question
     let jsonData = {
-      "question_link": "",
+      "questionLink": "",
       "source": "",
       "difficulty": "",
       "section": "RC",
       "content": {
-        "passage_title": "",
-        "passage_text": passageText,
+        "passageTitle": "",
+        "passageText": passageText,
         "questions": structuredQuestions
       }
     };

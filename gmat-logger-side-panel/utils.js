@@ -12,8 +12,8 @@ export const CONFIG = {
 
 // Determine base URL
 const isLocalhost = window.location.hostname === 'localhost' ||
-                   window.location.hostname === '127.0.0.1' ||
-                   window.location.href.includes('localhost');
+  window.location.hostname === '127.0.0.1' ||
+  window.location.href.includes('localhost');
 export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
 
 // --- Icons (SVG Strings) ---
@@ -140,6 +140,11 @@ export function createBadge(text, variant) {
       border: '1px solid #bbf7d0',
       color: '#166534'
     },
+    red: {
+      background: '#fee2e2',
+      border: '1px solid #fecaca',
+      color: '#991b1b'
+    },
     default: {
       background: '#f3f4f6',
       border: '1px solid #d1d5db',
@@ -194,7 +199,7 @@ export function showStatus(message, type, root) {
 export function enrichquestionData(questionData, payload) {
   if (!questionData) return null;
 
-  questionData.question_link = payload.question || questionData.question_link;
+  questionData.questionLink = payload.question || questionData.questionLink;
   questionData.difficulty = payload.difficulty || questionData.difficulty;
   questionData.source = payload.source || questionData.source;
 

@@ -50,6 +50,53 @@ const CATEGORY_MAPPING = {
 };
 
 /**
+ * Extract time spent from GMATClub timer
+ */
+function extractTimeSpent() {
+  const timerDisplay = document.querySelector('#timer_display.time');
+  if (!timerDisplay) {
+    return "";
+  }
+
+  const timeText = timerDisplay.textContent.trim();
+  console.log('[GMATClub] Extracted time spent:', timeText);
+  return timeText;
+}
+
+/**
+ * Extract selected and correct answers from GMATClub statistics
+ */
+function extractAnswerStatistics() {
+  const timerDiv = document.querySelector('.buttons');
+  if (!timerDiv) {
+    return { selectedAnswer: "", correctAnswer: "" };
+  }
+
+  let selectedAnswer = "";
+  let correctAnswer = "";
+
+  // Find selected answer
+  const selectedWrap = timerDiv.querySelector('.statisticWrap.selectedAnswer');
+  if (selectedWrap) {
+    const answerType = selectedWrap.querySelector('.answerType');
+    if (answerType) {
+      selectedAnswer = answerType.textContent.trim().toUpperCase();
+    }
+  }
+
+  // Find correct answer
+  const correctWrap = timerDiv.querySelector('.statisticWrap.correctAnswer');
+  if (correctWrap) {
+    const answerType = correctWrap.querySelector('.answerType');
+    if (answerType) {
+      correctAnswer = answerType.textContent.trim().toUpperCase();
+    }
+  }
+
+  return { selectedAnswer, correctAnswer };
+}
+
+/**
  * Extract tag IDs from GMATClub page and map to difficulty and category
  */
 function extractTagsFromPage() {
@@ -569,6 +616,14 @@ export function extractGMATClubQuestion() {
   const tags = extractTagsFromPage();
   console.log("Extracted tags:", tags);
 
+  // Extract answer statistics (selected and correct answers)
+  const answerStats = extractAnswerStatistics();
+  console.log("Extracted answer statistics:", answerStats);
+
+  // Extract time spent
+  const timeSpent = extractTimeSpent();
+  console.log("Extracted time spent:", timeSpent);
+
   let questionData = null;
 
   switch (section) {
@@ -586,7 +641,7 @@ export function extractGMATClubQuestion() {
       return null;
   }
 
-  // Merge extracted tags into the question data
+  // Merge extracted tags, answer statistics, and time spent into the question data
   if (questionData) {
     // Only set difficulty if successfully extracted
     if (tags.difficulty) {
@@ -596,7 +651,17 @@ export function extractGMATClubQuestion() {
     if (tags.category && section === "Critical Reasoning") {
       questionData.content.category = tags.category;
     }
-    // If category wasn't extracted, don't set any default - focus on text content only
+    // Add selected and correct answers
+    if (answerStats.selectedAnswer) {
+      questionData.selectedAnswer = answerStats.selectedAnswer;
+    }
+    if (answerStats.correctAnswer) {
+      questionData.correctAnswer = answerStats.correctAnswer;
+    }
+    // Add time spent
+    if (timeSpent) {
+      questionData.timeSpent = timeSpent;
+    }
   }
 
   return questionData;

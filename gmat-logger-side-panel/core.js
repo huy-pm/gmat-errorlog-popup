@@ -1274,20 +1274,49 @@ export async function createSidebar() {
             console.log('[Debug] Auto-populate: Found difficulty:', questionData.difficulty);
           }
 
+          // Add selected and correct answers if available
+          let isIncorrect = false;
+          if (questionData.selectedAnswer && questionData.correctAnswer) {
+            if (autoNotes) autoNotes += ' - ';
+            autoNotes += `Selected: ${questionData.selectedAnswer}, Correct: ${questionData.correctAnswer}`;
+
+            // Check if answer is incorrect
+            if (questionData.selectedAnswer !== questionData.correctAnswer) {
+              isIncorrect = true;
+              console.log('[Debug] Auto-populate: Incorrect answer detected');
+            }
+
+            console.log('[Debug] Auto-populate: Found answers - Selected:', questionData.selectedAnswer, 'Correct:', questionData.correctAnswer);
+          }
+
+          // Add time spent if available
+          if (questionData.timeSpent) {
+            if (autoNotes) autoNotes += ', ';
+            autoNotes += `Time: ${questionData.timeSpent}`;
+            console.log('[Debug] Auto-populate: Found time spent:', questionData.timeSpent);
+          }
+
+          // Add reflection prompt if answer is incorrect
+          if (isIncorrect) {
+            autoNotes += `\n\nWhy did I choose ${questionData.selectedAnswer}?\n`;
+            console.log('[Debug] Auto-populate: Added reflection prompt for incorrect answer');
+          }
+
           // Set the notes field with auto-detected values
           if (autoNotes) {
-            notesTextarea.value = autoNotes + '\n';
+            notesTextarea.value = autoNotes + (isIncorrect ? '' : '\n');
             // Update state with auto-populated notes
-            state.logData.notes = autoNotes + '\n';
+            state.logData.notes = autoNotes + (isIncorrect ? '' : '\n');
             // Position cursor at the end
-            notesTextarea.setSelectionRange(autoNotes.length + 1, autoNotes.length + 1);
+            const cursorPos = autoNotes.length + (isIncorrect ? 0 : 1);
+            notesTextarea.setSelectionRange(cursorPos, cursorPos);
             console.log('[Debug] Auto-populate: Notes set to:', autoNotes);
 
             // Trigger update of suggestions and parsed preview
             const event = new Event('input', { bubbles: true });
             notesTextarea.dispatchEvent(event);
           } else {
-            console.log('[Debug] Auto-populate: No category or difficulty found');
+            console.log('[Debug] Auto-populate: No category, difficulty, or answers found');
           }
         } else {
           console.log('[Debug] Auto-populate: No question data extracted');

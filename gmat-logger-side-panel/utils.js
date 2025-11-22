@@ -21,7 +21,10 @@ export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
  * Example: /review/62 -> /practice/62
  */
 export function getPracticeUrl(url) {
-  return url.replace('/review/', '/practice/');
+  if (url && url.includes('https://gmat-hero-v2.web.app/')) {
+    return url.replace('/review/', '/practice/');
+  }
+  return url;
 }
 
 // --- Icons (SVG Strings) ---

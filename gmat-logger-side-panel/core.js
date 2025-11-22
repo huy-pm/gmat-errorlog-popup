@@ -387,7 +387,6 @@ async function fetchAllTags() {
 function saveFormValuesToState(root) {
   const questionLinkInput = root.getElementById('gmat-question-link');
   const notesTextarea = root.getElementById('gmat-notes');
-  const tagsContainer = root.getElementById('gmat-tags-container');
 
   if (questionLinkInput) {
     state.logData.url = questionLinkInput.value;
@@ -397,12 +396,7 @@ function saveFormValuesToState(root) {
     state.logData.notes = notesTextarea.value;
   }
 
-  if (tagsContainer) {
-    const tagElements = tagsContainer.querySelectorAll('span');
-    state.logData.tags = Array.from(tagElements).map(tagEl =>
-      tagEl.textContent.replace(/\s*×\s*$/, '').trim()
-    ).filter(tag => tag && tag.trim() !== '');
-  }
+  // Tags are already saved to state.logData.tags by the toggleTag function
 }
 
 function updateParsedPreview(questionLink, notes, root) {
@@ -462,10 +456,21 @@ function clearFormValues(root) {
     notesTextarea.value = '';
   }
 
-  // Clear all tags
-  const tagsContainer = root.getElementById('gmat-tags-container');
-  if (tagsContainer) {
-    tagsContainer.innerHTML = '';
+  // Re-render tag list to reflect cleared state
+  // Tags will show as unselected since state.logData.tags is now empty
+  if (state.allTags && state.allTags.length > 0) {
+    const tagsList = root.getElementById('gmat-tags-list');
+    if (tagsList) {
+      // Re-render all tags with none selected
+      tagsList.innerHTML = '';
+      state.allTags.forEach(tag => {
+        const tagName = tag.name || tag;
+        const btn = document.createElement('button');
+        btn.className = 'px-3 py-1 rounded-full text-xs border transition-all bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50';
+        btn.textContent = tagName;
+        tagsList.appendChild(btn);
+      });
+    }
   }
 
   // Hide parsed preview
@@ -500,16 +505,9 @@ async function submitQuestionData(root) {
     return;
   }
 
-  // Get tags from DOM
-  const tagsContainer = root.getElementById('gmat-tags-container');
-  const tagElements = tagsContainer.querySelectorAll('span');
-  const tags = Array.from(tagElements).map(tagEl => {
-    let tagText = tagEl.textContent.replace(/\s*×\s*$/, '').trim();
-    console.log('Bookmarklet: Extracted tag text:', tagText);
-    return tagText;
-  }).filter(tag => tag && tag.trim() !== '');
-
-  console.log('Bookmarklet: Final tags to submit:', tags);
+  // Get tags from state (already maintained by toggle buttons)
+  const tags = state.logData.tags || [];
+  console.log('[Debug] Final tags to submit:', tags);
 
   const parsed = parseNotesAndLink(notes, questionLink);
   const payload = {
@@ -623,17 +621,10 @@ function renderLogTab(parent, root) {
   parent.appendChild(notesGroup);
 
   const tagsSection = document.createElement('div');
-  tagsSection.className = "space-y-2";
+  tagsSection.className = "space-y-3";
   tagsSection.innerHTML = `
     <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">${ICONS.tag} Mistake Tags</label>
-    <div id="gmat-tags-container" class="flex flex-wrap gap-2 min-h-[24px]"></div>
-    <div id="gmat-tags-section" class="mt-2">
-      <div class="flex justify-flex-start mb-1">
-        <button type="button" id="gmat-toggle-tags" class="text-blue-600 text-xs hover:underline">See all</button>
-      </div>
-      <div id="gmat-tags-list" class="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto custom-scrollbar"></div>
-      <div id="gmat-tags-expanded" style="display:none" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto custom-scrollbar"></div>
-    </div>
+    <div id="gmat-tags-list" class="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto custom-scrollbar"></div>
   `;
   parent.appendChild(tagsSection);
 
@@ -654,14 +645,11 @@ function renderLogTab(parent, root) {
 function setupLogTabEvents(root) {
   const questionLinkInput = root.getElementById('gmat-question-link');
   const notesTextarea = root.getElementById('gmat-notes');
-  const tagsContainer = root.getElementById('gmat-tags-container');
-  const toggleTagsBtn = root.getElementById('gmat-toggle-tags');
   const tagsList = root.getElementById('gmat-tags-list');
-  const tagsExpanded = root.getElementById('gmat-tags-expanded');
   const suggestionsDiv = root.getElementById('gmat-suggestions');
 
   // Safety check - ensure all required elements exist
-  if (!questionLinkInput || !notesTextarea || !tagsContainer || !toggleTagsBtn || !tagsList || !tagsExpanded || !suggestionsDiv) {
+  if (!questionLinkInput || !notesTextarea || !tagsList || !suggestionsDiv) {
     console.error('Log tab elements not found in DOM');
     return;
   }
@@ -671,80 +659,35 @@ function setupLogTabEvents(root) {
   // Initialize tags from state
   let tags = [...(state.logData.tags || [])];
 
-  function renderTags() {
-    tagsContainer.innerHTML = '';
-    tags.forEach((tag, index) => {
-      const tagElement = document.createElement('span');
-      tagElement.style.cssText = 'display:inline-block;padding:2px 8px;font-size:12px;font-weight:500;border-radius:9999px;background:#e5e7eb;border:1px solid #d1d5db;color:#374151;margin-right:4px;margin-bottom:4px;cursor:pointer';
-      tagElement.innerHTML = `${tag} <span style="margin-left:4px;cursor:pointer;font-weight:bold">×</span>`;
-      tagElement.querySelector('span').addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        tags.splice(index, 1);
-        // Update state when tags change
-        state.logData.tags = [...tags];
-        renderTags();
-      });
-      tagsContainer.appendChild(tagElement);
-    });
-  }
-
-  function addTag(tag) {
-    const trimmedTag = tag.trim();
-    if (trimmedTag && !tags.includes(trimmedTag)) {
-      tags.push(trimmedTag);
-      // Update state when tags change
-      state.logData.tags = [...tags];
-      renderTags();
-    }
-  }
-
   function renderTagList(allTags) {
     tagsList.innerHTML = '';
-    tagsExpanded.innerHTML = '';
-
-    const visibleTags = allTags.slice(0, 6);
-
-    visibleTags.forEach(tag => {
-      const tagElement = document.createElement('span');
-      tagElement.style.cssText = 'display:inline-block;padding:2px 8px;font-size:12px;font-weight:500;border-radius:9999px;background:#f3f4f6;border:1px solid #d1d5db;color:#374151;margin-right:4px;margin-bottom:4px;cursor:pointer';
-      tagElement.textContent = tag.name || tag;
-      tagElement.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        addTag(tag.name || tag);
-      });
-      tagsList.appendChild(tagElement);
-    });
 
     allTags.forEach(tag => {
-      const tagElement = document.createElement('span');
-      tagElement.style.cssText = 'display:inline-block;padding:2px 8px;font-size:12px;font-weight:500;border-radius:9999px;background:#f3f4f6;border:1px solid #d1d5db;color:#374151;margin-right:4px;margin-bottom:4px;cursor:pointer';
-      tagElement.textContent = tag.name || tag;
-      tagElement.addEventListener('click', (e) => {
+      const tagName = tag.name || tag;
+      const btn = document.createElement('button');
+      const isActive = tags.includes(tagName);
+      btn.className = `px-3 py-1 rounded-full text-xs border transition-all ${isActive ? 'bg-gray-800 text-white border-gray-800 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'}`;
+      btn.textContent = tagName;
+      btn.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        addTag(tag.name || tag);
-      });
-      tagsExpanded.appendChild(tagElement);
+        toggleTag(tagName);
+      };
+      tagsList.appendChild(btn);
     });
   }
 
-  let tagsExpandedState = false;
-  toggleTagsBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    tagsExpandedState = !tagsExpandedState;
-    if (tagsExpandedState) {
-      tagsList.style.display = 'none';
-      tagsExpanded.style.display = 'flex';
-      toggleTagsBtn.innerHTML = 'See less';
+  function toggleTag(tag) {
+    if (tags.includes(tag)) {
+      tags = tags.filter(t => t !== tag);
     } else {
-      tagsList.style.display = 'flex';
-      tagsExpanded.style.display = 'none';
-      toggleTagsBtn.innerHTML = 'See all';
+      tags.push(tag);
     }
-  });
+    // Update state when tags change
+    state.logData.tags = [...tags];
+    renderTagList(state.allTags);
+  }
+
 
   function updateSuggestions() {
     const input = notesTextarea.value;
@@ -817,9 +760,7 @@ function setupLogTabEvents(root) {
     state.logData.url = questionLinkInput.value;
   });
 
-  // Render existing tags from state
-  renderTags();
-
+  // Fetch and render tags from API/local storage
   fetchAllTags().then(fetchedTags => {
     state.allTags = fetchedTags;
     renderTagList(state.allTags);
@@ -889,6 +830,20 @@ function updateSidebarLayout() {
     sidebarContainer.style.width = `${state.sidebarWidth}px`;
     document.body.style.marginRight = `${state.sidebarWidth}px`;
     document.getElementById('smartlog-expand-button').style.display = 'none';
+
+    // Focus the notes textarea when sidebar opens (if on log tab)
+    if (state.activeTab === 'log') {
+      // Wait for animation to complete before focusing
+      setTimeout(() => {
+        const notesTextarea = shadow.getElementById('gmat-notes');
+        if (notesTextarea) {
+          notesTextarea.focus();
+          // Move cursor to end of text
+          const textLength = notesTextarea.value.length;
+          notesTextarea.setSelectionRange(textLength, textLength);
+        }
+      }, 350); // Slightly longer than the 300ms transition
+    }
   }
 }
 

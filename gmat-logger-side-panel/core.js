@@ -384,6 +384,27 @@ async function fetchAllTags() {
 // UI HELPER FUNCTIONS
 // ============================================================================
 
+function saveFormValuesToState(root) {
+  const questionLinkInput = root.getElementById('gmat-question-link');
+  const notesTextarea = root.getElementById('gmat-notes');
+  const tagsContainer = root.getElementById('gmat-tags-container');
+
+  if (questionLinkInput) {
+    state.logData.url = questionLinkInput.value;
+  }
+
+  if (notesTextarea) {
+    state.logData.notes = notesTextarea.value;
+  }
+
+  if (tagsContainer) {
+    const tagElements = tagsContainer.querySelectorAll('span');
+    state.logData.tags = Array.from(tagElements).map(tagEl =>
+      tagEl.textContent.replace(/\s*×\s*$/, '').trim()
+    ).filter(tag => tag && tag.trim() !== '');
+  }
+}
+
 function updateParsedPreview(questionLink, notes, root) {
   const parsed = parseNotesAndLink(notes, questionLink);
   const previewDiv = root.getElementById('gmat-parsed-preview');
@@ -420,6 +441,14 @@ function updateParsedPreview(questionLink, notes, root) {
 
 function clearFormValues(root) {
   console.log('[Debug] Clearing form values');
+
+  // Clear state values
+  state.logData = {
+    url: window.location.href,
+    notes: '',
+    tags: [],
+    source: document.title
+  };
 
   // Clear question link (reset to current URL)
   const questionLinkInput = root.getElementById('gmat-question-link');
@@ -569,11 +598,15 @@ async function submitQuestionData(root) {
 function renderLogTab(parent, root) {
   parent.innerHTML = '';
 
+  // Use state values if available, otherwise use defaults
+  const questionLinkValue = state.logData.url || window.location.href;
+  const notesValue = state.logData.notes || '';
+
   const questionLinkGroup = document.createElement('div');
   questionLinkGroup.className = "space-y-2";
   questionLinkGroup.innerHTML = `
     <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">${ICONS.link} Question Link</label>
-    <input id="gmat-question-link" type="text" value="${window.location.href}" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+    <input id="gmat-question-link" type="text" value="${questionLinkValue}" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
   `;
   parent.appendChild(questionLinkGroup);
 
@@ -582,7 +615,7 @@ function renderLogTab(parent, root) {
   notesGroup.innerHTML = `
     <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">${ICONS.fileText} Smart Notes</label>
     <div class="relative">
-      <textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." class="w-full p-3 border border-gray-300 rounded-lg text-sm h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none font-mono text-gray-700 leading-relaxed"></textarea>
+      <textarea id="gmat-notes" placeholder="Type: weaken hard - my mistake was..." class="w-full p-3 border border-gray-300 rounded-lg text-sm h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none font-mono text-gray-700 leading-relaxed">${notesValue}</textarea>
       <div id="gmat-suggestions" style="position:absolute;z-index:10;width:100%;margin-top:1px;background:white;border:1px solid #d1d5db;border-radius:6px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:none"></div>
     </div>
     <p class="text-xs text-gray-500">Type keywords: <code class="bg-gray-100 px-1.5 py-0.5 rounded">weaken</code>, <code class="bg-gray-100 px-1.5 py-0.5 rounded">hard</code> and press Tab to complete.</p>
@@ -635,7 +668,8 @@ function setupLogTabEvents(root) {
 
   let currentSuggestions = [];
   let cursorPosition = 0;
-  let tags = [];
+  // Initialize tags from state
+  let tags = [...(state.logData.tags || [])];
 
   function renderTags() {
     tagsContainer.innerHTML = '';
@@ -647,6 +681,8 @@ function setupLogTabEvents(root) {
         e.stopPropagation();
         e.preventDefault();
         tags.splice(index, 1);
+        // Update state when tags change
+        state.logData.tags = [...tags];
         renderTags();
       });
       tagsContainer.appendChild(tagElement);
@@ -657,6 +693,8 @@ function setupLogTabEvents(root) {
     const trimmedTag = tag.trim();
     if (trimmedTag && !tags.includes(trimmedTag)) {
       tags.push(trimmedTag);
+      // Update state when tags change
+      state.logData.tags = [...tags];
       renderTags();
     }
   }
@@ -745,6 +783,8 @@ function setupLogTabEvents(root) {
   notesTextarea.addEventListener('input', (e) => {
     cursorPosition = e.target.selectionStart;
     updateSuggestions();
+    // Save to state as user types
+    state.logData.notes = e.target.value;
   });
   notesTextarea.addEventListener('keyup', (e) => {
     cursorPosition = e.target.selectionStart;
@@ -771,7 +811,14 @@ function setupLogTabEvents(root) {
   notesTextarea.addEventListener('blur', () => {
     setTimeout(() => suggestionsDiv.style.display = 'none', 150);
   });
-  questionLinkInput.addEventListener('input', () => updateParsedPreview(questionLinkInput.value, notesTextarea.value, root));
+  questionLinkInput.addEventListener('input', () => {
+    updateParsedPreview(questionLinkInput.value, notesTextarea.value, root);
+    // Save to state as user types
+    state.logData.url = questionLinkInput.value;
+  });
+
+  // Render existing tags from state
+  renderTags();
 
   fetchAllTags().then(fetchedTags => {
     state.allTags = fetchedTags;
@@ -911,12 +958,37 @@ function render() {
 
 function attachEvents(root) {
   root.getElementById('btn-close')?.addEventListener('click', () => {
+    // Save form values before closing
+    if (state.activeTab === 'log') {
+      saveFormValuesToState(root);
+    }
     state.isCollapsed = true;
     updateSidebarLayout();
   });
-  root.getElementById('btn-settings')?.addEventListener('click', () => { state.activeTab = 'settings'; render(); });
-  root.getElementById('tab-log')?.addEventListener('click', () => { state.activeTab = 'log'; render(); });
-  root.getElementById('tab-ai')?.addEventListener('click', () => { state.activeTab = 'ai'; render(); });
+  root.getElementById('btn-settings')?.addEventListener('click', () => {
+    // Save form values before switching tabs
+    if (state.activeTab === 'log') {
+      saveFormValuesToState(root);
+    }
+    state.activeTab = 'settings';
+    render();
+  });
+  root.getElementById('tab-log')?.addEventListener('click', () => {
+    // Save form values if coming from another tab
+    if (state.activeTab === 'log') {
+      saveFormValuesToState(root);
+    }
+    state.activeTab = 'log';
+    render();
+  });
+  root.getElementById('tab-ai')?.addEventListener('click', () => {
+    // Save form values before switching tabs
+    if (state.activeTab === 'log') {
+      saveFormValuesToState(root);
+    }
+    state.activeTab = 'ai';
+    render();
+  });
   root.getElementById('back-from-settings')?.addEventListener('click', () => { state.activeTab = 'log'; render(); });
   root.getElementById('btn-save-key')?.addEventListener('click', () => {
     state.apiKey = root.getElementById('input-api-key').value;
@@ -927,7 +999,14 @@ function attachEvents(root) {
   });
   root.getElementById('btn-run-analysis')?.addEventListener('click', handleAnalysis);
   root.getElementById('btn-review-log')?.addEventListener('click', () => { state.activeTab = 'log'; render(); });
-  root.getElementById('btn-cancel')?.addEventListener('click', () => { state.isCollapsed = true; updateSidebarLayout(); });
+  root.getElementById('btn-cancel')?.addEventListener('click', () => {
+    // Save form values before closing
+    if (state.activeTab === 'log') {
+      saveFormValuesToState(root);
+    }
+    state.isCollapsed = true;
+    updateSidebarLayout();
+  });
 
   // Manual Log tab specific events
   if (state.activeTab === 'log') {
@@ -1243,6 +1322,8 @@ export async function createSidebar() {
           // Set the notes field with auto-detected values
           if (autoNotes) {
             notesTextarea.value = autoNotes + '\n';
+            // Update state with auto-populated notes
+            state.logData.notes = autoNotes + '\n';
             // Position cursor at the end
             notesTextarea.setSelectionRange(autoNotes.length + 1, autoNotes.length + 1);
             console.log('[Debug] Auto-populate: Notes set to:', autoNotes);

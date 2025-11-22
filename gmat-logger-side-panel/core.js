@@ -15,7 +15,8 @@ import {
   detectSourceFromLink,
   createBadge,
   showStatus,
-  enrichquestionData
+  enrichquestionData,
+  getPracticeUrl
 } from './utils.js';
 
 // ============================================================================
@@ -29,7 +30,7 @@ const state = {
   isAnalyzing: false,
   apiKey: localStorage.getItem('gemini_api_key') || '',
   logData: {
-    url: window.location.href,
+    url: getPracticeUrl(window.location.href),
     notes: '',
     tags: [],
     source: document.title
@@ -38,7 +39,7 @@ const state = {
   categories: [],
   allTags: [],
   extractQuestionFn: null,
-  lastUrl: window.location.href
+  lastUrl: getPracticeUrl(window.location.href)
 };
 
 // ============================================================================
@@ -541,16 +542,17 @@ function clearFormValues(root) {
 
 function handleUrlChange(root) {
   const currentUrl = window.location.href;
+  const practiceUrl = getPracticeUrl(currentUrl);
 
   if (currentUrl !== state.lastUrl) {
     console.log('[Debug] URL changed from', state.lastUrl, 'to', currentUrl);
     state.lastUrl = currentUrl;
 
-    // Update the question link field
+    // Update the question link field with practice URL
     const questionLinkInput = root.getElementById('gmat-question-link');
     if (questionLinkInput) {
-      questionLinkInput.value = currentUrl;
-      state.logData.url = currentUrl;
+      questionLinkInput.value = practiceUrl;
+      state.logData.url = practiceUrl;
     }
 
     // Automatically refresh data from new page
@@ -851,8 +853,8 @@ async function submitQuestionData(root) {
 function renderLogTab(parent, root) {
   parent.innerHTML = '';
 
-  // Use state values if available, otherwise use defaults
-  const questionLinkValue = state.logData.url || window.location.href;
+  // Use state values if available, otherwise use defaults (converted to practice URL)
+  const questionLinkValue = state.logData.url || getPracticeUrl(window.location.href);
   const notesValue = state.logData.notes || '';
 
   const questionLinkGroup = document.createElement('div');

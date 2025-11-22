@@ -16,6 +16,14 @@ const isLocalhost = window.location.hostname === 'localhost' ||
   window.location.href.includes('localhost');
 export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
 
+/**
+ * Convert review URL to practice URL for GMAT Hero
+ * Example: /review/62 -> /practice/62
+ */
+export function getPracticeUrl(url) {
+  return url.replace('/review/', '/practice/');
+}
+
 // --- Icons (SVG Strings) ---
 export const ICONS = {
   zap: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-600"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,

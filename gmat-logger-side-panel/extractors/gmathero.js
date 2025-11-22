@@ -13,6 +13,14 @@ function decodeHtmlEntities(text) {
 }
 
 /**
+ * Get practice URL from current URL (replace /review/ with /practice/)
+ */
+function getPracticeUrl() {
+  const currentUrl = window.location.href;
+  return currentUrl.replace('/review/', '/practice/');
+}
+
+/**
  * Detect GMAT section from GMAT Hero page URL
  */
 function detectGMATHeroSection() {
@@ -242,7 +250,7 @@ function extractGMATHeroQuantContent() {
 
     // Create JSON structure for Quant question
     var jsonData = {
-      "question_link": "",
+      "question_link": getPracticeUrl(),
       "source": "",
       "difficulty": metadata.difficulty || "",
       "section": "Quant",
@@ -392,7 +400,7 @@ function extractGMATHeroCRContent() {
 
     // Create JSON structure for CR question
     var jsonData = {
-      "question_link": "",
+      "question_link": getPracticeUrl(),
       "source": "",
       "difficulty": metadata.difficulty || "",
       "section": "CR",

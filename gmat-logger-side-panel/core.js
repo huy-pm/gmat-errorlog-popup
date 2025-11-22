@@ -900,7 +900,7 @@ function render() {
   header.innerHTML = `
     <div class="flex items-center space-x-2 text-gray-800">
       <div class="bg-yellow-100 p-1.5 rounded-md">${ICONS.zap}</div>
-      <h2 class="font-bold text-lg">Quick Log</h2>
+      <h2 class="font-bold text-lg">Smart Log</h2>
     </div>
     <div class="flex items-center gap-2">
       <button id="btn-settings" class="text-gray-400 hover:text-gray-600 transition p-1" title="Settings">
@@ -918,7 +918,7 @@ function render() {
     tabs.className = "flex border-b border-gray-200";
     tabs.innerHTML = `
       <button id="tab-log" class="flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${state.activeTab === 'log' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}">
-        Manual Log
+        Smart Log
       </button>
       <button id="tab-ai" class="flex-1 py-3 text-sm font-medium border-b-2 transition-colors flex justify-center items-center gap-2 ${state.activeTab === 'ai' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700'}">
         ${ICONS.sparkles}

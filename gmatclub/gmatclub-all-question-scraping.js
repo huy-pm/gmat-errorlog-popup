@@ -9,6 +9,29 @@ javascript: (function () {
   // Function to detect the GMAT section
   function detectSection() {
     let section = "Unknown";
+
+    // First try: Check taglist for section tag IDs
+    const tagList = document.querySelector('#taglist');
+    if (tagList) {
+      const tagLinks = tagList.querySelectorAll('a.tag_css_link');
+      for (const link of tagLinks) {
+        const tagId = link.href.match(/tag_id=(\d+)/)?.[1];
+        if (tagId) {
+          if (tagId === "1015") {
+            section = "Quant";
+            return section;
+          } else if (tagId === "101" || tagId === "1017") {
+            section = "Critical Reasoning";
+            return section;
+          } else if (tagId === "1018") {
+            section = "Reading";
+            return section;
+          }
+        }
+      }
+    }
+
+    // Second try: Check forum links in DOM (fallback method)
     const td = document.querySelector('td a[href*="/forum/"]')?.closest('td');
     if (td) {
       if (td.querySelector('a[href*="quantitative-questions-7"]'))
@@ -20,6 +43,7 @@ javascript: (function () {
       else if (td.querySelector('a[href*="data-insights-questions-177"]'))
         section = "Data Insights";
     }
+
     return section;
   }
 

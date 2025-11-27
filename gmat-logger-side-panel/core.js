@@ -829,7 +829,16 @@ async function submitQuestionData(root) {
 
     // Clear form values after successful submission
     setTimeout(() => {
-      clearFormValues(root);
+      // Clear state values
+      state.logData = {
+        url: getPracticeUrl(window.location.href),
+        notes: '',
+        tags: [],
+        source: document.title
+      };
+
+      // Re-render the entire tab to properly reset everything including event listeners
+      render();
 
       // Collapse sidebar after clearing
       setTimeout(() => {

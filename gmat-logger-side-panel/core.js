@@ -1133,7 +1133,10 @@ function render() {
       <button id="btn-settings" class="text-gray-400 hover:text-gray-600 transition p-1" title="Settings">
          ${ICONS.settings}
       </button>
-      <button id="btn-close" class="text-gray-400 hover:text-gray-600 transition p-1" title="Close Sidebar">
+      <button id="btn-minimize" class="text-gray-400 hover:text-gray-600 transition p-1" title="Minimize Sidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <button id="btn-close" class="text-gray-400 hover:text-red-600 transition p-1" title="Close Sidebar">
         ${ICONS.x}
       </button>
     </div>
@@ -1185,7 +1188,11 @@ function render() {
 
 function attachEvents(root) {
   root.getElementById('btn-close')?.addEventListener('click', () => {
-    // Save form values before closing
+    // Completely close and destroy the sidebar
+    destroySidebar();
+  });
+  root.getElementById('btn-minimize')?.addEventListener('click', () => {
+    // Save form values before minimizing
     if (state.activeTab === 'log') {
       saveFormValuesToState(root);
     }
@@ -1305,6 +1312,36 @@ async function analyzeContent(text) {
 // ============================================================================
 // INITIALIZATION & EXPORTS
 // ============================================================================
+
+function destroySidebar() {
+  console.log('[Debug] Destroying sidebar...');
+
+  // Remove the sidebar container
+  const sidebarElement = document.getElementById('smartlog-split-container');
+  if (sidebarElement) {
+    sidebarElement.remove();
+  }
+
+  // Remove the expand button
+  const expandButton = document.getElementById('smartlog-expand-button');
+  if (expandButton) {
+    expandButton.remove();
+  }
+
+  // Reset body margin
+  document.body.style.marginRight = '0px';
+
+  // Clear the URL check interval
+  if (window.__SMARTLOG_URL_CHECK_INTERVAL__) {
+    clearInterval(window.__SMARTLOG_URL_CHECK_INTERVAL__);
+    window.__SMARTLOG_URL_CHECK_INTERVAL__ = null;
+  }
+
+  // Reset the injection flag
+  window.__SMARTLOG_INJECTED__ = false;
+
+  console.log('[Debug] Sidebar destroyed');
+}
 
 export async function createSidebar() {
   // Prevent multiple injections

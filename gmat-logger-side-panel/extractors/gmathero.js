@@ -34,6 +34,9 @@ function detectGMATHeroSection() {
   } else if (url.includes('cr') || url.includes('rcr')) {
     section = "Critical Reasoning";
     return section;
+  } else if (url.includes('rc') || url.includes('rrc')) {
+    section = "Reading Comprehension";
+    return section;
   }
 
   // Fallback: Look for href attributes in the page
@@ -250,7 +253,7 @@ function extractGMATHeroQuantContent() {
 
     // Create JSON structure for Quant question
     var jsonData = {
-      "question_link": getPracticeUrl(),
+      "questionLink": getPracticeUrl(),
       "source": "",
       "difficulty": metadata.difficulty || "",
       "section": "Quant",
@@ -258,9 +261,9 @@ function extractGMATHeroQuantContent() {
       "correctAnswer": metadata.correctAnswer || "",
       "timeSpent": metadata.timeSpent || "",
       "content": {
-        "question_text": decodeHtmlEntities(questionText),
-        "answer_choices": answerChoices,
-        "correct_answer": metadata.correctAnswer || "",
+        "questionText": decodeHtmlEntities(questionText),
+        "answerChoices": answerChoices,
+        "correctAnswer": metadata.correctAnswer || "",
         "category": metadata.category || ""
       }
     };
@@ -400,7 +403,7 @@ function extractGMATHeroCRContent() {
 
     // Create JSON structure for CR question
     var jsonData = {
-      "question_link": getPracticeUrl(),
+      "questionLink": getPracticeUrl(),
       "source": "",
       "difficulty": metadata.difficulty || "",
       "section": "CR",
@@ -409,9 +412,9 @@ function extractGMATHeroCRContent() {
       "timeSpent": metadata.timeSpent || "",
       "content": {
         "passage": passage,
-        "question_text": question,
-        "answer_choices": answerChoices,
-        "correct_answer": metadata.correctAnswer || "",
+        "questionText": question,
+        "answerChoices": answerChoices,
+        "correctAnswer": metadata.correctAnswer || "",
         "category": metadata.category || ""
       }
     };
@@ -420,6 +423,114 @@ function extractGMATHeroCRContent() {
 
   } catch (error) {
     console.error("Error extracting GMAT Hero CR content:", error);
+    return null;
+  }
+}
+
+/**
+ * Extract Reading Comprehension question from GMAT Hero
+ */
+function extractGMATHeroRCContent() {
+  try {
+    // Extract passage from left panel
+    var leftPanel = document.getElementById('left-panel');
+    if (!leftPanel) {
+      console.warn("Could not find GMAT Hero left-panel element!");
+      return null;
+    }
+
+    var passageElement = leftPanel.querySelector('.passage');
+    if (!passageElement) {
+      console.warn("Could not find GMAT Hero passage element!");
+      return null;
+    }
+
+    // Get passage HTML and process it
+    var passageHTML = passageElement.innerHTML;
+
+    // Split by <br> tags (handle both single and double <br>)
+    // Replace double <br> with paragraph marker, then clean up
+    var passageText = passageHTML
+      .replace(/<br[^>]*>\s*<br[^>]*>/gi, '\n\n') // Double breaks = paragraph breaks
+      .replace(/<br[^>]*>/gi, ' ') // Single breaks = spaces
+      .replace(/<[^>]*>/g, '') // Remove all HTML tags
+      .replace(/&ldquo;/g, '"')
+      .replace(/&rdquo;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&[a-zA-Z0-9#]+;/g, '')
+      .replace(/[ \t]+/g, ' ') // Normalize spaces and tabs, but preserve newlines
+      .trim();
+
+    // Split into paragraphs and clean each one
+    var paragraphs = passageText.split('\n\n')
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+
+    // Join paragraphs with double newlines
+    var passage = paragraphs.join('\n');
+    passage = decodeHtmlEntities(passage);
+
+    // Extract question from right panel
+    var rightPanel = document.getElementById('right-panel');
+    if (!rightPanel) {
+      console.warn("Could not find GMAT Hero right-panel element!");
+      return null;
+    }
+
+    var questionStem = rightPanel.querySelector('.question-stem');
+    if (!questionStem) {
+      console.warn("Could not find GMAT Hero question-stem element!");
+      return null;
+    }
+
+    var question = questionStem.textContent.trim();
+    question = decodeHtmlEntities(question);
+
+    // Extract answer choices
+    var answerChoices = [];
+    var standardChoices = rightPanel.querySelector('.standard-choices.ng-star-inserted');
+
+    if (standardChoices) {
+      var options = standardChoices.querySelectorAll('.option.ng-star-inserted, .option');
+      options.forEach(function (option) {
+        var label = option.querySelector('label');
+        if (label) {
+          var span = label.querySelector('span');
+          if (span) {
+            var answerText = span.textContent.trim();
+            if (answerText) {
+              answerChoices.push(decodeHtmlEntities(answerText));
+            }
+          }
+        }
+      });
+    }
+
+    // Extract metadata (category, difficulty, selected/correct answers, time)
+    const metadata = extractGMATHeroMetadata();
+
+    // Create JSON structure for RC question
+    var jsonData = {
+      "questionLink": getPracticeUrl(),
+      "source": "",
+      "difficulty": metadata.difficulty || "",
+      "section": "RC",
+      "selectedAnswer": metadata.selectedAnswer || "",
+      "correctAnswer": metadata.correctAnswer || "",
+      "timeSpent": metadata.timeSpent || "",
+      "content": {
+        "passage": passage,
+        "questionText": question,
+        "answerChoices": answerChoices,
+        "correctAnswer": metadata.correctAnswer || "",
+        "category": metadata.category || ""
+      }
+    };
+
+    return jsonData;
+
+  } catch (error) {
+    console.error("Error extracting GMAT Hero RC content:", error);
     return null;
   }
 }
@@ -436,6 +547,8 @@ export function extractGMATHeroQuestion() {
       return extractGMATHeroQuantContent();
     case "Critical Reasoning":
       return extractGMATHeroCRContent();
+    case "Reading Comprehension":
+      return extractGMATHeroRCContent();
     default:
       console.warn("Unsupported GMAT Hero question type:", section);
       return null;

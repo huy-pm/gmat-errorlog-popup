@@ -28,7 +28,7 @@ function detectGMATHeroSection() {
 
   // First priority: Check the current page URL
   const url = window.location.href.toLowerCase();
-  if (url.includes('quant') || url.includes('rq')) {
+  if (url.includes('quant') || url.includes('rq') || url.includes('qt')) {
     section = "Quant";
     return section;
   } else if (url.includes('cr') || url.includes('rcr')) {
@@ -45,12 +45,15 @@ function detectGMATHeroSection() {
   for (let link of links) {
     const href = link.getAttribute('href').toLowerCase();
 
-    if (href.includes('quant') || href.includes('rq')) {
+    if (href.includes('quant') || href.includes('rq') || href.includes('qt')) {
       section = "Quant";
       break;
     }
     else if (href.includes('cr') || href.includes('rcr')) {
       section = "Critical Reasoning";
+      break;
+    } else if (href.includes('rc') || href.includes('rrc')) {
+      section = "Reading Comprehension";
       break;
     }
   }
@@ -78,14 +81,23 @@ function extractGMATHeroMetadata() {
 
   // 2. Extract category from .hide-small.centered
   const categoryEl = document.querySelector('.hide-small.centered');
-  if (categoryEl) {
-    const fullText = categoryEl.textContent.trim();
-    const parts = fullText.split('-');
-    if (parts.length > 1) {
-      metadata.category = parts[parts.length - 1].trim();
-    } else {
-      metadata.category = fullText;
+  const url = window.location.href.toLowerCase();
+  if (url.includes('og-quant') || url.includes('prep-quant')
+    || url.includes('og-cr') || url.includes('prep-cr')) {
+    if (categoryEl) {
+      const fullText = categoryEl.textContent.trim();
+      const parts = fullText.split('-');
+      if (parts.length > 1) {
+        metadata.category = parts[parts.length - 1].trim();
+      } else {
+        metadata.category = fullText;
+      }
     }
+  } else if (url.includes('og-rc') || url.includes('prep-rc')) {
+    metadata.category = "rc"
+  }
+  else {
+    metadata.category = "";
   }
 
   // 3. Extract selected answer

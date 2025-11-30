@@ -1,3 +1,5 @@
+import { getPracticeUrl } from '../utils.js';
+
 /**
  * GMAT Logger Modular - GMATClub Extractor
  * Extracts questions from gmatclub.com forum pages
@@ -94,6 +96,49 @@ function extractAnswerStatistics() {
   }
 
   return { selectedAnswer, correctAnswer };
+}
+
+/**
+ * Extract metadata from History table (Time, Selected Answer, Correct Answer)
+ */
+function extractHistoryMetadata() {
+  const historyTable = document.querySelector('.historyTable');
+  if (!historyTable) {
+    return { timeSpent: "", selectedAnswer: "", correctAnswer: "" };
+  }
+
+  const rows = historyTable.querySelectorAll('.historyTableRow');
+  if (rows.length === 0) {
+    return { timeSpent: "", selectedAnswer: "", correctAnswer: "" };
+  }
+
+  // Get the last row (latest attempt)
+  const lastRow = rows[rows.length - 1];
+
+  // Extract Time
+  const timeDiv = lastRow.querySelector('.time');
+  const timeSpent = timeDiv ? timeDiv.textContent.trim() : "";
+
+  // Extract Answers
+  let selectedAnswer = "";
+  let correctAnswer = "";
+
+  const answersPopup = lastRow.querySelector('.answersPopup');
+  if (answersPopup) {
+    const rows = answersPopup.querySelectorAll('.answersPopupRow');
+    rows.forEach(row => {
+      const text = row.textContent.trim();
+      if (text.includes("My Answer:")) {
+        const span = row.querySelector('span');
+        if (span) selectedAnswer = span.textContent.trim();
+      } else if (text.includes("Correct Answer:")) {
+        const span = row.querySelector('span');
+        if (span) correctAnswer = span.textContent.trim();
+      }
+    });
+  }
+
+  return { timeSpent, selectedAnswer, correctAnswer };
 }
 
 /**
@@ -464,7 +509,7 @@ function extractGMATClubCRContent() {
       "questionLink": "",
       "source": "",
       "difficulty": "",
-      "section": "CR",
+      "section": "verbal",
       "content": {
         "passage": passage,
         "questionText": question,
@@ -486,6 +531,20 @@ function extractGMATClubCRContent() {
  */
 function extractGMATClubRCContent() {
   try {
+    // Gather metadata first
+    const tags = extractTagsFromPage();
+    const historyMetadata = extractHistoryMetadata();
+    const answerStats = extractAnswerStatistics(); // Fallback if history is empty?
+
+    // Prioritize history metadata, fallback to answerStats/tags
+    const metadata = {
+      difficulty: tags.difficulty,
+      category: tags.category,
+      timeSpent: historyMetadata.timeSpent || extractTimeSpent(),
+      selectedAnswer: historyMetadata.selectedAnswer || answerStats.selectedAnswer,
+      correctAnswer: historyMetadata.correctAnswer || answerStats.correctAnswer
+    };
+
     let container = document.querySelector('.item.text');
     if (!container) {
       console.warn('No GMATClub RC container found.');
@@ -495,7 +554,6 @@ function extractGMATClubRCContent() {
     let clone = container.cloneNode(true);
     clone.querySelectorAll('.twoRowsBlock, .post_signature, .spoiler').forEach(el => el.remove());
 
-    let htmlContent = clone.innerHTML;
     let bbcodeBoxOut = clone.querySelector('.bbcodeBoxOut');
     if (!bbcodeBoxOut) {
       console.warn('No bbcodeBoxOut found.');
@@ -508,112 +566,108 @@ function extractGMATClubRCContent() {
       return null;
     }
 
+    // --- Passage Extraction ---
     let passageBox = bbcodeBoxIns[0];
     let passageHTML = passageBox.innerHTML;
 
-    passageHTML = passageHTML.replace(/<br\s*\/?>/gi, '\n');
-    passageHTML = passageHTML.replace(/<span[^>]*>(.*?)<\/span>/gi, '**$1**');
+    // Handle highlighting: <span style="background-color: #FFFF00">...</span> -> **...**
+    passageHTML = passageHTML.replace(/<span[^>]*background-color:\s*#FFFF00[^>]*>(.*?)<\/span>/gi, '**$1**');
+
+    // Handle paragraph separation
+    passageHTML = passageHTML.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n\n'); // Double break -> New paragraph
+    passageHTML = passageHTML.replace(/<br\s*\/?>/gi, '\n'); // Single break -> Newline
 
     let passageText = passageHTML.replace(/<[^>]*>/g, '');
-    passageText = decodeHtmlEntities(passageText);
+    passageText = decodeHtmlEntities(passageText).trim();
 
-    let questions = [];
+    // --- Question Extraction ---
+    let questionText = "";
+    let answerChoices = [];
 
     if (bbcodeBoxIns.length >= 2) {
       let questionsBox = bbcodeBoxIns[1];
       let questionWrappers = questionsBox.querySelectorAll('.question_wrapper');
 
-      questionWrappers.forEach((wrapper, index) => {
-        try {
-          let wrapperClone = wrapper.cloneNode(true);
+      // Find the visible question
+      let visibleWrapper = null;
+      for (const wrapper of questionWrappers) {
+        if (wrapper.style.display !== 'none') {
+          visibleWrapper = wrapper;
+          break;
+        }
+      }
 
-          let questionSpan = wrapperClone.querySelector('span[style*="font-weight: bold"]');
-          let questionText = '';
+      // Default to first question if none explicitly visible (or all hidden/shown?)
+      if (!visibleWrapper && questionWrappers.length > 0) {
+        visibleWrapper = questionWrappers[0];
+      }
 
-          if (questionSpan) {
-            questionText = questionSpan.textContent.trim();
-            questionText = questionText.replace(/^\d+\.\s*/, '');
-          } else {
-            questionText = wrapperClone.textContent.trim().split('\n')[0] || '';
-            questionText = questionText.replace(/^\d+\.\s*/, '');
-          }
+      if (visibleWrapper) {
+        let wrapperClone = visibleWrapper.cloneNode(true);
 
-          questionText = decodeHtmlEntities(questionText);
+        // Extract Question Text
+        let questionSpan = wrapperClone.querySelector('span[style*="font-weight: bold"]');
 
-          let choices = {};
-          let wrapperHTML = wrapper.innerHTML;
+        if (questionSpan) {
+          questionText = questionSpan.textContent.trim();
+          // Remove leading number (e.g., "1. ")
+          questionText = questionText.replace(/^\d+\.\s*/, '');
+        } else {
+          // Fallback: take first line
+          questionText = wrapperClone.textContent.trim().split('\n')[0] || '';
+          questionText = questionText.replace(/^\d+\.\s*/, '');
+        }
+        questionText = decodeHtmlEntities(questionText);
 
-          let choicesHTML = '';
-          if (questionSpan && questionSpan.outerHTML) {
-            let spanEndIndex = wrapperHTML.indexOf(questionSpan.outerHTML) + questionSpan.outerHTML.length;
-            choicesHTML = wrapperHTML.substring(spanEndIndex);
-          } else {
-            choicesHTML = wrapperHTML;
-            if (questionSpan && questionSpan.outerHTML) {
-              choicesHTML = choicesHTML.replace(questionSpan.outerHTML, '');
-            }
-          }
+        // Extract Answer Choices
+        let choicesHTML = '';
+        if (questionSpan && questionSpan.outerHTML) {
+          // Get content after the question span
+          let wrapperHTML = visibleWrapper.innerHTML;
+          let spanEndIndex = wrapperHTML.indexOf(questionSpan.outerHTML) + questionSpan.outerHTML.length;
+          choicesHTML = wrapperHTML.substring(spanEndIndex);
+        } else {
+          // Fallback: use whole wrapper
+          choicesHTML = visibleWrapper.innerHTML;
+        }
 
-          choicesHTML = choicesHTML.replace(/<br\s*\/?>/gi, '\n');
-          let choicesText = choicesHTML.replace(/<[^>]*>/g, '');
-          choicesText = decodeHtmlEntities(choicesText);
+        choicesHTML = choicesHTML.replace(/<br\s*\/?>/gi, '\n');
+        let choicesText = choicesHTML.replace(/<[^>]*>/g, '');
+        choicesText = decodeHtmlEntities(choicesText);
 
-          let lines = choicesText.split('\n');
-
-          lines.forEach(line => {
-            let cleanLine = line.trim();
-            if (cleanLine) {
-              let choiceMatch = cleanLine.match(/^([A-Ea-e])[.)]\s*(.*)/);
-              if (choiceMatch) {
-                let letter = choiceMatch[1].toUpperCase();
-                let text = choiceMatch[2].trim();
-                if (text) {
-                  choices[letter] = decodeHtmlEntities(text);
-                }
+        let lines = choicesText.split('\n');
+        lines.forEach(line => {
+          let cleanLine = line.trim();
+          if (cleanLine) {
+            // Match (A), A., A), etc.
+            let choiceMatch = cleanLine.match(/^([A-Ea-e])[\.\)\:]\s*(.*)/) || cleanLine.match(/^\(([A-Ea-e])\)\s*(.*)/);
+            if (choiceMatch) {
+              // let letter = choiceMatch[1].toUpperCase(); // Not strictly needed for array but good for debug
+              let text = choiceMatch[2].trim();
+              if (text) {
+                answerChoices.push(decodeHtmlEntities(text));
               }
             }
-          });
-
-          if (questionText) {
-            questions.push({
-              question_text: questionText,
-              choices: choices
-            });
           }
-        } catch (e) {
-          console.error('Error processing question wrapper ' + index + ':', e);
-        }
-      });
+        });
+      }
     }
 
-    // Create structured questions array
-    let structuredQuestions = [];
-    questions.forEach(q => {
-      let choicesArray = [];
-      let letters = ["A", "B", "C", "D", "E"];
-      letters.forEach(letter => {
-        if (q.choices[letter]) {
-          choicesArray.push(decodeHtmlEntities(q.choices[letter]));
-        }
-      });
-
-      let structuredQuestion = {
-        "questionText": decodeHtmlEntities(q.question_text),
-        "answerChoices": choicesArray
-      };
-      structuredQuestions.push(structuredQuestion);
-    });
-
     // Create JSON structure for RC question
-    let jsonData = {
-      "questionLink": "",
-      "source": "",
-      "difficulty": "",
-      "section": "RC",
+    var jsonData = {
+      "questionLink": getPracticeUrl(window.location.href),
+      "source": "", // Will be filled by enrich or caller if needed, but usually empty here
+      "difficulty": metadata.difficulty || "",
+      "section": "verbal",
+      "selectedAnswer": metadata.selectedAnswer || "",
+      "correctAnswer": metadata.correctAnswer || "",
+      "timeSpent": metadata.timeSpent || "",
       "content": {
-        "passageTitle": "",
-        "passageText": passageText,
-        "questions": structuredQuestions
+        "passage": passageText,
+        "questionText": questionText,
+        "answerChoices": answerChoices,
+        "correctAnswer": metadata.correctAnswer || "",
+        "category": metadata.category || ""
       }
     };
 
@@ -662,24 +716,27 @@ export function extractGMATClubQuestion() {
   }
 
   // Merge extracted tags, answer statistics, and time spent into the question data
+  // Note: RC extraction now handles this internally, but we keep this for other sections
+  // and to ensure consistency if RC extraction missed something (though RC returns full object now)
   if (questionData) {
-    // Only set difficulty if successfully extracted
-    if (tags.difficulty) {
+    // Only set difficulty if successfully extracted and not already present
+    if (tags.difficulty && !questionData.difficulty) {
       questionData.difficulty = tags.difficulty;
     }
-    // Only set category if successfully extracted (for CR questions only)
+    // Only set category if successfully extracted (for CR questions only, RC handles it)
     if (tags.category && section === "Critical Reasoning") {
       questionData.content.category = tags.category;
     }
-    // Add selected and correct answers
-    if (answerStats.selectedAnswer) {
+
+    // Add selected and correct answers if not present
+    if (answerStats.selectedAnswer && !questionData.selectedAnswer) {
       questionData.selectedAnswer = answerStats.selectedAnswer;
     }
-    if (answerStats.correctAnswer) {
+    if (answerStats.correctAnswer && !questionData.correctAnswer) {
       questionData.correctAnswer = answerStats.correctAnswer;
     }
-    // Add time spent
-    if (timeSpent) {
+    // Add time spent if not present
+    if (timeSpent && !questionData.timeSpent) {
       questionData.timeSpent = timeSpent;
     }
   }

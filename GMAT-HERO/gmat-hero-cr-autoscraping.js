@@ -402,7 +402,22 @@ javascript: (function () {
     function saveQuestionsToJSON() {
         try {
             var timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            var filename = 'gmat-cr-' + timestamp + '.json';
+
+            var categoryPart = "";
+            if (extractedQuestions.length > 0 && extractedQuestions[0].category) {
+                categoryPart = extractedQuestions[0].category
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .split(/\s+/)
+                    .join('-');
+
+                if (categoryPart) {
+                    categoryPart += '-';
+                }
+            }
+
+            var filename = 'gmat-cr-' + categoryPart + timestamp + '.json';
             var jsonData = JSON.stringify(extractedQuestions, null, 2);
 
             var blob = new Blob([jsonData], { type: 'application/json' });
@@ -450,6 +465,24 @@ javascript: (function () {
                 extractedQuestions.push(questionData);
                 popup.document.getElementById('count').textContent = extractedQuestions.length;
             }
+
+            // Check if we reached the last question
+            var quizNoEl = document.querySelector('.quiz-no span');
+            if (quizNoEl) {
+                var text = quizNoEl.textContent.trim();
+                var parts = text.split(' of ');
+                if (parts.length === 2) {
+                    var currentQ = parseInt(parts[0]);
+                    var totalQ = parseInt(parts[1]);
+
+                    if (currentQ === totalQ && extractedQuestions.length === totalQ) {
+                        stopExtraction();
+                        return;
+                    }
+                }
+            }
+
+            // Click next button
 
             // Click next button
             var hasNext = clickNextButton();

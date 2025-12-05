@@ -82,8 +82,7 @@ function extractGMATHeroMetadata() {
   // 2. Extract category from .hide-small.centered
   const categoryEl = document.querySelector('.hide-small.centered');
   const url = window.location.href.toLowerCase();
-  if (url.includes('og-quant') || url.includes('prep-quant')
-    || url.includes('og-cr') || url.includes('prep-cr')) {
+  if (url.includes('quant') || url.includes('cr')) {
     if (categoryEl) {
       const fullText = categoryEl.textContent.trim();
       const parts = fullText.split('-');
@@ -93,7 +92,7 @@ function extractGMATHeroMetadata() {
         metadata.category = fullText;
       }
     }
-  } else if (url.includes('og-rc') || url.includes('prep-rc')) {
+  } else if (url.includes('rc')) {
     metadata.category = "rc"
   }
   else {

@@ -149,6 +149,32 @@ javascript: (function () {
 
             var questionHTML = questionStem.innerHTML;
 
+            // Check if this is a Data Sufficiency question (skip these)
+            // Pattern: <br>(1) <span> and <br>(2) <span>
+            var tempCheckDiv = document.createElement("div");
+            tempCheckDiv.innerHTML = questionHTML;
+
+            // Count <br> tags followed by (1) or (2)
+            var brTags = tempCheckDiv.querySelectorAll('br');
+            var hasDataSufficiencyPattern = false;
+
+            brTags.forEach(function (br) {
+                var nextNode = br.nextSibling;
+                if (nextNode && nextNode.nodeType === Node.TEXT_NODE) {
+                    var text = nextNode.textContent.trim();
+                    // Check if text starts with (1) or (2)
+                    if (text.match(/^\(1\)\s*/) || text.match(/^\(2\)\s*/)) {
+                        hasDataSufficiencyPattern = true;
+                    }
+                }
+            });
+
+            // If this is a Data Sufficiency question, skip it
+            if (hasDataSufficiencyPattern) {
+                console.log("Skipping Data Sufficiency question (contains <br>(1) and <br>(2) pattern)");
+                return null;
+            }
+
             // Convert KaTeX to TeX format for JSON
             var tempDiv = document.createElement("div");
             tempDiv.innerHTML = questionHTML;
@@ -384,8 +410,8 @@ javascript: (function () {
                 if (parts.length === 2) {
                     var currentQ = parseInt(parts[0]);
                     var totalQ = parseInt(parts[1]);
-
-                    if (currentQ === totalQ && extractedQuestions.length === totalQ) {
+                    //Dont extract DS question
+                    if (currentQ === totalQ) {
                         stopExtraction();
                         return;
                     }

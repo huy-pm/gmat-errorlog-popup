@@ -125,6 +125,16 @@ javascript: (function () {
         return metadata;
     }
 
+    // Helper function to convert highlighted text to markdown
+    function convertHighlightedTextToMarkdown(htmlContent) {
+        // Replace spans with yellow background to markdown highlight format ==text==
+        var result = htmlContent.replace(
+            /<span\s+style="[^"]*background-color:\s*yellow[^"]*">([^<]*)<\/span>/gi,
+            '==$1=='
+        );
+        return result;
+    }
+
     // Function to extract data from current question (RC-specific)
     function extractQuestionData() {
         try {
@@ -143,6 +153,9 @@ javascript: (function () {
 
             // Get passage HTML and process it
             var passageHTML = passageElement.innerHTML;
+
+            // Convert highlighted text to markdown format first (before removing HTML tags)
+            passageHTML = convertHighlightedTextToMarkdown(passageHTML);
 
             // Split by <br> tags (handle both single and double <br>)
             // Replace double <br> with paragraph marker, then clean up
@@ -179,7 +192,18 @@ javascript: (function () {
                 return null;
             }
 
-            var question = questionStem.textContent.trim();
+            // Get question HTML and convert highlighted text to markdown
+            var questionHTML = questionStem.innerHTML;
+            questionHTML = convertHighlightedTextToMarkdown(questionHTML);
+
+            // Remove HTML tags and clean up
+            var question = questionHTML
+                .replace(/<[^>]*>/g, '') // Remove all HTML tags
+                .replace(/&ldquo;/g, '"')
+                .replace(/&rdquo;/g, '"')
+                .replace(/&amp;/g, '&')
+                .replace(/&[a-zA-Z0-9#]+;/g, '')
+                .trim();
             question = decodeHtmlEntities(question);
 
             // Extract answer choices

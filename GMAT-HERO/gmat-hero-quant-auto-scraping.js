@@ -147,6 +147,14 @@ javascript: (function () {
                 return null;
             }
 
+            // Extract image if exists
+            var questionImage = null;
+            var imgElement = questionStem.querySelector('img');
+            if (imgElement) {
+                // Use .src property to get absolute URL instead of .getAttribute('src')
+                questionImage = imgElement.src;
+            }
+
             var questionHTML = questionStem.innerHTML;
 
             // Check if this is a Data Sufficiency question (skip these)
@@ -281,6 +289,7 @@ javascript: (function () {
                 "content": {
                     "questionText": decodeHtmlEntities(questionText),
                     "answerChoices": answerChoices,
+                    "image": questionImage
                 }
             };
 

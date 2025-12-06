@@ -1,0 +1,898 @@
+<div _ngcontent-ng-c744778606="" id="test-content" class="test-content two-panels show-left">
+    <div _ngcontent-ng-c744778606="" id="left-panel" class="left-panel ng-star-inserted" style="flex-grow: 7;">
+        <!---->
+        <div _ngcontent-ng-c744778606="" class="integrated-reasoning ng-star-inserted">
+            <ngx-ir _ngcontent-ng-c744778606="" _nghost-ng-c2296498254="">
+                <!---->
+                <div _ngcontent-ng-c2296498254="" class="ir-ta ng-star-inserted">
+                    <div _ngcontent-ng-c2296498254="" class="ng-star-inserted">The table above gives information for
+                        2008 on total passengers (total passengers enplaned and deplaned with passengers in transit
+                        counted once) and total movements (landing and takeoff of an aircraft) for 21 airports
+                        throughout the world. The 21 airports were chosen for inclusion in the table because, in 2008,
+                        each was among the busiest 30 airports in the world in terms of both total passengers and total
+                        movements. In addition to the numbers of total passengers and total movements for each airport,
+                        the table also gives the percent of increase and decrease over the numbers for 2007 and the rank
+                        of the airport for total passengers and total movements.</div>
+                    <!---->
+                    <div _ngcontent-ng-c2296498254="" class="sorter">
+                        <span _ngcontent-ng-c2296498254="">Sort By:</span>
+                        <p-dropdown _ngcontent-ng-c2296498254="" placeholder="Select"
+                            class="p-element p-inputwrapper ng-pristine ng-valid p-inputwrapper-filled ng-touched">
+                            <div id="pn_id_130" class="p-dropdown p-component p-inputwrapper">
+                                <span role="combobox" pautofocus=""
+                                    class="p-element p-dropdown-label p-inputtext ng-star-inserted"
+                                    aria-disabled="false" aria-label="City" aria-haspopup="listbox"
+                                    aria-expanded="false" tabindex="0">Select
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                </span>
+                                <!---->
+                                <!---->
+                                <!---->
+                                <!---->
+                                <div role="button" aria-label="dropdown trigger" aria-haspopup="listbox"
+                                    class="p-dropdown-trigger" aria-expanded="false" data-pc-section="trigger">
+                                    <!---->
+                                    <chevrondownicon class="p-element p-icon-wrapper ng-star-inserted">
+                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg" class="p-dropdown-trigger-icon p-icon"
+                                            aria-hidden="true">
+                                            <path
+                                                d="M7.01744 10.398C6.91269 10.3985 6.8089 10.378 6.71215 10.3379C6.61541 10.2977 6.52766 10.2386 6.45405 10.1641L1.13907 4.84913C1.03306 4.69404 0.985221 4.5065 1.00399 4.31958C1.02276 4.13266 1.10693 3.95838 1.24166 3.82747C1.37639 3.69655 1.55301 3.61742 1.74039 3.60402C1.92777 3.59062 2.11386 3.64382 2.26584 3.75424L7.01744 8.47394L11.769 3.75424C11.9189 3.65709 12.097 3.61306 12.2748 3.62921C12.4527 3.64535 12.6199 3.72073 12.7498 3.84328C12.8797 3.96582 12.9647 4.12842 12.9912 4.30502C13.0177 4.48162 12.9841 4.662 12.8958 4.81724L7.58083 10.1322C7.50996 10.2125 7.42344 10.2775 7.32656 10.3232C7.22968 10.3689 7.12449 10.3944 7.01744 10.398Z"
+                                                fill="currentColor"></path>
+                                        </svg>
+                                    </chevrondownicon>
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                    <!---->
+                                </div>
+                                <p-overlay class="p-element ng-tns-c3177733119-72 ng-star-inserted">
+                                    <!---->
+                                </p-overlay>
+                            </div>
+                        </p-dropdown>
+                    </div>
+                    <div _ngcontent-ng-c2296498254="" class="sortable-table disable-select">
+                        <table _ngcontent-ng-c2296498254="" class="margin-auto">
+                            <thead _ngcontent-ng-c2296498254="">
+                                <tr _ngcontent-ng-c2296498254="" class="sub-header ng-star-inserted">
+                                    <th colspan="3" style="text-align: center">Airport</th>
+                                    <th colspan="3" style="text-align: center">Passengers</th>
+                                    <th colspan="3" style="text-align: center">Movements</th>
+                                </tr>
+                                <!---->
+                                <tr _ngcontent-ng-c2296498254="">
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">City</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">Country</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">Code</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">Number P</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">% change P</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">Rank P</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">Number M</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">% change M</div>
+                                    </th>
+                                    <th _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <div _ngcontent-ng-c2296498254="">Rank M</div>
+                                    </th>
+                                    <!---->
+                                </tr>
+                            </thead>
+                            <tbody _ngcontent-ng-c2296498254="">
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Amsterdam</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">NLD</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">AMS</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">47,430,019</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-0.8</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">14</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">446,592</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-1.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">17</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Atlanta</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">ATL</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">90,039,280</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">0.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">978,824</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-1.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Beijing</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">CHN</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">PEK</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">55,937,289</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">4.4</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">8</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">431,670</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">8.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">21</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Charlotte</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">CLT</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">34,739,020</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">4.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">26</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">536,253</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">2.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">9</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Chicago</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">ORD</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">69,353,876</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-9.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">2</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">881,566</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-4.9</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">2</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Dallas/Ft Worth</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">DFW</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">57,093,187</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-4.5</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">656,310</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-4.3</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">3</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Denver</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">DEN</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">51,245,334</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">2.8</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">10</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">619,503</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">0.9</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">5</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Detroit</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">DTW</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">35,135,828</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-2.4</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">24</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">462,520</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-1.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">15</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Frankfurt</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">DEU</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">FRA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">53,467,450</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-1.3</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">9</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">485,783</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1.4</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">12</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Houston</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">IAH</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">41,709,389</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-3.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">16</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">576,062</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-4.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">7</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Las Vegas</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">LAS</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">43,208,724</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-8.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">15</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">578,949</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-5.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">6</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">London</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">GBR</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">LHR</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">67,056,379</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-1.5</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">3</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">478,518</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-0.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">13</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Los Angeles</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">LAX</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">59,497,539</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-4.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">622,506</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-8.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">4</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Madrid</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">ESP</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">MAD</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">50,824,435</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-2.4</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">11</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">469,740</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-2.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">14</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Miami</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">MIA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">34,063,531</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">29</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">371,519</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-3.8</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">29</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Minneapolis</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">MSP</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">34,056,443</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-3.0</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">30</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">450,044</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-0.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">16</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Munich</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">DEU</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">MUC</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">34,530,593</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">27</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">432,296</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">0.1</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">20</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Newark</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">EWR</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">35,360,848</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-2.8</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">23</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">434,428</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-0.4</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">19</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Paris</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">FRA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">CDG</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">60,874,682</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1.6</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">5</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">559,816</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">1.3</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">8</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">Phoenix</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">PHX</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">39,891,193</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-5.4</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">17</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">502,499</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">-6.8</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">10</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <tr _ngcontent-ng-c2296498254="" class="ng-star-inserted">
+                                    <!---->
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">San Francisco</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">USA</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">SFO</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">37,234,592</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">4.7</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">21</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">387,710</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">2.2</span>
+                                    </td>
+                                    <td _ngcontent-ng-c2296498254="" class="center ng-star-inserted">
+                                        <span _ngcontent-ng-c2296498254="">24</span>
+                                    </td>
+                                    <!---->
+                                </tr>
+                                <!---->
+                            </tbody>
+                            <tfoot _ngcontent-ng-c2296498254="">
+                                <!---->
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!---->
+                </div>
+                <!---->
+            </ngx-ir>
+        </div>
+        <!---->
+    </div>
+    <!---->
+    <div _ngcontent-ng-c744778606="" id="right-panel" class="right-panel" style="flex-grow: 4;">
+        <div _ngcontent-ng-c744778606="" class="question-stem">Consider each of the following statements about these
+            airports. For each statement indicate whether the statement is true or false, based on the information
+            provided in the table. </div>
+        <ngx-answer-select _ngcontent-ng-c744778606="" _nghost-ng-c3038166522="">
+            <!---->
+            <div _ngcontent-ng-c3038166522="" class="yes-no-question review-mode ng-star-inserted">
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <b _ngcontent-ng-c3038166522="">True</b>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <b _ngcontent-ng-c3038166522="">False</b>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center-vertical">
+                    <!---->
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <p-radiobutton _ngcontent-ng-c3038166522="" name="option-A" value="Y"
+                        class="p-element has-answered-incorrectly ng-untouched ng-pristine">
+                        <div data-pc-name="radiobutton" data-pc-section="root"
+                            class="p-radiobutton p-component p-radiobutton-disabled">
+                            <div class="p-hidden-accessible" data-pc-section="hiddenInputWrapper">
+                                <input type="radio" pautofocus="" class="p-element" value="Y" name="option-A"
+                                    aria-checked="false" data-pc-section="hiddenInput" disabled="">
+                            </div>
+                            <div data-pc-section="input" class="p-radiobutton-box p-disabled">
+                                <span class="p-radiobutton-icon" data-pc-section="icon"></span>
+                            </div>
+                        </div>
+                        <!---->
+                    </p-radiobutton>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <p-radiobutton _ngcontent-ng-c3038166522="" name="option-A" value="N"
+                        class="p-element has-answered-correctly correct-answer ng-untouched ng-pristine">
+                        <div data-pc-name="radiobutton" data-pc-section="root"
+                            class="p-radiobutton p-component p-radiobutton-disabled">
+                            <div class="p-hidden-accessible" data-pc-section="hiddenInputWrapper">
+                                <input type="radio" pautofocus="" class="p-element" value="N" name="option-A"
+                                    aria-checked="false" data-pc-section="hiddenInput" disabled="">
+                            </div>
+                            <div data-pc-section="input" class="p-radiobutton-box p-disabled">
+                                <span class="p-radiobutton-icon" data-pc-section="icon"></span>
+                            </div>
+                        </div>
+                        <!---->
+                    </p-radiobutton>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item">The airport experiencing the greatest percent
+                    decrease in total passengers from 2007 to 2008 also experienced the greatest decrease in the percent
+                    of movements.</div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <p-radiobutton _ngcontent-ng-c3038166522="" name="option-B" value="Y"
+                        class="p-element has-answered-incorrectly ng-untouched ng-pristine">
+                        <div data-pc-name="radiobutton" data-pc-section="root"
+                            class="p-radiobutton p-component p-radiobutton-disabled">
+                            <div class="p-hidden-accessible" data-pc-section="hiddenInputWrapper">
+                                <input type="radio" pautofocus="" class="p-element" value="Y" name="option-B"
+                                    aria-checked="false" data-pc-section="hiddenInput" disabled="">
+                            </div>
+                            <div data-pc-section="input" class="p-radiobutton-box p-disabled">
+                                <span class="p-radiobutton-icon" data-pc-section="icon"></span>
+                            </div>
+                        </div>
+                        <!---->
+                    </p-radiobutton>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <p-radiobutton _ngcontent-ng-c3038166522="" name="option-B" value="N"
+                        class="p-element has-answered-correctly correct-answer ng-untouched ng-pristine">
+                        <div data-pc-name="radiobutton" data-pc-section="root"
+                            class="p-radiobutton p-component p-radiobutton-disabled">
+                            <div class="p-hidden-accessible" data-pc-section="hiddenInputWrapper">
+                                <input type="radio" pautofocus="" class="p-element" value="N" name="option-B"
+                                    aria-checked="false" data-pc-section="hiddenInput" disabled="">
+                            </div>
+                            <div data-pc-section="input" class="p-radiobutton-box p-disabled">
+                                <span class="p-radiobutton-icon" data-pc-section="icon"></span>
+                            </div>
+                        </div>
+                        <!---->
+                    </p-radiobutton>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item">The airport with the median rank based on total
+                    number of passengers is the same as the airport with the median rank based on total number of
+                    movements.</div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <p-radiobutton _ngcontent-ng-c3038166522="" name="option-C" value="Y"
+                        class="p-element has-answered-correctly correct-answer ng-untouched ng-pristine">
+                        <div data-pc-name="radiobutton" data-pc-section="root"
+                            class="p-radiobutton p-component p-radiobutton-disabled">
+                            <div class="p-hidden-accessible" data-pc-section="hiddenInputWrapper">
+                                <input type="radio" pautofocus="" class="p-element" value="Y" name="option-C"
+                                    aria-checked="false" data-pc-section="hiddenInput" disabled="">
+                            </div>
+                            <div data-pc-section="input" class="p-radiobutton-box p-disabled">
+                                <span class="p-radiobutton-icon" data-pc-section="icon"></span>
+                            </div>
+                        </div>
+                        <!---->
+                    </p-radiobutton>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item center">
+                    <p-radiobutton _ngcontent-ng-c3038166522="" name="option-C" value="N"
+                        class="p-element has-answered-incorrectly ng-untouched ng-pristine">
+                        <div data-pc-name="radiobutton" data-pc-section="root"
+                            class="p-radiobutton p-component p-radiobutton-disabled">
+                            <div class="p-hidden-accessible" data-pc-section="hiddenInputWrapper">
+                                <input type="radio" pautofocus="" class="p-element" value="N" name="option-C"
+                                    aria-checked="false" data-pc-section="hiddenInput" disabled="">
+                            </div>
+                            <div data-pc-section="input" class="p-radiobutton-box p-disabled">
+                                <span class="p-radiobutton-icon" data-pc-section="icon"></span>
+                            </div>
+                        </div>
+                        <!---->
+                    </p-radiobutton>
+                </div>
+                <div _ngcontent-ng-c3038166522="" class="grid-item">Exactly 50% of the airports that experienced an
+                    increase in both total number of passengers and in total number of movements are located in the
+                    United States (USA).</div>
+            </div>
+            <!---->
+            <!---->
+            <!---->
+        </ngx-answer-select>
+    </div>
+    <ngx-watermark _ngcontent-ng-c744778606="" _nghost-ng-c2816705612="" class="ng-star-inserted">
+        <!---->
+    </ngx-watermark>
+    <!---->
+</div>

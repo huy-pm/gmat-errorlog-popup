@@ -418,7 +418,14 @@ javascript: (function () {
             }
 
             var filename = 'gmat-cr-' + categoryPart + timestamp + '.json';
-            var jsonData = JSON.stringify(extractedQuestions, null, 2);
+
+            // Wrap questions in object with totalRecords
+            var output = {
+                totalRecords: extractedQuestions.length,
+                questions: extractedQuestions
+            };
+
+            var jsonData = JSON.stringify(output, null, 2);
 
             var blob = new Blob([jsonData], { type: 'application/json' });
             var url = URL.createObjectURL(blob);

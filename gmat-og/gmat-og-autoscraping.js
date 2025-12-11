@@ -356,51 +356,71 @@ javascript: (function () {
             var passage = "";
             var questionText = "";
 
-            // Find the question (typically ends with ?)
-            var questionIndex = -1;
-            for (var i = parts.length - 1; i >= 0; i--) {
-                var part = parts[i].trim();
-                if (part.includes("?")) {
-                    var lowerPart = part.toLowerCase();
-                    if (lowerPart.includes("which") ||
-                        lowerPart.includes("what") ||
-                        lowerPart.includes("how") ||
-                        lowerPart.includes("why") ||
-                        lowerPart.includes("except") ||
-                        lowerPart.includes("following") ||
-                        lowerPart.includes("assumption") ||
-                        lowerPart.includes("conclusion") ||
-                        lowerPart.includes("strengthen") ||
-                        lowerPart.includes("weaken") ||
-                        lowerPart.includes("flaw") ||
-                        lowerPart.includes("vulnerable")) {
-                        questionIndex = i;
-                        questionText = part;
-                        break;
-                    }
+            // Check for "Complete the Argument" type questions
+            // These have the question prompt first (ends with ?) and the passage/argument after (contains __________)
+            var isCompleteArgument = false;
+            var blankIndex = -1;
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i].includes("__________") || parts[i].includes("_____")) {
+                    blankIndex = i;
+                    isCompleteArgument = true;
+                    break;
                 }
             }
 
-            // Fallback: last part with ? is the question
-            if (questionIndex === -1) {
-                for (var i = parts.length - 1; i >= 0; i--) {
-                    if (parts[i].includes("?")) {
-                        questionIndex = i;
-                        questionText = parts[i].trim();
-                        break;
-                    }
-                }
-            }
-
-            // Passage is everything before the question
-            if (questionIndex > 0) {
-                passage = parts.slice(0, questionIndex).join('\n\n').trim();
-            } else if (questionIndex === 0) {
-                // No separate passage, might be embedded
-                passage = "";
+            if (isCompleteArgument && blankIndex > 0) {
+                // For "Complete the Argument" questions:
+                // - Question is the first part (the prompt)
+                // - Passage is the part with the blank (and any parts in between)
+                questionText = parts[0].trim();
+                passage = parts.slice(1).join('\n\n').trim();
             } else {
-                // Couldn't find question, use entire content
-                passage = textContent;
+                // Standard CR question: Find the question (typically ends with ?)
+                var questionIndex = -1;
+                for (var i = parts.length - 1; i >= 0; i--) {
+                    var part = parts[i].trim();
+                    if (part.includes("?")) {
+                        var lowerPart = part.toLowerCase();
+                        if (lowerPart.includes("which") ||
+                            lowerPart.includes("what") ||
+                            lowerPart.includes("how") ||
+                            lowerPart.includes("why") ||
+                            lowerPart.includes("except") ||
+                            lowerPart.includes("following") ||
+                            lowerPart.includes("assumption") ||
+                            lowerPart.includes("conclusion") ||
+                            lowerPart.includes("strengthen") ||
+                            lowerPart.includes("weaken") ||
+                            lowerPart.includes("flaw") ||
+                            lowerPart.includes("vulnerable")) {
+                            questionIndex = i;
+                            questionText = part;
+                            break;
+                        }
+                    }
+                }
+
+                // Fallback: last part with ? is the question
+                if (questionIndex === -1) {
+                    for (var i = parts.length - 1; i >= 0; i--) {
+                        if (parts[i].includes("?")) {
+                            questionIndex = i;
+                            questionText = parts[i].trim();
+                            break;
+                        }
+                    }
+                }
+
+                // Passage is everything before the question
+                if (questionIndex > 0) {
+                    passage = parts.slice(0, questionIndex).join('\n\n').trim();
+                } else if (questionIndex === 0) {
+                    // No separate passage, might be embedded
+                    passage = "";
+                } else {
+                    // Couldn't find question, use entire content
+                    passage = textContent;
+                }
             }
 
             // Extract answer choices

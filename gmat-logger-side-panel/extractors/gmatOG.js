@@ -20,6 +20,43 @@ function getCurrentUrl() {
 }
 
 /**
+ * Convert time format from "52 secs" or "2 mins 52 secs" to "MM:SS" format
+ * Examples:
+ *   "52 secs" -> "00:52"
+ *   "2 mins 52 secs" -> "02:52"
+ *   "1 min 5 secs" -> "01:05"
+ */
+function formatTimeToMMSS(timeString) {
+    if (!timeString) return "";
+
+    let minutes = 0;
+    let seconds = 0;
+
+    // Match patterns like "2 mins", "2 min", "1 minute", etc.
+    const minsMatch = timeString.match(/(\d+)\s*min(s|ute|utes)?/i);
+    if (minsMatch) {
+        minutes = parseInt(minsMatch[1], 10);
+    }
+
+    // Match patterns like "52 secs", "52 sec", "5 seconds", etc.
+    const secsMatch = timeString.match(/(\d+)\s*sec(s|ond|onds)?/i);
+    if (secsMatch) {
+        seconds = parseInt(secsMatch[1], 10);
+    }
+
+    // If no match found, return original string
+    if (minutes === 0 && seconds === 0 && !minsMatch && !secsMatch) {
+        return timeString;
+    }
+
+    // Format as MM:SS
+    const formattedMins = String(minutes).padStart(2, '0');
+    const formattedSecs = String(seconds).padStart(2, '0');
+
+    return `${formattedMins}:${formattedSecs}`;
+}
+
+/**
  * Extract time spent from OG Practice page
  * Based on: <div class="time-taken-label">Time Spent:</div><span>52 secs</span>
  */
@@ -31,7 +68,8 @@ function extractTimeSpent() {
 
     const timeSpan = timeContainer.querySelector('span');
     if (timeSpan) {
-        return timeSpan.textContent.trim();
+        const rawTime = timeSpan.textContent.trim();
+        return formatTimeToMMSS(rawTime);
     }
 
     return "";
@@ -223,12 +261,12 @@ function extractOGRCContent() {
             "selectedAnswer": selectedAnswer,
             "correctAnswer": correctAnswer,
             "timeSpent": timeSpent,
+            "category": category || "RC",
             "content": {
                 "passage": passageText,
                 "questionText": questionText,
                 "answerChoices": answerChoices,
                 "correctAnswer": correctAnswer,
-                "category": category || "Reading Comprehension"
             }
         };
 
@@ -360,12 +398,12 @@ function extractOGCRContent() {
             "selectedAnswer": selectedAnswer,
             "correctAnswer": correctAnswer,
             "timeSpent": timeSpent,
+            "category": category || "",
             "content": {
                 "passage": passage,
                 "questionText": questionText,
                 "answerChoices": answerChoices,
-                "correctAnswer": correctAnswer,
-                "category": category || "Critical Reasoning"
+                "correctAnswer": correctAnswer
             }
         };
 

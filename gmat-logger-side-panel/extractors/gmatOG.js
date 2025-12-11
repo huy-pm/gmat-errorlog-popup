@@ -227,6 +227,8 @@ function extractOGRCContent() {
             .replace(/<[^>]*>/g, '')
             .trim();
         questionText = decodeHtmlEntities(questionText);
+        // Remove "Question" prefix if present
+        questionText = questionText.replace(/^Question\s*\n*\s*/i, '').trim();
 
         // Extract answer choices
         const answerChoices = [];
@@ -265,8 +267,7 @@ function extractOGRCContent() {
             "content": {
                 "passage": passageText,
                 "questionText": questionText,
-                "answerChoices": answerChoices,
-                "correctAnswer": correctAnswer,
+                "answerChoices": answerChoices
             }
         };
 
@@ -311,6 +312,8 @@ function extractOGCRContent() {
             .trim();
 
         textContent = decodeHtmlEntities(textContent);
+        // Remove "Question" prefix if present
+        textContent = textContent.replace(/^Question\s*\n*\s*/i, '').trim();
 
         // Split into parts to separate passage from question
         const parts = textContent.split('\n\n').filter(p => p.trim().length > 0);
@@ -402,8 +405,7 @@ function extractOGCRContent() {
             "content": {
                 "passage": passage,
                 "questionText": questionText,
-                "answerChoices": answerChoices,
-                "correctAnswer": correctAnswer
+                "answerChoices": answerChoices
             }
         };
 

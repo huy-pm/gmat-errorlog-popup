@@ -14,7 +14,7 @@ export const CONFIG = {
 const isLocalhost = window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1' ||
   window.location.href.includes('localhost');
-export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
+export const baseUrl = CONFIG.devUrl//isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
 
 /**
  * Convert review URL to practice URL for GMAT Hero
@@ -137,6 +137,8 @@ export function detectQuestionSource(url) {
     return 'gmatclub';
   } else if (url.includes('gmat-hero-v2.web.app')) {
     return 'gmathero';
+  } else if (url.includes('gmatofficialpractice.mba.com')) {
+    return 'gmatog';
   }
   return null;
 }

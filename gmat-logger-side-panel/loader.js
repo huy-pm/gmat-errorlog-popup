@@ -3,7 +3,7 @@
  * Entry point that detects the page and loads appropriate modules
  */
 
-(async function() {
+(async function () {
   'use strict';
 
   // Cache busting for development - add timestamp to all module imports
@@ -46,6 +46,11 @@
       const { extractGMATHeroQuestion } = await import(`${basePath}extractors/gmathero.js${cacheBuster}`);
       setQuestionExtractor(extractGMATHeroQuestion);
       console.log('GMAT Hero extractor loaded');
+    } else if (source === 'gmatog') {
+      console.log('Loading GMAT Official Practice extractor...');
+      const { extractGMATOGQuestion } = await import(`${basePath}extractors/gmatOG.js${cacheBuster}`);
+      setQuestionExtractor(extractGMATOGQuestion);
+      console.log('GMAT Official Practice extractor loaded');
     } else {
       console.log('No specific extractor for this page (will work without question extraction)');
     }

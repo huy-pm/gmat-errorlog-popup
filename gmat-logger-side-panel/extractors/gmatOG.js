@@ -184,6 +184,48 @@ function processBoldface(html) {
 }
 
 /**
+ * Extract highlight ranges from text with ==marker== format
+ * Returns { cleanText: string, highlightRanges: [{start: number, end: number}] }
+ */
+function extractHighlightRanges(textWithMarkers) {
+    const highlightRanges = [];
+    let cleanText = '';
+    let currentPos = 0;
+
+    // Find all ==...== patterns
+    const regex = /==(.*?)==/g;
+    let match;
+    let lastIndex = 0;
+
+    while ((match = regex.exec(textWithMarkers)) !== null) {
+        // Add text before the highlight
+        const beforeHighlight = textWithMarkers.substring(lastIndex, match.index);
+        cleanText += beforeHighlight;
+
+        // Calculate start position in clean text
+        const start = cleanText.length;
+
+        // Add the highlighted content (without markers)
+        const highlightedContent = match[1];
+        cleanText += highlightedContent;
+
+        // Calculate end position in clean text
+        const end = cleanText.length;
+
+        // Record the range
+        highlightRanges.push({ start, end });
+
+        // Update lastIndex to after the closing ==
+        lastIndex = regex.lastIndex;
+    }
+
+    // Add any remaining text after the last highlight
+    cleanText += textWithMarkers.substring(lastIndex);
+
+    return { cleanText, highlightRanges };
+}
+
+/**
  * Extract RC (Reading Comprehension) question from OG Practice
  */
 function extractOGRCContent() {
@@ -214,6 +256,10 @@ function extractOGRCContent() {
         // Remove remaining HTML tags
         let passageText = passageHTML.replace(/<[^>]*>/g, '');
         passageText = decodeHtmlEntities(passageText).trim();
+
+        // Extract highlight ranges and clean the passage text
+        const { cleanText: cleanPassage, highlightRanges } = extractHighlightRanges(passageText);
+        passageText = cleanPassage;
 
         // Extract question
         const questionContainer = document.querySelector('#content-question-start');
@@ -282,7 +328,8 @@ function extractOGRCContent() {
             "content": {
                 "passage": passageText,
                 "questionText": questionText,
-                "answerChoices": answerChoices
+                "answerChoices": answerChoices,
+                "highlight_ranges": highlightRanges
             }
         };
 

@@ -6,6 +6,36 @@ javascript: (function () {
     return textArea.value;
   }
 
+  /**
+   * Extract highlight ranges from text with ==marker== format
+   * Returns { cleanText: string, highlightRanges: [{start: number, end: number}] }
+   */
+  function extractHighlightRanges(textWithMarkers) {
+    const highlightRanges = [];
+    let cleanText = '';
+    let lastIndex = 0;
+
+    const regex = /==(.*?)==/g;
+    let match;
+
+    while ((match = regex.exec(textWithMarkers)) !== null) {
+      const beforeHighlight = textWithMarkers.substring(lastIndex, match.index);
+      cleanText += beforeHighlight;
+
+      const start = cleanText.length;
+      const highlightedContent = match[1];
+      cleanText += highlightedContent;
+      const end = cleanText.length;
+
+      highlightRanges.push({ start, end });
+      lastIndex = regex.lastIndex;
+    }
+
+    cleanText += textWithMarkers.substring(lastIndex);
+
+    return { cleanText, highlightRanges };
+  }
+
   // Function to detect the GMAT section
   function detectSection() {
     let section = "Unknown";
@@ -565,9 +595,6 @@ javascript: (function () {
       // Remove unwanted blocks
       clone.querySelectorAll('.twoRowsBlock, .post_signature, .spoiler').forEach(el => el.remove());
 
-      // Convert the clone to HTML string for easier manipulation
-      let htmlContent = clone.innerHTML;
-
       // Find bbcodeBoxOut element
       let bbcodeBoxOut = clone.querySelector('.bbcodeBoxOut');
       if (!bbcodeBoxOut) {
@@ -576,150 +603,117 @@ javascript: (function () {
       }
 
       // Step 1: Locate the passage content
-      // Find the first bbcodeBoxIn within bbcodeBoxOut
       let bbcodeBoxIns = bbcodeBoxOut.querySelectorAll('.bbcodeBoxIn');
       if (bbcodeBoxIns.length < 1) {
         alert('No bbcodeBoxIn elements found.');
         return;
       }
 
+      // --- Passage Extraction ---
       let passageBox = bbcodeBoxIns[0];
       let passageHTML = passageBox.innerHTML;
 
-      // Process passage content
-      // Convert <br> tags to newlines
-      passageHTML = passageHTML.replace(/<br\s*\/?>/gi, '\n');
+      // Handle highlighting: <span style="background-color: #FFFF00">...</span> -> ==...==
+      passageHTML = passageHTML.replace(/<span[^>]*background-color:\s*#FFFF00[^>]*>(.*?)<\/span>/gi, '==$1==');
 
-      // Find <span> tags and enclose their content with ** markers
-      passageHTML = passageHTML.replace(/<span[^>]*>(.*?)<\/span>/gi, '**$1**');
+      // Handle paragraph separation
+      passageHTML = passageHTML.replace(/<br\s*\/?>/gi, '\n');
 
       // Clean up other HTML tags but preserve the marked content
       let passageText = passageHTML.replace(/<[^>]*>/g, '');
+      passageText = decodeHtmlEntities(passageText).trim();
 
-      // Apply HTML entity decoding
-      passageText = decodeHtmlEntities(passageText);
+      // Extract highlight ranges and clean the passage text
+      const { cleanText: cleanPassage, highlightRanges } = extractHighlightRanges(passageText);
+      passageText = cleanPassage;
 
-      // Step 2: Locate and extract questions and answers
-      let questions = [];
+      // --- Question Extraction ---
+      let questionText = "";
+      let answerChoices = [];
 
       if (bbcodeBoxIns.length >= 2) {
         let questionsBox = bbcodeBoxIns[1];
         let questionWrappers = questionsBox.querySelectorAll('.question_wrapper');
 
-        questionWrappers.forEach((wrapper, index) => {
-          try {
-            // Clone the wrapper to avoid modifying the original
-            let wrapperClone = wrapper.cloneNode(true);
+        // Find the visible question
+        let visibleWrapper = null;
+        for (const wrapper of questionWrappers) {
+          if (wrapper.style.display !== 'none') {
+            visibleWrapper = wrapper;
+            break;
+          }
+        }
 
-            // Find question text in <span> tags with style="font-weight: bold"
-            let questionSpan = wrapperClone.querySelector('span[style*="font-weight: bold"]');
-            let questionText = '';
+        // Default to first question if none explicitly visible
+        if (!visibleWrapper && questionWrappers.length > 0) {
+          visibleWrapper = questionWrappers[0];
+        }
 
-            if (questionSpan) {
-              questionText = questionSpan.textContent.trim();
-              // Remove the question number prefix (e.g., "1. ")
-              questionText = questionText.replace(/^\d+\.\s*/, '');
-            } else {
-              // Fallback: try to get text content
-              questionText = wrapperClone.textContent.trim().split('\n')[0] || '';
-              // Remove the question number prefix if present
-              questionText = questionText.replace(/^\d+\.\s*/, '');
-            }
+        if (visibleWrapper) {
+          let wrapperClone = visibleWrapper.cloneNode(true);
 
-            // Apply HTML entity decoding
-            questionText = decodeHtmlEntities(questionText);
+          // Extract Question Text
+          let questionSpan = wrapperClone.querySelector('span[style*="font-weight: bold"]');
 
-            // Find answer choices by parsing the content after the question
-            let choices = {};
+          if (questionSpan) {
+            questionText = questionSpan.textContent.trim();
+            // Remove leading number (e.g., "1. ")
+            questionText = questionText.replace(/^\d+\.\s*/, '');
+          } else {
+            // Fallback: take first line
+            questionText = wrapperClone.textContent.trim().split('\n')[0] || '';
+            questionText = questionText.replace(/^\d+\.\s*/, '');
+          }
+          questionText = decodeHtmlEntities(questionText);
 
-            // Get the HTML content of the wrapper
-            let wrapperHTML = wrapper.innerHTML;
+          // Extract Answer Choices
+          let choicesHTML = '';
+          if (questionSpan && questionSpan.outerHTML) {
+            // Get content after the question span
+            let wrapperHTML = visibleWrapper.innerHTML;
+            let spanEndIndex = wrapperHTML.indexOf(questionSpan.outerHTML) + questionSpan.outerHTML.length;
+            choicesHTML = wrapperHTML.substring(spanEndIndex);
+          } else {
+            // Fallback: use whole wrapper
+            choicesHTML = visibleWrapper.innerHTML;
+          }
 
-            // Extract content after the question span
-            let choicesHTML = '';
-            if (questionSpan && questionSpan.outerHTML) {
-              let spanEndIndex = wrapperHTML.indexOf(questionSpan.outerHTML) + questionSpan.outerHTML.length;
-              choicesHTML = wrapperHTML.substring(spanEndIndex);
-            } else {
-              // Fallback to all content after removing the first span if it exists
-              choicesHTML = wrapperHTML;
-              if (questionSpan && questionSpan.outerHTML) {
-                choicesHTML = choicesHTML.replace(questionSpan.outerHTML, '');
-              }
-            }
+          choicesHTML = choicesHTML.replace(/<br\s*\/?>/gi, '\n');
+          let choicesText = choicesHTML.replace(/<[^>]*>/g, '');
+          choicesText = decodeHtmlEntities(choicesText);
 
-            // Parse answer choices from the HTML
-            // Convert <br> tags to newlines for easier parsing
-            choicesHTML = choicesHTML.replace(/<br\s*\/?>/gi, '\n');
-            // Remove all other HTML tags
-            let choicesText = choicesHTML.replace(/<[^>]*>/g, '');
-
-            // Apply HTML entity decoding
-            choicesText = decodeHtmlEntities(choicesText);
-
-            // Split by newlines and parse each line
-            let lines = choicesText.split('\n');
-
-            lines.forEach(line => {
-              let cleanLine = line.trim();
-              if (cleanLine) {
-                // Check if this line starts with a letter and period/dot
-                let choiceMatch = cleanLine.match(/^([A-Ea-e])[.)]\s*(.*)/);
-                if (choiceMatch) {
-                  let letter = choiceMatch[1].toUpperCase();
-                  let text = choiceMatch[2].trim();
-                  if (text) {
-                    // Apply HTML entity decoding to the answer choice text
-                    choices[letter] = decodeHtmlEntities(text);
-                  }
+          let lines = choicesText.split('\n');
+          lines.forEach(line => {
+            let cleanLine = line.trim();
+            if (cleanLine) {
+              // Match (A), A., A), etc.
+              let choiceMatch = cleanLine.match(/^([A-Ea-e])[\.\)\:]\s*(.*)/) || cleanLine.match(/^\(([A-Ea-e])\)\s*(.*)/);
+              if (choiceMatch) {
+                let text = choiceMatch[2].trim();
+                if (text) {
+                  answerChoices.push(decodeHtmlEntities(text));
                 }
               }
-            });
-
-            // Only add question if we have text
-            if (questionText) {
-              questions.push({
-                question_text: questionText,
-                choices: choices
-              });
             }
-          } catch (e) {
-            console.error('Error processing question wrapper ' + index + ':', e);
-          }
-        });
+          });
+        }
       }
 
-      // Step 3: Compile and format the final output as JSON
-      // Create structured questions array
-      let structuredQuestions = [];
-      questions.forEach(q => {
-        // Convert choices object to array
-        let choicesArray = [];
-        let letters = ["A", "B", "C", "D", "E"];
-        letters.forEach(letter => {
-          if (q.choices[letter]) {
-            choicesArray.push(decodeHtmlEntities(q.choices[letter]));
-          }
-        });
-
-        let structuredQuestion = {
-          "question_text": decodeHtmlEntities(q.question_text),
-          "answer_choices": choicesArray, // Changed from object to array
-          "correct_answer": ""
-        };
-        structuredQuestions.push(structuredQuestion);
-      });
-
-      // Create JSON structure for RC question
+      // Create JSON structure matching gmatclub.js format
       let jsonData = {
-        "question_link": "",
+        "questionLink": window.location.href,
         "source": "",
         "difficulty": "",
-        "type": "RC",
+        "section": "verbal",
+        "selectedAnswer": "",
+        "correctAnswer": "",
+        "timeSpent": "",
+        "category": "",
         "content": {
-          "passage_title": "",
-          "passage_text": passageText,
-          "questions": structuredQuestions
+          "passage": passageText,
+          "questionText": questionText,
+          "answerChoices": answerChoices,
+          "highlight_ranges": highlightRanges
         }
       };
 

@@ -11,112 +11,93 @@
 
 (function () {
     // ============================================
+    // DYNAMIC BASE URL DETECTION
+    // ============================================
+    // Find the script's own src and extract the base URL
+    // This allows the same code to work on production (github.io) and localhost
+    function getBaseUrl() {
+        // Find all scripts and look for bookmarklet-manager.js
+        const scripts = document.querySelectorAll('script[src*="bookmarklet-manager.js"]');
+        if (scripts.length > 0) {
+            const scriptSrc = scripts[scripts.length - 1].src; // Get the most recent one
+            // Remove the filename to get the base URL
+            const baseUrl = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
+            return baseUrl;
+        }
+        // Fallback to localhost if script not found (e.g., running inline)
+        return 'http://localhost:8000';
+    }
+
+    const BASE_URL = getBaseUrl();
+    console.log('[Bookmarklet Manager] Using base URL:', BASE_URL);
+
+    // ============================================
     // CONFIGURATION: Add your bookmarklets here
     // ============================================
     const BOOKMARKLETS = [
         {
             name: "Network Logger",
             description: "Log network requests",
-            code: function () {
-                // Load external script from your local server
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero-network-logger.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero-network-logger.js'
         },
         {
             name: "Extract HTML",
             description: "Extract page HTML structure",
-            code: function () {
-                // Load external script
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat_hero_extract_html_bookmarklet.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat_hero_extract_html_bookmarklet.js'
         },
         {
             name: "GMAT Hero - Quant Auto",
             description: "Auto-scrape GMAT Hero questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-quant-auto-scraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-quant-auto-scraping.js'
         },
         {
             name: "GMAT Hero - CR Auto",
             description: "Auto-scrape GMAT Hero questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-cr-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-cr-autoscraping.js'
         },
         {
             name: "GMAT Hero - RC Auto",
             description: "Auto-scrape GMAT Hero questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-rc-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-rc-autoscraping.js'
         },
         {
             name: "GMAT Hero - DI Auto",
             description: "Auto-scrape GMAT Hero questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-di-autoscraping.js'
         },
         {
             name: "GMAT Hero - DI TPA Auto",
             description: "Auto-scrape Two-Part Analysis questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-tpa-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-di-tpa-autoscraping.js'
         },
         {
             name: "GMAT Hero - DI TA Auto",
             description: "Auto-scrape Table Analysis questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-ta-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-di-ta-autoscraping.js'
         },
         {
             name: "GMAT Hero - DI MSR Auto",
             description: "Auto-scrape Multi-Source Reasoning questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-msr-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-di-msr-autoscraping.js'
         },
         {
             name: "Fullscreen Mode",
             description: "Add fullscreen toggle button to GMAT Hero header",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-fullscreen.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-hero/gmat-hero-fullscreen.js'
         },
         {
             name: "GMAT OG - Auto",
             description: "Auto-scrape GMAT Official Practice questions",
-            code: function () {
-                var s = document.createElement('script');
-                s.src = 'http://localhost:8000/gmat-og/gmat-og-autoscraping.js?ts=' + (+new Date());
-                document.head.appendChild(s);
-            }
+            script: '/gmat-og/gmat-og-autoscraping.js'
         }
-
     ];
+
+    // Helper function to load a script
+    function loadScript(scriptPath) {
+        var s = document.createElement('script');
+        s.src = BASE_URL + scriptPath + '?ts=' + (+new Date());
+        document.head.appendChild(s);
+    }
 
     // ============================================
     // UI STYLES
@@ -327,8 +308,8 @@
                 // Close the manager
                 overlay.remove();
 
-                // Execute the bookmarklet
-                bookmarklet.code();
+                // Load the bookmarklet script
+                loadScript(bookmarklet.script);
             } catch (error) {
                 console.error(`Error executing bookmarklet "${bookmarklet.name}":`, error);
                 alert(`Error executing "${bookmarklet.name}": ${error.message}`);

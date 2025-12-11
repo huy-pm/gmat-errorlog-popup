@@ -13,6 +13,34 @@ function decodeHtmlEntities(text) {
 }
 
 /**
+ * Convert styled spans to markdown format for boldface questions
+ * - Italicized spans (font-style: italic) -> *text*
+ * - Bold spans or default -> **text**
+ */
+function convertStyledSpansToMarkdown(htmlContent) {
+  var result = htmlContent;
+  result = result.replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, function (match, content) {
+    if (match.includes('font-style: italic') || match.includes('font-style:italic')) {
+      return '*' + content + '*';
+    }
+    return '**' + content + '**';
+  });
+  return result;
+}
+
+/**
+ * Convert highlighted text to markdown format for RC questions
+ * - Yellow background spans -> ==text==
+ */
+function convertHighlightedTextToMarkdown(htmlContent) {
+  var result = htmlContent.replace(
+    /<span\s+style="[^"]*background-color:\s*yellow[^"]*">([^<]*)<\/span>/gi,
+    '==$1=='
+  );
+  return result;
+}
+
+/**
  * Get practice URL from current URL (replace /review/ with /practice/)
  */
 function getPracticeUrl() {
@@ -312,6 +340,17 @@ function extractGMATHeroCRContent() {
     }
 
     var stemContent = questionStem.innerHTML;
+
+    // Extract metadata first to check question type
+    const metadata = extractGMATHeroMetadata();
+    var isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
+    var isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
+
+    // If it's a Boldface or Complete the Argument question, convert styled spans to markdown
+    if (isBoldfaceQuestion || isCompleteArgumentQuestion) {
+      stemContent = convertStyledSpansToMarkdown(stemContent);
+    }
+
     var parts = stemContent.split(/<br\s*\/?>/gi);
 
     var passage = "";
@@ -410,8 +449,7 @@ function extractGMATHeroCRContent() {
       });
     }
 
-    // Extract metadata (category, difficulty, selected/correct answers, time)
-    const metadata = extractGMATHeroMetadata();
+    // Note: metadata was already extracted earlier to check for Boldface questions
 
     // Create JSON structure for CR question
     var jsonData = {
@@ -460,6 +498,9 @@ function extractGMATHeroRCContent() {
     // Get passage HTML and process it
     var passageHTML = passageElement.innerHTML;
 
+    // Convert highlighted text to markdown format first (before removing HTML tags)
+    passageHTML = convertHighlightedTextToMarkdown(passageHTML);
+
     // Split by <br> tags (handle both single and double <br>)
     // Replace double <br> with paragraph marker, then clean up
     var passageText = passageHTML
@@ -495,7 +536,18 @@ function extractGMATHeroRCContent() {
       return null;
     }
 
-    var question = questionStem.textContent.trim();
+    // Get question HTML and convert highlighted text to markdown
+    var questionHTML = questionStem.innerHTML;
+    questionHTML = convertHighlightedTextToMarkdown(questionHTML);
+
+    // Remove HTML tags and clean up
+    var question = questionHTML
+      .replace(/<[^>]*>/g, '')
+      .replace(/&ldquo;/g, '"')
+      .replace(/&rdquo;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&[a-zA-Z0-9#]+;/g, '')
+      .trim();
     question = decodeHtmlEntities(question);
 
     // Extract answer choices

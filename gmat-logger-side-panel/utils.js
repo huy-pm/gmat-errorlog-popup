@@ -224,10 +224,7 @@ export function enrichquestionData(questionData, payload) {
   questionData.questionLink = payload.question || questionData.questionLink;
   questionData.difficulty = payload.difficulty || questionData.difficulty;
   questionData.source = payload.source || questionData.source;
-
-  if (questionData.content && payload.category) {
-    questionData.content.category = payload.category;
-  }
+  questionData.category = payload.category || questionData.category;
 
   return questionData;
 }

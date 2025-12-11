@@ -618,8 +618,8 @@ async function refreshData(root, isAutoRefresh = false) {
     let autoNotes = '';
 
     // Add category if available
-    if (questionData.content && questionData.content.category) {
-      autoNotes += questionData.content.category;
+    if (questionData.category) {
+      autoNotes += questionData.category;
     }
 
     // Add difficulty if available
@@ -782,17 +782,6 @@ async function submitQuestionData(root) {
         // Enrich with bookmarklet data
         const enrichedJson = enrichquestionData(questionData, payload);
         console.log('Enriched question JSON:', enrichedJson);
-
-        // Remove the extracted answer/time fields from questionData (they're now in notes/payload)
-        delete enrichedJson.selectedAnswer;
-        delete enrichedJson.correctAnswer;
-        delete enrichedJson.timeSpent;
-
-        // Add correct answer to questionData.content if available from parsed notes
-        if (parsed.correctAnswer && enrichedJson.content) {
-          enrichedJson.content.correctAnswer = parsed.correctAnswer;
-          console.log('[Debug] Added correct answer to questionData.content.correctAnswer:', parsed.correctAnswer);
-        }
 
         // Add to payload
         payload.questionData = enrichedJson;
@@ -1577,9 +1566,9 @@ export async function createSidebar() {
           let autoNotes = '';
 
           // Add category if available (for CR questions)
-          if (questionData.content && questionData.content.category) {
-            autoNotes += questionData.content.category;
-            console.log('[Debug] Auto-populate: Found category:', questionData.content.category);
+          if (questionData.category) {
+            autoNotes += questionData.category;
+            console.log('[Debug] Auto-populate: Found category:', questionData.category);
           }
 
           // Add difficulty if available

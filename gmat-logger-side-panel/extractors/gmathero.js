@@ -330,11 +330,10 @@ function extractGMATHeroQuantContent() {
       "selectedAnswer": metadata.selectedAnswer || "",
       "correctAnswer": metadata.correctAnswer || "",
       "timeSpent": metadata.timeSpent || "",
+      "category": metadata.category || "",
       "content": {
         "questionText": decodeHtmlEntities(questionText),
-        "answerChoices": answerChoices,
-        "correctAnswer": metadata.correctAnswer || "",
-        "category": metadata.category || ""
+        "answerChoices": answerChoices
       }
     };
 

@@ -12,8 +12,8 @@ export const CONFIG = {
 
 // Determine base URL
 const isLocalhost = window.location.hostname === 'localhost' ||
-                   window.location.hostname === '127.0.0.1' ||
-                   window.location.href.includes('localhost');
+  window.location.hostname === '127.0.0.1' ||
+  window.location.href.includes('localhost');
 export const baseUrl = isLocalhost ? CONFIG.devUrl : CONFIG.apiUrl;
 
 // Mappings for parsing
@@ -192,11 +192,6 @@ export function enrichquestionData(questionData, payload) {
   questionData.question_link = payload.question || questionData.question_link;
   questionData.difficulty = payload.difficulty || questionData.difficulty;
   questionData.source = payload.source || questionData.source;
-
-  // Map category to category (if content exists)
-  if (questionData.content && payload.category) {
-    questionData.content.category = payload.category;
-  }
 
   return questionData;
 }

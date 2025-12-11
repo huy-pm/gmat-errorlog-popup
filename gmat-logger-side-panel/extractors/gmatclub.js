@@ -334,12 +334,12 @@ function extractGMATClubQuantContent() {
       "source": "",
       "difficulty": "",
       "section": "Quant",
+      "category": "Problem Solving",
       "content": {
         "questionText": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
         "answerChoices": answerChoices.map(choice =>
           decodeHtmlEntities(choice.content.replace(/<[^>]*>/g, '').trim())
-        ),
-        "category": "Problem Solving"
+        )
       }
     };
 
@@ -353,10 +353,10 @@ function extractGMATClubQuantContent() {
       "source": "",
       "difficulty": "",
       "section": "Quant",
+      "category": "Problem Solving",
       "content": {
         "questionText": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
-        "answerChoices": [],
-        "category": "Problem Solving"
+        "answerChoices": []
       }
     };
 
@@ -759,7 +759,7 @@ export function extractGMATClubQuestion() {
     }
     // Only set category if successfully extracted (for CR questions only, RC handles it)
     if (tags.category && section === "Critical Reasoning") {
-      questionData.content.category = tags.category;
+      questionData.category = tags.category;
     }
 
     // Add selected and correct answers if not present

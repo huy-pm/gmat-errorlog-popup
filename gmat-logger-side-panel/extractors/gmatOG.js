@@ -78,18 +78,25 @@ function extractTimeSpent() {
 /**
  * Extract selected answer from OG Practice page
  * Based on: <div class="multi-choice incorrect" data-choice="A"></div>
+ *           <div class="multi-choice correct" data-choice="A"></div> (when selected = correct)
  */
 function extractSelectedAnswer() {
-    // Look for the selected answer (incorrect or corrected with class selected)
+    // Look for incorrect answer (user got it wrong)
     const incorrectChoice = document.querySelector('.multi-choice.incorrect');
     if (incorrectChoice) {
         return incorrectChoice.getAttribute('data-choice') || "";
     }
 
-    // If no incorrect, check for correct answer (user got it right)
-    const correctChoice = document.querySelector('.multi-choice.corrected');
+    // Check for correct answer (user got it right - has "correct" class)
+    const correctChoice = document.querySelector('.multi-choice.correct');
     if (correctChoice) {
         return correctChoice.getAttribute('data-choice') || "";
+    }
+
+    // Fallback: check for "corrected" class
+    const correctedChoice = document.querySelector('.multi-choice.corrected');
+    if (correctedChoice) {
+        return correctedChoice.getAttribute('data-choice') || "";
     }
 
     return "";
@@ -98,9 +105,17 @@ function extractSelectedAnswer() {
 /**
  * Extract correct answer from OG Practice page
  * Based on: <div class="multi-choice corrected" data-choice="B"></div>
+ *           <div class="multi-choice correct" data-choice="A"></div> (when selected = correct)
  */
 function extractCorrectAnswer() {
-    const correctChoice = document.querySelector('.multi-choice.corrected');
+    // Check for "corrected" class (shows the correct answer when user was wrong)
+    const correctedChoice = document.querySelector('.multi-choice.corrected');
+    if (correctedChoice) {
+        return correctedChoice.getAttribute('data-choice') || "";
+    }
+
+    // Check for "correct" class (user selected the correct answer)
+    const correctChoice = document.querySelector('.multi-choice.correct');
     if (correctChoice) {
         return correctChoice.getAttribute('data-choice') || "";
     }

@@ -60,7 +60,62 @@
                 s.src = 'http://localhost:8000/gmat-hero/gmat-hero-rc-autoscraping.js?ts=' + (+new Date());
                 document.head.appendChild(s);
             }
+        },
+        {
+            name: "GMAT Hero - DI Auto",
+            description: "Auto-scrape GMAT Hero questions",
+            code: function () {
+                var s = document.createElement('script');
+                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-autoscraping.js?ts=' + (+new Date());
+                document.head.appendChild(s);
+            }
+        },
+        {
+            name: "GMAT Hero - DI TPA Auto",
+            description: "Auto-scrape Two-Part Analysis questions",
+            code: function () {
+                var s = document.createElement('script');
+                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-tpa-autoscraping.js?ts=' + (+new Date());
+                document.head.appendChild(s);
+            }
+        },
+        {
+            name: "GMAT Hero - DI TA Auto",
+            description: "Auto-scrape Table Analysis questions",
+            code: function () {
+                var s = document.createElement('script');
+                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-ta-autoscraping.js?ts=' + (+new Date());
+                document.head.appendChild(s);
+            }
+        },
+        {
+            name: "GMAT Hero - DI MSR Auto",
+            description: "Auto-scrape Multi-Source Reasoning questions",
+            code: function () {
+                var s = document.createElement('script');
+                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-di-msr-autoscraping.js?ts=' + (+new Date());
+                document.head.appendChild(s);
+            }
+        },
+        {
+            name: "Fullscreen Mode",
+            description: "Add fullscreen toggle button to GMAT Hero header",
+            code: function () {
+                var s = document.createElement('script');
+                s.src = 'http://localhost:8000/gmat-hero/gmat-hero-fullscreen.js?ts=' + (+new Date());
+                document.head.appendChild(s);
+            }
+        },
+        {
+            name: "GMAT OG - Auto",
+            description: "Auto-scrape GMAT Official Practice questions",
+            code: function () {
+                var s = document.createElement('script');
+                s.src = 'http://localhost:8000/gmat-og/gmat-og-autoscraping.js?ts=' + (+new Date());
+                document.head.appendChild(s);
+            }
         }
+
     ];
 
     // ============================================

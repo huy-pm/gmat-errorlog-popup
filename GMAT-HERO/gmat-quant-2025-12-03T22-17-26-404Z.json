@@ -1,0 +1,100 @@
+{
+  "totalRecords": 5,
+  "questions": [
+    {
+      "questionLink": "https://gmat-hero-v2.web.app/pages/study/og-quant/OG-PS-01/practice/1",
+      "source": "OG",
+      "difficulty": "easy",
+      "section": "quant",
+      "questionType": "quant",
+      "correctAnswer": "E",
+      "category": "Number Theory 1",
+      "content": {
+        "questionText": "For any positive integer $n$, $n>1$, the \"length\" of $n$ is the number of positive primes (not necessarily distinct) whose product is $n$. For ex, the length of $50$ is $3$, since $50=2\\times 5 \\times 5$. Which of the following integers has length $3$?",
+        "answerChoices": [
+          "3",
+          "15",
+          "60",
+          "64",
+          "105"
+        ]
+      }
+    },
+    {
+      "questionLink": "https://gmat-hero-v2.web.app/pages/study/og-quant/OG-PS-01/practice/2",
+      "source": "OG",
+      "difficulty": "easy",
+      "section": "quant",
+      "questionType": "quant",
+      "correctAnswer": "D",
+      "category": "Number Theory 1",
+      "content": {
+        "questionText": "If $a = 1$ and $$\\dfrac{a - b}{c} = 1$$ which of the following is NOT a possible value of $b$?",
+        "answerChoices": [
+          "-2",
+          "-1",
+          "0",
+          "1",
+          "2"
+        ]
+      }
+    },
+    {
+      "questionLink": "https://gmat-hero-v2.web.app/pages/study/og-quant/OG-PS-01/practice/3",
+      "source": "OG",
+      "difficulty": "easy",
+      "section": "quant",
+      "questionType": "quant",
+      "correctAnswer": "E",
+      "category": "Number Theory 1",
+      "content": {
+        "questionText": "If the sum of $n$ consecutive integers is 0, which of the following must be true?I. $n$ is an even numberII. $n$ is an odd numberIII. The average (arithmetic mean) of the $n$ integers is 0",
+        "answerChoices": [
+          "I only",
+          "II only",
+          "III only",
+          "I and III",
+          "II and III"
+        ]
+      }
+    },
+    {
+      "questionLink": "https://gmat-hero-v2.web.app/pages/study/og-quant/OG-PS-01/practice/4",
+      "source": "OG",
+      "difficulty": "easy",
+      "section": "quant",
+      "questionType": "quant",
+      "correctAnswer": "D",
+      "category": "Number Theory 1",
+      "content": {
+        "questionText": "Fermat primes are prime numbers that can be written in the form $2^k+1$, where k is an integer and a power of $2$. Which of the following is NOT a Fermat prime",
+        "answerChoices": [
+          "3",
+          "5",
+          "17",
+          "31",
+          "257"
+        ]
+      }
+    },
+    {
+      "questionLink": "https://gmat-hero-v2.web.app/pages/study/og-quant/OG-PS-01/practice/5",
+      "source": "OG",
+      "difficulty": "easy",
+      "section": "quant",
+      "questionType": "quant",
+      "correctAnswer": "B",
+      "category": "Number Theory 1",
+      "content": {
+        "questionText": "Which of the following is NOT equal to the square of an integer:",
+        "answerChoices": [
+          "$\\sqrt{{\\sqrt{1}}}$",
+          "$\\sqrt{4}$",
+          "$18/2$",
+          "$41 - 25$",
+          "$36$"
+        ]
+      }
+    }
+  ]
+}

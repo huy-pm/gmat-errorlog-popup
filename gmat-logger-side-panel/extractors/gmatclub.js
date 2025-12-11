@@ -15,6 +15,36 @@ function decodeHtmlEntities(text) {
 }
 
 /**
+ * Extract highlight ranges from text with ==marker== format
+ * Returns { cleanText: string, highlightRanges: [{start: number, end: number}] }
+ */
+function extractHighlightRanges(textWithMarkers) {
+  const highlightRanges = [];
+  let cleanText = '';
+  let lastIndex = 0;
+
+  const regex = /==(.*?)==/g;
+  let match;
+
+  while ((match = regex.exec(textWithMarkers)) !== null) {
+    const beforeHighlight = textWithMarkers.substring(lastIndex, match.index);
+    cleanText += beforeHighlight;
+
+    const start = cleanText.length;
+    const highlightedContent = match[1];
+    cleanText += highlightedContent;
+    const end = cleanText.length;
+
+    highlightRanges.push({ start, end });
+    lastIndex = regex.lastIndex;
+  }
+
+  cleanText += textWithMarkers.substring(lastIndex);
+
+  return { cleanText, highlightRanges };
+}
+
+/**
  * Difficulty mapping: GMATClub tag_id -> difficulty level
  */
 const DIFFICULTY_MAPPING = {
@@ -570,8 +600,8 @@ function extractGMATClubRCContent() {
     let passageBox = bbcodeBoxIns[0];
     let passageHTML = passageBox.innerHTML;
 
-    // Handle highlighting: <span style="background-color: #FFFF00">...</span> -> **...**
-    passageHTML = passageHTML.replace(/<span[^>]*background-color:\s*#FFFF00[^>]*>(.*?)<\/span>/gi, '**$1**');
+    // Handle highlighting: <span style="background-color: #FFFF00">...</span> -> ==...==
+    passageHTML = passageHTML.replace(/<span[^>]*background-color:\s*#FFFF00[^>]*>(.*?)<\/span>/gi, '==$1==');
 
     // Handle paragraph separation
     passageHTML = passageHTML.replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '\n\n'); // Double break -> New paragraph
@@ -579,6 +609,10 @@ function extractGMATClubRCContent() {
 
     let passageText = passageHTML.replace(/<[^>]*>/g, '');
     passageText = decodeHtmlEntities(passageText).trim();
+
+    // Extract highlight ranges and clean the passage text
+    const { cleanText: cleanPassage, highlightRanges } = extractHighlightRanges(passageText);
+    passageText = cleanPassage;
 
     // --- Question Extraction ---
     let questionText = "";
@@ -662,12 +696,12 @@ function extractGMATClubRCContent() {
       "selectedAnswer": metadata.selectedAnswer || "",
       "correctAnswer": metadata.correctAnswer || "",
       "timeSpent": metadata.timeSpent || "",
+      "category": metadata.category || "",
       "content": {
         "passage": passageText,
         "questionText": questionText,
         "answerChoices": answerChoices,
-        "correctAnswer": metadata.correctAnswer || "",
-        "category": metadata.category || ""
+        "highlight_ranges": highlightRanges
       }
     };
 

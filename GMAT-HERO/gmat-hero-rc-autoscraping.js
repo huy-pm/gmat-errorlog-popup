@@ -135,6 +135,33 @@ javascript: (function () {
         return result;
     }
 
+    // Helper function to extract highlight ranges from text with ==marker== format
+    function extractHighlightRanges(textWithMarkers) {
+        var highlightRanges = [];
+        var cleanText = '';
+        var lastIndex = 0;
+
+        var regex = /==(.*?)==/g;
+        var match;
+
+        while ((match = regex.exec(textWithMarkers)) !== null) {
+            var beforeHighlight = textWithMarkers.substring(lastIndex, match.index);
+            cleanText += beforeHighlight;
+
+            var start = cleanText.length;
+            var highlightedContent = match[1];
+            cleanText += highlightedContent;
+            var end = cleanText.length;
+
+            highlightRanges.push({ start: start, end: end });
+            lastIndex = regex.lastIndex;
+        }
+
+        cleanText += textWithMarkers.substring(lastIndex);
+
+        return { cleanText: cleanText, highlightRanges: highlightRanges };
+    }
+
     // Function to extract data from current question (RC-specific)
     function extractQuestionData() {
         try {
@@ -178,6 +205,11 @@ javascript: (function () {
             // Join paragraphs with double newlines
             var passage = paragraphs.join('\n');
             passage = decodeHtmlEntities(passage);
+
+            // Extract highlight ranges and clean the passage text
+            var highlightResult = extractHighlightRanges(passage);
+            passage = highlightResult.cleanText;
+            var highlightRanges = highlightResult.highlightRanges;
 
             // Extract question from right panel
             var rightPanel = document.getElementById('right-panel');
@@ -243,6 +275,7 @@ javascript: (function () {
                     "passage": passage,
                     "questionText": question,
                     "answerChoices": answerChoices,
+                    "highlight_ranges": highlightRanges
                 }
             };
 

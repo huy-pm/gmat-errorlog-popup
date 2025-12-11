@@ -41,6 +41,36 @@ function convertHighlightedTextToMarkdown(htmlContent) {
 }
 
 /**
+ * Extract highlight ranges from text with ==marker== format
+ * Returns { cleanText: string, highlightRanges: [{start: number, end: number}] }
+ */
+function extractHighlightRanges(textWithMarkers) {
+  const highlightRanges = [];
+  let cleanText = '';
+  let lastIndex = 0;
+
+  const regex = /==(.*?)==/g;
+  let match;
+
+  while ((match = regex.exec(textWithMarkers)) !== null) {
+    const beforeHighlight = textWithMarkers.substring(lastIndex, match.index);
+    cleanText += beforeHighlight;
+
+    const start = cleanText.length;
+    const highlightedContent = match[1];
+    cleanText += highlightedContent;
+    const end = cleanText.length;
+
+    highlightRanges.push({ start, end });
+    lastIndex = regex.lastIndex;
+  }
+
+  cleanText += textWithMarkers.substring(lastIndex);
+
+  return { cleanText, highlightRanges };
+}
+
+/**
  * Get practice URL from current URL (replace /review/ with /practice/)
  */
 function getPracticeUrl() {
@@ -460,12 +490,11 @@ function extractGMATHeroCRContent() {
       "selectedAnswer": metadata.selectedAnswer || "",
       "correctAnswer": metadata.correctAnswer || "",
       "timeSpent": metadata.timeSpent || "",
+      "category": metadata.category || "",
       "content": {
         "passage": passage,
         "questionText": question,
-        "answerChoices": answerChoices,
-        "correctAnswer": metadata.correctAnswer || "",
-        "category": metadata.category || ""
+        "answerChoices": answerChoices
       }
     };
 
@@ -522,6 +551,10 @@ function extractGMATHeroRCContent() {
     // Join paragraphs with double newlines
     var passage = paragraphs.join('\n');
     passage = decodeHtmlEntities(passage);
+
+    // Extract highlight ranges and clean the passage text
+    const { cleanText: cleanPassage, highlightRanges } = extractHighlightRanges(passage);
+    passage = cleanPassage;
 
     // Extract question from right panel
     var rightPanel = document.getElementById('right-panel');
@@ -582,12 +615,12 @@ function extractGMATHeroRCContent() {
       "selectedAnswer": metadata.selectedAnswer || "",
       "correctAnswer": metadata.correctAnswer || "",
       "timeSpent": metadata.timeSpent || "",
+      "category": metadata.category || "",
       "content": {
         "passage": passage,
         "questionText": question,
         "answerChoices": answerChoices,
-        "correctAnswer": metadata.correctAnswer || "",
-        "category": metadata.category || ""
+        "highlight_ranges": highlightRanges
       }
     };
 

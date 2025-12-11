@@ -36,6 +36,17 @@ javascript: (function () {
     return { cleanText, highlightRanges };
   }
 
+  /**
+   * Process boldface text - convert <strong>text</strong> and <span style="font-weight: bold">text</span> to **text**
+   */
+  function processBoldface(html) {
+    // Handle <strong> tags
+    let result = html.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+    // Handle <span style="font-weight: bold">text</span>
+    result = result.replace(/<span[^>]*font-weight:\s*bold[^>]*>(.*?)<\/span>/gi, '**$1**');
+    return result;
+  }
+
   // Function to detect the GMAT section
   function detectSection() {
     let section = "Unknown";
@@ -343,6 +354,9 @@ javascript: (function () {
       });
 
       var h = o.innerHTML.replace(/\r?\n|\r/g, "");
+
+      // Apply boldface processing before extracting content
+      h = processBoldface(h);
 
       // Find where answer choices begin - look for multiple patterns
       // More comprehensive pattern matching for answer sections

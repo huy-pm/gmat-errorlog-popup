@@ -1,9 +1,23 @@
-javascript:(function() {
+javascript: (function () {
   // Function to decode HTML entities
   function decodeHtmlEntities(text) {
     const textArea = document.createElement('textarea');
     textArea.innerHTML = text;
     return textArea.value;
+  }
+
+  // Convert styled spans to markdown format for boldface questions
+  // - Italicized spans (font-style: italic) -> *text*
+  // - Bold spans or default -> **text**
+  function convertStyledSpansToMarkdown(htmlContent) {
+    var result = htmlContent;
+    result = result.replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, function (match, content) {
+      if (match.includes('font-style: italic') || match.includes('font-style:italic')) {
+        return '*' + content + '*';
+      }
+      return '**' + content + '**';
+    });
+    return result;
   }
 
   // Function to detect the GMAT section
@@ -78,7 +92,7 @@ javascript:(function() {
 
       // Process all Katex math expressions
       var katexElements = tempDiv.querySelectorAll(".katex");
-      katexElements.forEach(function(katexElem) {
+      katexElements.forEach(function (katexElem) {
         var mathml = katexElem.querySelector(".katex-mathml");
         if (mathml) {
           var annotation = mathml.querySelector("annotation");
@@ -86,7 +100,7 @@ javascript:(function() {
             var texContent = annotation.textContent;
             // Determine if display or inline math
             var isDisplay = texContent.includes("\\dfrac") || texContent.includes("\\frac") ||
-                           texContent.includes("\\int") || texContent.includes("\\sum");
+              texContent.includes("\\int") || texContent.includes("\\sum");
             var mathPlaceholder = document.createTextNode(isDisplay ? "$$" + texContent + "$$" : "$" + texContent + "$");
             katexElem.replaceWith(mathPlaceholder);
           }
@@ -102,7 +116,7 @@ javascript:(function() {
       if (standardChoices) {
         var options = standardChoices.querySelectorAll('.option.ng-star-inserted, .option');
 
-        options.forEach(function(option) {
+        options.forEach(function (option) {
           var answerText = '';
 
           // Look for label with span containing katex
@@ -117,7 +131,7 @@ javascript:(function() {
 
               // Process all Katex math expressions
               var katexElementsInLabel = tempDiv.querySelectorAll(".katex");
-              katexElementsInLabel.forEach(function(katexElem) {
+              katexElementsInLabel.forEach(function (katexElem) {
                 var mathml = katexElem.querySelector(".katex-mathml");
                 if (mathml) {
                   var annotation = mathml.querySelector("annotation");
@@ -200,6 +214,9 @@ javascript:(function() {
       // Get all content from question-stem
       var stemContent = questionStem.innerHTML;
 
+      // Apply boldface processing before extracting content
+      stemContent = convertStyledSpansToMarkdown(stemContent);
+
       // Split by <br> tags to separate passage from question
       var parts = stemContent.split(/<br\s*\/?>/gi);
 
@@ -224,17 +241,17 @@ javascript:(function() {
           if (cleanPart.includes("?")) {
             var lowerPart = cleanPart.toLowerCase();
             if (lowerPart.includes("which") ||
-                lowerPart.includes("what") ||
-                lowerPart.includes("how") ||
-                lowerPart.includes("why") ||
-                lowerPart.includes("except") ||
-                lowerPart.includes("vulnerable") ||
-                lowerPart.includes("flaw") ||
-                lowerPart.includes("assumption") ||
-                lowerPart.includes("conclusion") ||
-                lowerPart.includes("inference") ||
-                lowerPart.includes("strengthen") ||
-                lowerPart.includes("weaken")) {
+              lowerPart.includes("what") ||
+              lowerPart.includes("how") ||
+              lowerPart.includes("why") ||
+              lowerPart.includes("except") ||
+              lowerPart.includes("vulnerable") ||
+              lowerPart.includes("flaw") ||
+              lowerPart.includes("assumption") ||
+              lowerPart.includes("conclusion") ||
+              lowerPart.includes("inference") ||
+              lowerPart.includes("strengthen") ||
+              lowerPart.includes("weaken")) {
               questionIndex = i;
               question = cleanPart;
               break;
@@ -293,7 +310,7 @@ javascript:(function() {
 
       if (standardChoices) {
         var options = standardChoices.querySelectorAll('.option.ng-star-inserted');
-        options.forEach(function(option) {
+        options.forEach(function (option) {
           var label = option.querySelector('label');
           if (label) {
             var span = label.querySelector('span');

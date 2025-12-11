@@ -45,6 +45,17 @@ function extractHighlightRanges(textWithMarkers) {
 }
 
 /**
+ * Process boldface text - convert <strong>text</strong> and <span style="font-weight: bold">text</span> to **text**
+ */
+function processBoldface(html) {
+  // Handle <strong> tags
+  let result = html.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+  // Handle <span style="font-weight: bold">text</span>
+  result = result.replace(/<span[^>]*font-weight:\s*bold[^>]*>(.*?)<\/span>/gi, '**$1**');
+  return result;
+}
+
+/**
  * Difficulty mapping: GMATClub tag_id -> difficulty level
  */
 const DIFFICULTY_MAPPING = {
@@ -393,6 +404,9 @@ function extractGMATClubCRContent() {
     });
 
     var h = o.innerHTML.replace(/\r?\n|\r/g, "");
+
+    // Apply boldface processing before extracting content
+    h = processBoldface(h);
 
     // Find where answer choices begin
     var answerSectionStart = -1;

@@ -343,6 +343,7 @@ function extractGMATClubQuantContent() {
     let jsonData = {
       "questionLink": "",
       "source": "",
+      "questionType": "quant",
       "difficulty": "",
       "section": "Quant",
       "category": "Problem Solving",
@@ -362,6 +363,7 @@ function extractGMATClubQuantContent() {
     let jsonData = {
       "questionLink": "",
       "source": "",
+      "questionType": "quant",
       "difficulty": "",
       "section": "Quant",
       "category": "Problem Solving",
@@ -552,6 +554,7 @@ function extractGMATClubCRContent() {
     var jsonData = {
       "questionLink": "",
       "source": "",
+      "questionType": "cr",
       "difficulty": "",
       "section": "verbal",
       "content": {
@@ -705,6 +708,7 @@ function extractGMATClubRCContent() {
     var jsonData = {
       "questionLink": getPracticeUrl(window.location.href),
       "source": "", // Will be filled by enrich or caller if needed, but usually empty here
+      "questionType": "rc",
       "difficulty": metadata.difficulty || "",
       "section": "verbal",
       "selectedAnswer": metadata.selectedAnswer || "",

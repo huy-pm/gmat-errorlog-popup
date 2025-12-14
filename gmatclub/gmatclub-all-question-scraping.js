@@ -188,6 +188,7 @@ javascript: (function () {
       "source": "",
       "difficulty": "",
       "type": "Quant",
+      "questionType": "quant",
       "content": {
         "question_text": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
         "answer_choices": [], // Changed from object to array
@@ -535,6 +536,7 @@ javascript: (function () {
         "source": "",
         "difficulty": "",
         "type": "CR",
+        "questionType": "cr",
         "content": {
           "passage": passage,
           "question_text": question,
@@ -719,6 +721,7 @@ javascript: (function () {
         "source": "",
         "difficulty": "",
         "section": "verbal",
+        "questionType": "rc",
         "selectedAnswer": "",
         "correctAnswer": "",
         "timeSpent": "",

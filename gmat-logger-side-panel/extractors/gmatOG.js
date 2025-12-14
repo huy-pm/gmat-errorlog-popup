@@ -313,18 +313,19 @@ function extractOGRCContent() {
         const timeSpent = extractTimeSpent();
         const selectedAnswer = extractSelectedAnswer();
         const correctAnswer = extractCorrectAnswer();
-        const category = extractCategory();
+        const category = rc//extractCategory();
 
         // Create JSON structure for RC question
         const jsonData = {
             "questionLink": getCurrentUrl(),
             "source": "GMAT Official",
+            "questionType": "rc",
             "difficulty": "",
             "section": "verbal",
             "selectedAnswer": selectedAnswer,
             "correctAnswer": correctAnswer,
             "timeSpent": timeSpent,
-            "category": category || "RC",
+            "category": category || "rc",
             "content": {
                 "passage": passageText,
                 "questionText": questionText,
@@ -472,12 +473,13 @@ function extractOGCRContent() {
         const timeSpent = extractTimeSpent();
         const selectedAnswer = extractSelectedAnswer();
         const correctAnswer = extractCorrectAnswer();
-        const category = extractCategory();
+        //const category = extractCategory();
 
         // Create JSON structure for CR question
         const jsonData = {
             "questionLink": getCurrentUrl(),
             "source": "GMAT Official",
+            "questionType": "cr",
             "difficulty": "",
             "section": "verbal",
             "selectedAnswer": selectedAnswer,

@@ -171,6 +171,7 @@ javascript: (function () {
         "source": "",
         "difficulty": "",
         "type": "Quant",
+        "questionType": "quant",
         "content": {
           "question_text": decodeHtmlEntities(questionText),
           "answer_choices": answerChoices,
@@ -330,6 +331,7 @@ javascript: (function () {
         "source": "",
         "difficulty": "",
         "type": "CR",
+        "questionType": "cr",
         "content": {
           "passage": passage,
           "question_text": question,

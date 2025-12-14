@@ -325,6 +325,7 @@ function extractGMATHeroQuantContent() {
     var jsonData = {
       "questionLink": getPracticeUrl(),
       "source": "",
+      "questionType": "quant",
       "difficulty": metadata.difficulty || "",
       "section": "Quant",
       "selectedAnswer": metadata.selectedAnswer || "",
@@ -484,6 +485,7 @@ function extractGMATHeroCRContent() {
     var jsonData = {
       "questionLink": getPracticeUrl(),
       "source": "",
+      "questionType": "cr",
       "difficulty": metadata.difficulty || "",
       "section": "verbal",
       "selectedAnswer": metadata.selectedAnswer || "",
@@ -609,6 +611,7 @@ function extractGMATHeroRCContent() {
     var jsonData = {
       "questionLink": getPracticeUrl(),
       "source": "",
+      "questionType": "rc",
       "difficulty": metadata.difficulty || "",
       "section": "verbal",
       "selectedAnswer": metadata.selectedAnswer || "",

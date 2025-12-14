@@ -163,6 +163,7 @@ javascript: (function () {
         "source": "",
         "difficulty": "",
         "section": "verbal",
+        "questionType": "rc",
         "selectedAnswer": "",
         "correctAnswer": "",
         "timeSpent": "",

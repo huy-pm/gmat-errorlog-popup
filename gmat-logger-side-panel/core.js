@@ -654,10 +654,7 @@ async function refreshData(root, isAutoRefresh = false) {
     // Preserve user's custom notes (text that's not auto-generated)
     let customNotes = '';
     if (parsed.extractedNotes) {
-      // Remove old reflection prompts before preserving custom notes
-      customNotes = parsed.extractedNotes
-        .replace(/\n*Why did I choose [A-E]\?\s*/g, '')  // Remove old prompts
-        .trim();
+      customNotes = parsed.extractedNotes.trim();
     }
 
     // Combine: auto-notes + custom notes
@@ -667,10 +664,7 @@ async function refreshData(root, isAutoRefresh = false) {
       finalNotes += customNotes;
     }
 
-    // Add/update reflection prompt if answer is incorrect
-    if (isIncorrect) {
-      finalNotes += `\n\nWhy did I choose ${questionData.selectedAnswer}?\n`;
-    } else if (!isIncorrect && finalNotes) {
+    if (finalNotes) {
       finalNotes += '\n';
     }
 
@@ -1603,12 +1597,6 @@ export async function createSidebar() {
             if (autoNotes) autoNotes += ' ';
             autoNotes += `Time:${questionData.timeSpent}`;
             console.log('[Debug] Auto-populate: Found time spent:', questionData.timeSpent);
-          }
-
-          // Add reflection prompt if answer is incorrect
-          if (isIncorrect) {
-            autoNotes += `\n\nWhy did I choose ${questionData.selectedAnswer}?\n`;
-            console.log('[Debug] Auto-populate: Added reflection prompt for incorrect answer');
           }
 
           // Set the notes field with auto-detected values

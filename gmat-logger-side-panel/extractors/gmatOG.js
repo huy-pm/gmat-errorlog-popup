@@ -313,7 +313,7 @@ function extractOGRCContent() {
         const timeSpent = extractTimeSpent();
         const selectedAnswer = extractSelectedAnswer();
         const correctAnswer = extractCorrectAnswer();
-        const category = rc//extractCategory();
+        const category = "rc"//extractCategory();
 
         // Create JSON structure for RC question
         const jsonData = {
@@ -473,7 +473,7 @@ function extractOGCRContent() {
         const timeSpent = extractTimeSpent();
         const selectedAnswer = extractSelectedAnswer();
         const correctAnswer = extractCorrectAnswer();
-        //const category = extractCategory();
+        const category = ""//extractCategory();
 
         // Create JSON structure for CR question
         const jsonData = {

@@ -617,8 +617,21 @@ async function refreshData(root, isAutoRefresh = false) {
     // Build new auto-populated notes
     let autoNotes = '';
 
+    // Add section based on questionType if available
+    if (questionData.questionType) {
+      const questionType = questionData.questionType.toLowerCase();
+      if (questionType === 'quant') {
+        autoNotes += 'quant';
+      } else if (questionType === 'cr' || questionType === 'rc') {
+        autoNotes += 'verbal';
+      } else if (questionType === 'di') {
+        autoNotes += 'di';
+      }
+    }
+
     // Add category if available
     if (questionData.category) {
+      if (autoNotes) autoNotes += ' ';
       autoNotes += questionData.category;
     }
 
@@ -772,6 +785,19 @@ async function submitQuestionData(root) {
 
       if (questionData) {
         console.log('Question extracted successfully:', questionData);
+
+        // Derive section from questionType if available
+        if (questionData.questionType && !payload.section) {
+          const questionType = questionData.questionType.toLowerCase();
+          if (questionType === 'quant') {
+            payload.section = 'quant';
+          } else if (questionType === 'cr' || questionType === 'rc') {
+            payload.section = 'verbal';
+          } else if (questionType === 'di') {
+            payload.section = 'di';
+          }
+          console.log('[Debug] Derived section from questionType:', questionType, '->', payload.section);
+        }
 
         // Enrich with bookmarklet data
         const enrichedJson = enrichquestionData(questionData, payload);
@@ -1559,8 +1585,22 @@ export async function createSidebar() {
           console.log('[Debug] Auto-populate: Question data extracted:', questionData);
           let autoNotes = '';
 
+          // Add section based on questionType if available
+          if (questionData.questionType) {
+            const questionType = questionData.questionType.toLowerCase();
+            if (questionType === 'quant') {
+              autoNotes += 'quant';
+            } else if (questionType === 'cr' || questionType === 'rc') {
+              autoNotes += 'verbal';
+            } else if (questionType === 'di') {
+              autoNotes += 'di';
+            }
+            console.log('[Debug] Auto-populate: Derived section from questionType:', questionType);
+          }
+
           // Add category if available (for CR questions)
           if (questionData.category) {
+            if (autoNotes) autoNotes += ' ';
             autoNotes += questionData.category;
             console.log('[Debug] Auto-populate: Found category:', questionData.category);
           }

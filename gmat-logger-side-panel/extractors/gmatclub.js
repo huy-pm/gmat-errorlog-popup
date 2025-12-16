@@ -56,6 +56,22 @@ function processBoldface(html) {
 }
 
 /**
+ * Clean trash content from GMATClub posts (signatures, dividers, excessive whitespace)
+ */
+function cleanTrashContent(text) {
+  let result = text
+    // Remove underscore dividers (commonly used as separators)
+    .replace(/_+/g, '')
+    // Remove excessive whitespace (tabs, multiple spaces, multiple newlines)
+    .replace(/[\t\r]+/g, ' ')
+    .replace(/\n\s*\n/g, '\n')
+    .replace(/\s{2,}/g, ' ')
+    // Trim leading/trailing whitespace
+    .trim();
+  return result;
+}
+
+/**
  * Difficulty mapping: GMATClub tag_id -> difficulty level
  */
 const DIFFICULTY_MAPPING = {
@@ -348,10 +364,10 @@ function extractGMATClubQuantContent() {
       "section": "Quant",
       "category": "Problem Solving",
       "content": {
-        "questionText": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
+        "questionText": cleanTrashContent(decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, ''))),
         "answerChoices": answerChoices.map(choice =>
-          decodeHtmlEntities(choice.content.replace(/<[^>]*>/g, '').trim())
-        )
+          cleanTrashContent(decodeHtmlEntities(choice.content.replace(/<[^>]*>/g, '').trim()))
+        ).filter(choice => choice.length > 0) // Filter out empty choices after cleanup
       }
     };
 
@@ -368,7 +384,7 @@ function extractGMATClubQuantContent() {
       "section": "Quant",
       "category": "Problem Solving",
       "content": {
-        "questionText": decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, '')),
+        "questionText": cleanTrashContent(decodeHtmlEntities(questionHTML.replace(/<[^>]*>/g, ''))),
         "answerChoices": []
       }
     };

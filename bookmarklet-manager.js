@@ -89,6 +89,11 @@
             name: "GMAT OG - Auto",
             description: "Auto-scrape GMAT Official Practice questions",
             script: '/gmat-og/gmat-og-autoscraping.js'
+        },
+        {
+            name: "GMAT OG - Advanced",
+            description: "Auto-scrape GMAT Official Practice questions",
+            script: '/gmat-og/gmat-og-advanced-autoscraping.js'
         }
     ];
 

@@ -11,6 +11,7 @@ javascript: (function () {
     var currentDifficulty = "";
     var totalProcessed = 0;  // Track total processed (success + fail)
     var failedCount = 0;     // Track failed extractions
+    var currentPageNumber = 1;  // Track which pagination page we're on
 
     // ============================================
     // HELPER FUNCTIONS (from gmatOG.js)
@@ -531,6 +532,12 @@ javascript: (function () {
 
         // Look for the Review link (a.link)
         var reviewLink = actionCell.querySelector('a.link');
+
+        // Check if the link has 'hidden' class (not reviewable)
+        if (reviewLink && reviewLink.classList.contains('hidden')) {
+            return null;
+        }
+
         return reviewLink;
     }
 
@@ -595,6 +602,45 @@ javascript: (function () {
         return null;
     }
 
+    // Get current page number from pagination
+    function getCurrentPageFromPagination() {
+        var activePageLink = document.querySelector('.answers-pagination li.active span.current:not(.prev)');
+        if (activePageLink) {
+            var pageNum = parseInt(activePageLink.textContent.trim(), 10);
+            if (!isNaN(pageNum)) {
+                return pageNum;
+            }
+        }
+        return 1;
+    }
+
+    // Navigate to a specific page number
+    function navigateToPage(targetPage) {
+        var currentPage = getCurrentPageFromPagination();
+        if (currentPage === targetPage) {
+            return true; // Already on correct page
+        }
+
+        // Look for the page link
+        var pageLinks = document.querySelectorAll('.answers-pagination a.page-link');
+        for (var i = 0; i < pageLinks.length; i++) {
+            var linkText = pageLinks[i].textContent.trim();
+            if (linkText === String(targetPage)) {
+                pageLinks[i].click();
+                console.log("Navigated to page " + targetPage);
+                return true;
+            }
+        }
+
+        // If target page not directly clickable, use Next button repeatedly
+        if (targetPage > currentPage && hasNextPage()) {
+            clickNextPage();
+            return false; // Need more clicks
+        }
+
+        return false;
+    }
+
     // ============================================
     // MAIN EXTRACTION LOOP
     // ============================================
@@ -608,7 +654,9 @@ javascript: (function () {
 
     function updateCount() {
         if (popup && !popup.closed) {
-            popup.document.getElementById('count').textContent = extractedQuestions.length;
+            popup.document.getElementById('success-count').textContent = extractedQuestions.length;
+            popup.document.getElementById('skipped-count').textContent = failedCount;
+            popup.document.getElementById('total-count').textContent = totalProcessed;
         }
     }
 
@@ -643,6 +691,7 @@ javascript: (function () {
             if (hasNextPage()) {
                 updateStatus("Going to next page...");
                 currentQuestionIndex = 0;
+                currentPageNumber++;  // Track page number
                 clickNextPage();
                 setTimeout(processCurrentQuestion, 3000); // Wait for page to load
                 return;
@@ -669,14 +718,18 @@ javascript: (function () {
             console.warn("No review link found for question " + questionNumber + ", skipping...");
             totalProcessed++;  // Count as processed (failed)
             failedCount++;
+            updateCount();
             currentQuestionIndex++;
             setTimeout(processCurrentQuestion, 500);
             return;
         }
 
+        // Store current page number before navigating to detail
+        currentPageNumber = getCurrentPageFromPagination();
+        console.log("On page " + currentPageNumber + ", clicking review link for question " + questionNumber);
+
         // Click the review link to navigate to question detail
         reviewLink.click();
-        console.log("Clicked review link for question " + questionNumber);
 
         // Wait for question page to load, then extract
         setTimeout(extractFromQuestionPage, 2500);
@@ -709,21 +762,50 @@ javascript: (function () {
                 console.log("Extracted question:", questionData.questionLink);
             }
             totalProcessed++;  // Count as processed (success)
+            updateCount();
         } else {
             console.warn("Failed to extract question data");
             totalProcessed++;  // Count as processed (failed)
             failedCount++;
+            updateCount();
         }
 
-        // Use browser back to return to list page (more reliable than Done Reviewing button)
-        updateStatus("Returning to list...");
+        // Use browser back to return to list page
+        updateStatus("Returning to list page " + currentPageNumber + "...");
         history.back();
 
         // Move to next question
         currentQuestionIndex++;
 
-        // Wait for list page to reload, then process next question
-        setTimeout(processCurrentQuestion, 2500);
+        // Wait for list page to reload, then check if we need to navigate to correct page
+        setTimeout(function () {
+            ensureCorrectPageAndContinue();
+        }, 2500);
+    }
+
+    // Ensure we're on the correct page after history.back()
+    function ensureCorrectPageAndContinue() {
+        if (!isRunning) return;
+
+        // Make sure we're on the list page
+        if (!isOnListPage()) {
+            updateStatus("Waiting for list page...");
+            setTimeout(ensureCorrectPageAndContinue, 1000);
+            return;
+        }
+
+        // Check current page vs expected page
+        var actualPage = getCurrentPageFromPagination();
+
+        if (actualPage !== currentPageNumber) {
+            updateStatus("Navigating back to page " + currentPageNumber + "...");
+            navigateToPage(currentPageNumber);
+            setTimeout(ensureCorrectPageAndContinue, 2000);
+            return;
+        }
+
+        // We're on the correct page, continue processing
+        processCurrentQuestion();
     }
 
     // ============================================
@@ -740,6 +822,7 @@ javascript: (function () {
         currentDifficulty = "";
         totalProcessed = 0;
         failedCount = 0;
+        currentPageNumber = 1;
 
         // Update UI
         popup.document.getElementById('start-btn').disabled = true;
@@ -868,7 +951,7 @@ javascript: (function () {
         '<button id="stop-btn" onclick="window.opener.stopAdvancedExtraction()" disabled>Stop</button>' +
         '</div>' +
         '<div class="status">Status: <span id="status">Ready</span></div>' +
-        '<div class="count">Questions Extracted: <span id="count">0</span></div>' +
+        '<div class="count">Success: <span id="success-count" style="color:#4CAF50">0</span> | Skipped: <span id="skipped-count" style="color:#f44336">0</span> | Total: <span id="total-count">0</span></div>' +
         '</body>' +
         '</html>'
     );

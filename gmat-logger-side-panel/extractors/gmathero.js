@@ -440,6 +440,52 @@ function extractGMATHeroCRContent() {
       }
     }
 
+    // Edge case: Sentence-completion style questions without question mark
+    // These are incomplete sentences that the answer choices complete
+    // Examples: "...best serves as part of an argument that", "...most strongly supports which of the following"
+    if (questionIndex === -1) {
+      // Look for patterns that indicate a stem/completion question
+      var completionPatterns = [
+        /\bthat\s*$/i,           // ends with "that"
+        /\bto\s*$/i,             // ends with "to" 
+        /\bbecause\s*$/i,        // ends with "because"
+        /\bfor\s*$/i,            // ends with "for"
+        /\bwhich\s*$/i,          // ends with "which"
+        /\bif\s*$/i,             // ends with "if"
+        /\bthe following\s*$/i,  // ends with "the following"
+        /\bargument that\s*$/i,  // "argument that" pattern
+        /\bconclusion that\s*$/i, // "conclusion that" pattern
+        /\bassumption that\s*$/i, // "assumption that" pattern
+        /\bstatement that\s*$/i,  // "statement that" pattern
+        /\bevidence that\s*$/i,   // "evidence that" pattern
+        /\bserves? as\s*$/i,      // "serve as" / "serves as" pattern
+        /\bserves? to\s*$/i       // "serve to" / "serves to" pattern
+      ];
+
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var part = parts[i].trim();
+        if (part.length > 0) {
+          var cleanPart = part
+            .replace(/<[^>]*>/g, '')
+            .replace(/&ldquo;/g, '"')
+            .replace(/&rdquo;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&[a-zA-Z0-9#]+;/g, '')
+            .trim();
+          // Check if this part matches any completion pattern
+          for (var j = 0; j < completionPatterns.length; j++) {
+            if (completionPatterns[j].test(cleanPart)) {
+              questionIndex = i;
+              question = cleanPart;
+              console.log("Detected sentence-completion question pattern:", cleanPart);
+              break;
+            }
+          }
+          if (questionIndex !== -1) break;
+        }
+      }
+    }
+
     if (questionIndex >= 0) {
       var passageParts = parts.slice(0, questionIndex);
       passage = passageParts.join(" ").trim();

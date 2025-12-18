@@ -229,3 +229,47 @@ export function enrichquestionData(questionData, payload) {
 
   return questionData;
 }
+
+/**
+ * Patterns that indicate a sentence-completion style question without a question mark.
+ * These are incomplete sentences that the answer choices complete.
+ * Examples:
+ *   - "...best serves as part of an argument that"
+ *   - "...most strongly supports which of the following"
+ *   - "The consultant responds to the lawmaker's argument by"
+ */
+export const COMPLETION_PATTERNS = [
+  /\bthat\s*$/i,           // ends with "that"
+  /\bto\s*$/i,             // ends with "to" 
+  /\bbecause\s*$/i,        // ends with "because"
+  /\bfor\s*$/i,            // ends with "for"
+  /\bwhich\s*$/i,          // ends with "which"
+  /\bif\s*$/i,             // ends with "if"
+  /\bby\s*$/i,             // ends with "by" (e.g., "responds to the argument by")
+  /\bthe following\s*$/i,  // ends with "the following"
+  /\bargument that\s*$/i,  // "argument that" pattern
+  /\bconclusion that\s*$/i, // "conclusion that" pattern
+  /\bassumption that\s*$/i, // "assumption that" pattern
+  /\bstatement that\s*$/i,  // "statement that" pattern
+  /\bevidence that\s*$/i,   // "evidence that" pattern
+  /\bserves? as\s*$/i,      // "serve as" / "serves as" pattern
+  /\bserves? to\s*$/i,      // "serve to" / "serves to" pattern
+  /\bargument by\s*$/i,     // "argument by" pattern
+  /\bresponds? to\s*$/i,    // "respond to" / "responds to" pattern (when at end)
+];
+
+/**
+ * Check if a text matches any sentence-completion style question pattern.
+ * @param {string} text - The text to check (should be trimmed)
+ * @returns {boolean} - True if the text matches a completion pattern
+ */
+export function isCompletionStyleQuestion(text) {
+  if (!text || typeof text !== 'string') return false;
+  const trimmed = text.trim();
+  for (let i = 0; i < COMPLETION_PATTERNS.length; i++) {
+    if (COMPLETION_PATTERNS[i].test(trimmed)) {
+      return true;
+    }
+  }
+  return false;
+}

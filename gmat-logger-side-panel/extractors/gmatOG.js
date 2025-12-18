@@ -4,6 +4,39 @@
  */
 
 /**
+ * Shared patterns for sentence-completion style questions (synced with utils.js COMPLETION_PATTERNS)
+ * If updating, also update: utils.js, gmathero.js, gmatclub.js, gmat-og/*.js, gmat-hero/*.js, gmatclub/*.js
+ */
+const COMPLETION_PATTERNS = [
+    /\bthat\s*$/i,           // ends with "that"
+    /\bto\s*$/i,             // ends with "to" 
+    /\bbecause\s*$/i,        // ends with "because"
+    /\bfor\s*$/i,            // ends with "for"
+    /\bwhich\s*$/i,          // ends with "which"
+    /\bif\s*$/i,             // ends with "if"
+    /\bby\s*$/i,             // ends with "by" (e.g., "responds to the argument by")
+    /\bthe following\s*$/i,  // ends with "the following"
+    /\bargument that\s*$/i,  // "argument that" pattern
+    /\bconclusion that\s*$/i, // "conclusion that" pattern
+    /\bassumption that\s*$/i, // "assumption that" pattern
+    /\bstatement that\s*$/i,  // "statement that" pattern
+    /\bevidence that\s*$/i,   // "evidence that" pattern
+    /\bserves? as\s*$/i,      // "serve as" / "serves as" pattern
+    /\bserves? to\s*$/i,      // "serve to" / "serves to" pattern
+    /\bargument by\s*$/i,     // "argument by" pattern
+    /\bresponds? to\s*$/i,    // "respond to" / "responds to" pattern (when at end)
+];
+
+function isCompletionStyleQuestion(text) {
+    if (!text || typeof text !== 'string') return false;
+    const trimmed = text.trim();
+    for (let i = 0; i < COMPLETION_PATTERNS.length; i++) {
+        if (COMPLETION_PATTERNS[i].test(trimmed)) return true;
+    }
+    return false;
+}
+
+/**
  * Decode HTML entities
  */
 function decodeHtmlEntities(text) {
@@ -440,39 +473,16 @@ function extractOGCRContent() {
             }
 
             // Edge case: Sentence-completion style questions without question mark
-            // These are incomplete sentences that the answer choices complete
-            // Examples: "...best serves as part of an argument that", "...most strongly supports which of the following"
+            // Uses shared utility from utils.js (COMPLETION_PATTERNS)
             if (questionIndex === -1) {
-                // Look for patterns that indicate a stem/completion question
-                const completionPatterns = [
-                    /\bthat\s*$/i,           // ends with "that"
-                    /\bto\s*$/i,             // ends with "to" 
-                    /\bbecause\s*$/i,        // ends with "because"
-                    /\bfor\s*$/i,            // ends with "for"
-                    /\bwhich\s*$/i,          // ends with "which"
-                    /\bif\s*$/i,             // ends with "if"
-                    /\bthe following\s*$/i,  // ends with "the following"
-                    /\bargument that\s*$/i,  // "argument that" pattern
-                    /\bconclusion that\s*$/i, // "conclusion that" pattern
-                    /\bassumption that\s*$/i, // "assumption that" pattern
-                    /\bstatement that\s*$/i,  // "statement that" pattern
-                    /\bevidence that\s*$/i,   // "evidence that" pattern
-                    /\bserves? as\s*$/i,      // "serve as" / "serves as" pattern
-                    /\bserves? to\s*$/i       // "serve to" / "serves to" pattern
-                ];
-
                 for (let i = parts.length - 1; i >= 0; i--) {
                     const part = parts[i].trim();
-                    // Check if this part matches any completion pattern
-                    for (let j = 0; j < completionPatterns.length; j++) {
-                        if (completionPatterns[j].test(part)) {
-                            questionIndex = i;
-                            questionText = part;
-                            console.log("Detected sentence-completion question pattern:", part);
-                            break;
-                        }
+                    if (isCompletionStyleQuestion(part)) {
+                        questionIndex = i;
+                        questionText = part;
+                        console.log("Detected sentence-completion question pattern:", part);
+                        break;
                     }
-                    if (questionIndex !== -1) break;
                 }
             }
 

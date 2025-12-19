@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GMAT Math Question Renderer</title>
+    <meta charset="UTF-8">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+
+        .button-group {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #question-display {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+
+        .question-section {
+            margin-bottom: 25px;
+        }
+
+        .question-section h2 {
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+
+        .answer-choices {
+            line-height: 1.8;
+        }
+
+        .answer-choice {
+            margin-bottom: 8px;
+        }
+
+        .rendering-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .rendering-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+
+        .rendering-info ul {
+            margin-bottom: 0;
+        }
+
+        .rendering-info li {
+            margin-bottom: 5px;
+        }
+
+        .file-upload {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .file-upload label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-list {
+            margin-top: 20px;
+        }
+
+        .question-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            background-color: #fff;
+        }
+
+        .question-item h3 {
+            margin-top: 0;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .question-item h3:hover {
+            color: #3498db;
+        }
+
+        .question-content {
+            display: none;
+        }
+
+        .active .question-content {
+            display: block;
+        }
+
+        .question-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>GMAT Math Question Renderer</h1>
+
+        <div class="rendering-info">
+            <h3>How to Use:</h3>
+            <ul>
+                <li>Copy a GMAT question from the clipboard (using the bookmarklet)</li>
+                <li>Paste it into the text area below</li>
+                <li>Click "Render Question" to display with proper math formatting</li>
+                <li>Or upload a JSON file containing multiple questions</li>
+                <li>Use "Clear" to reset the form</li>
+            </ul>
+            <p><strong>Supported formats:</strong> Standard text with $inline$ and $$display$$ math expressions</p>
+        </div>
+
+        <textarea id="question-input"
+            placeholder="Paste your GMAT question here...&#10;&#10;Example:&#10;n is the product of the first 5 prime numbers. If $\dfrac{12!}{n}$ is divisible by $2^k$, what is the greatest value of a positive integer $k$?&#10;&#10;A. 6&#10;B. 7&#10;C. 8&#10;D. 9&#10;E. 10"></textarea>
+
+        <div class="button-group">
+            <button id="render-btn">Render Question</button>
+            <button id="clear-btn">Clear</button>
+            <button id="sample-btn">Load Sample</button>
+        </div>
+
+        <div class="file-upload">
+            <label for="json-file">Upload JSON File with Questions:</label>
+            <input type="file" id="json-file" accept=".json">
+            <button id="upload-btn">Load Questions from JSON</button>
+            <p id="file-status" style="margin-top: 10px; font-size: 14px; color: #666;"></p>
+        </div>
+
+        <div id="question-display">
+            <p style="color: #666; text-align: center; font-style: italic;">Questions will be displayed here after
+                rendering...</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const questionInput = document.getElementById('question-input');
+        const renderBtn = document.getElementById('render-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const sampleBtn = document.getElementById('sample-btn');
+        const questionDisplay = document.getElementById('question-display');
+        const jsonFileInput = document.getElementById('json-file');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileStatus = document.getElementById('file-status');
+
+        // Sample question
+        const sampleQuestion = `n is the product of the first 5 prime numbers. If $\\dfrac{12!}{n}$ is divisible by $2^k$, what is the greatest value of a positive integer $k$?
+
+A. 6
+B. 7
+C. 8
+D. 9
+E. 10
+
+Sample with currency: A television manufacturer produces 600 units of a certain model each month at a cost to the manufacturer of $90 per unit and all of the produced units are sold each month. What is the minimum selling price per unit that will ensure that the monthly profit (revenue from sales minus the manufacturer's cost to produce) on the sales of these units will be at least $42,000?`;
+
+        // Event listeners
+        renderBtn.addEventListener('click', renderSingleQuestion);
+        clearBtn.addEventListener('click', clearForm);
+        sampleBtn.addEventListener('click', loadSample);
+        uploadBtn.addEventListener('click', loadQuestionsFromJSON);
+        jsonFileInput.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                fileStatus.textContent = `Selected file: ${this.files[0].name}. Click "Load Questions from JSON" to load.`;
+                fileStatus.style.color = '#666';
+            } else {
+                fileStatus.textContent = '';
+            }
+        });
+
+        // Render single question function
+        function renderSingleQuestion() {
+            const inputText = questionInput.value.trim();
+            if (!inputText) {
+                alert('Please paste a question first!');
+                return;
+            }
+
+            try {
+                // Parse the input text
+                const parsedContent = parseQuestion(inputText);
+
+                // Escape currency dollar signs before rendering
+                const escapedQuestion = escapeCurrencyDollars(parsedContent.question);
+                const escapedAnswers = parsedContent.answers.map(answer => escapeCurrencyDollars(answer));
+
+                // Render the content
+                questionDisplay.innerHTML = `
+                    <div class="question-section">
+                        <h2>Question</h2>
+                        <div id="question-content">${escapedQuestion}</div>
+                    </div>
+                    <div class="question-section">
+                        <h2>Answer Choices</h2>
+                        <div class="answer-choices">${escapedAnswers.map((answer, index) => {
+                    // Check if answer already has a label prefix
+                    let formattedAnswer = answer;
+                    let label = '';
+
+                    // Check if answer starts with a label like "A.", "B.", etc.
+                    const labelMatch = answer.match(/^([A-Ea-e])\.\s*(.*)/);
+                    if (labelMatch) {
+                        label = labelMatch[1].toUpperCase();
+                        formattedAnswer = labelMatch[2];
+                    } else {
+                        // No label found, use default labeling
+                        const labels = ['A', 'B', 'C', 'D', 'E'];
+                        label = index < labels.length ? labels[index] : String.fromCharCode(65 + index);
+                    }
+
+                    return `<div class="answer-choice"><strong>${label}.</strong> ${formattedAnswer}</div>`;
+                }).join('')}</div>
+                    </div>
+                `;
+
+                // Render math with MathJax
+                if (typeof MathJax !== 'undefined') {
+                    MathJax.typesetPromise([questionDisplay]).then(() => {
+                        console.log('MathJax rendering complete');
+                    }).catch((err) => {
+                        console.error('MathJax rendering error:', err);
+                    });
+                }
+
+                // Render math with KaTeX as fallback
+                if (typeof renderMathInElement !== 'undefined') {
+                    renderMathInElement(questionDisplay, {
+                        delimiters: [
+                            { left: "$$", right: "$$", display: true },
+                            { left: "$", right: "$", display: false }
+                        ]
+                    });
+                }
+            } catch (error) {
+                console.error('Error rendering question:', error);
+                questionDisplay.innerHTML = `<p style="color: red;">Error rendering question: ${error.message}</p>`;
+            }
+        }
+
+        // Escape currency dollar signs (but not math delimiters)
+        function escapeCurrencyDollars(text) {
+            if (!text) return text;
+
+            // This function carefully distinguishes between:
+            // 1. Mathematical expressions: $$...$$ or $...$ (should NOT be escaped)
+            // 2. Currency values: $90, $400, etc. (should be escaped)
+
+            // First, let's identify and protect mathematical expressions
+            let result = text;
+
+            // Handle escaped backslashes that might be present in JSON
+            // This is important for expressions like \\( x \\)
+            result = result.replace(/\\\\\(/g, '\\(');
+            result = result.replace(/\\\\\)/g, '\\)');
+            result = result.replace(/\\\\\[/g, '\\[');
+            result = result.replace(/\\\\\]/g, '\\]');
+            result = result.replace(/\\\\left/g, '\\left');
+            result = result.replace(/\\\\right/g, '\\right');
+            result = result.replace(/\\\\frac/g, '\\frac');
+
+            // Protect display math $$...$$
+            result = result.replace(/\$\$([^$]+)\$\$/g, function (match, content) {
+                return '__DISPLAY_MATH__' + content + '__DISPLAY_MATH__';
+            });
+
+            // Protect inline math $...$ (avoiding $$...$$)
+            // We do this by first marking all $$...$$ as protected, then handling $...$
+            let tempResult = result.replace(/\$\$/g, '__DOUBLE_DOLLAR__');
+
+            // Now handle single dollar signs (inline math)
+            tempResult = tempResult.replace(/\$([^$]*)\$/g, function (match, content) {
+                return '__INLINE_MATH__' + content + '__INLINE_MATH__';
+            });
+
+            // Restore double dollars
+            tempResult = tempResult.replace(/__DOUBLE_DOLLAR__/g, '$$');
+
+            // Now escape currency dollar signs (those not protected)
+            tempResult = tempResult.replace(/\$/g, '\\$');
+
+            // Restore mathematical expressions
+            tempResult = tempResult.replace(/__DISPLAY_MATH__([^_]+)__DISPLAY_MATH__/g, function (match, content) {
+                return '$$' + content + '$$';
+            });
+
+            tempResult = tempResult.replace(/__INLINE_MATH__([^_]+)__INLINE_MATH__/g, function (match, content) {
+                return '$' + content + '$';
+            });
+
+            return tempResult;
+        }
+
+        // Clear form function
+        function clearForm() {
+            questionInput.value = '';
+            questionDisplay.innerHTML = '<p style="color: #666; text-align: center; font-style: italic;">Questions will be displayed here after rendering...</p>';
+            questionInput.focus();
+            jsonFileInput.value = '';
+            fileStatus.textContent = '';
+        }
+
+        // Load sample function
+        function loadSample() {
+            questionInput.value = sampleQuestion;
+        }
+
+        // Load questions from JSON file
+        function loadQuestionsFromJSON() {
+            const file = jsonFileInput.files[0];
+            if (!file) {
+                alert('Please select a JSON file first!');
+                return;
+            }
+
+            if (!file.name.endsWith('.json')) {
+                alert('Please select a valid JSON file!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    // Handle both formats: direct array or object with questions property
+                    let questionsData;
+                    if (Array.isArray(jsonData)) {
+                        // Direct array format
+                        questionsData = { questions: jsonData };
+                    } else if (jsonData && jsonData.questions && Array.isArray(jsonData.questions)) {
+                        // Object with questions property
+                        questionsData = jsonData;
+                    } else {
+                        throw new Error('Invalid JSON format: Expected either an array of questions or an object with a "questions" array');
+                    }
+                    renderQuestionsFromJSON(questionsData);
+                    fileStatus.textContent = `Loaded ${questionsData.questions.length} questions from ${file.name}`;
+                    fileStatus.style.color = 'green';
+                } catch (error) {
+                    console.error('Error parsing JSON file:', error);
+                    fileStatus.textContent = 'Error parsing JSON file: ' + error.message;
+                    fileStatus.style.color = 'red';
+                }
+            };
+            reader.onerror = function () {
+                console.error('Error reading file');
+                fileStatus.textContent = 'Error reading file';
+                fileStatus.style.color = 'red';
+            };
+            reader.readAsText(file);
+        }
+
+        // Render questions from JSON data
+        function renderQuestionsFromJSON(jsonData) {
+            if (!jsonData || !jsonData.questions || !Array.isArray(jsonData.questions)) {
+                throw new Error('Invalid JSON format: Expected "questions" array');
+            }
+
+            // Create a list of questions
+            let html = '<div class="question-list">';
+
+            jsonData.questions.forEach((question, index) => {
+                const questionId = `question-${index}`;
+
+                // Handle both old format (question/answers) and new format (content.questionText/content.answerChoices)
+                const questionText = question.content?.questionText || question.question || 'No question text provided';
+                const answers = question.content?.answerChoices || question.answers || question.answer_choices || [];
+
+                // Escape currency dollar signs in question and answers
+                const escapedQuestion = escapeCurrencyDollars(questionText);
+                const escapedAnswers = answers.map(answer => escapeCurrencyDollars(answer));
+
+                // Handle both 'link' and 'questionLink' properties
+                const questionLink = question.questionLink || question.link || '';
+
+                // Build metadata display
+                let metaData = [];
+                if (question.source) metaData.push(`Source: ${question.source}`);
+                if (question.difficulty) metaData.push(`Difficulty: ${question.difficulty}`);
+                if (question.category || question.content?.category) metaData.push(`Category: ${question.category || question.content.category}`);
+                if (question.correctAnswer) metaData.push(`Correct Answer: ${question.correctAnswer}`);
+                const metaDisplay = metaData.length > 0 ? metaData.join(' | ') : (questionLink ? 'Link: ' + questionLink : '');
+
+                html += `
+                    <div class="question-item" id="${questionId}">
+                        <h3 onclick="toggleQuestion('${questionId}')">Question ${index + 1}${questionLink ? ' - <a href="' + questionLink + '" target="_blank">View Original</a>' : ''}</h3>
+                        <div class="question-meta">
+                            ${metaDisplay}
+                        </div>
+                        <div class="question-content">
+                            <div class="question-section">
+                                <h2>Question</h2>
+                                <div class="question-text">${escapedQuestion}</div>
+                            </div>
+                            <div class="question-section">
+                                <h2>Answer Choices</h2>
+                                <div class="answer-choices">
+                                    ${renderAnswerChoices(escapedAnswers)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            questionDisplay.innerHTML = html;
+
+            // Render math with MathJax
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([questionDisplay]).then(() => {
+                    console.log('MathJax rendering complete');
+                }).catch((err) => {
+                    console.error('MathJax rendering error:', err);
+                });
+            }
+
+            // Render math with KaTeX as fallback
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(questionDisplay, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ]
+                });
+            }
+        }
+
+        // Render answer choices
+        function renderAnswerChoices(answers) {
+            if (!answers || !Array.isArray(answers) || answers.length === 0) {
+                return '<p>No answer choices provided</p>';
+            }
+
+            let html = '';
+            const labels = ['A', 'B', 'C', 'D', 'E'];
+
+            answers.forEach((answer, index) => {
+                // Check if answer already has a label prefix
+                let formattedAnswer = answer;
+                let label = '';
+
+                // Check if answer starts with a label like "A.", "B.", etc.
+                const labelMatch = answer.match(/^([A-Ea-e])\.\s*(.*)/);
+                if (labelMatch) {
+                    label = labelMatch[1].toUpperCase();
+                    formattedAnswer = labelMatch[2];
+                } else {
+                    // No label found, use default labeling
+                    label = index < labels.length ? labels[index] : String.fromCharCode(65 + index);
+                }
+
+                html += `<div class="answer-choice"><strong>${label}.</strong> ${formattedAnswer}</div>`;
+            });
+
+            return html;
+        }
+
+        // Toggle question visibility
+        function toggleQuestion(questionId) {
+            const questionElement = document.getElementById(questionId);
+            questionElement.classList.toggle('active');
+        }
+
+        // Parse question function (for single question rendering)
+        function parseQuestion(inputText) {
+            // Check if input is JSON
+            try {
+                const jsonData = JSON.parse(inputText);
+                // Handle array format
+                if (Array.isArray(jsonData) && jsonData.length > 0) {
+                    const question = jsonData[0];
+                    return {
+                        question: question.content?.questionText || question.question || '',
+                        answers: question.content?.answerChoices || question.answers || question.answer_choices || []
+                    };
+                }
+                // Handle object format with questions array
+                else if (jsonData.questions && Array.isArray(jsonData.questions) && jsonData.questions.length > 0) {
+                    const question = jsonData.questions[0];
+                    return {
+                        question: question.content?.questionText || question.question || '',
+                        answers: question.content?.answerChoices || question.answers || question.answer_choices || []
+                    };
+                }
+                // Handle single question object format
+                else if (jsonData.question || jsonData.content?.questionText) {
+                    return {
+                        question: jsonData.content?.questionText || jsonData.question || '',
+                        answers: jsonData.content?.answerChoices || jsonData.answers || jsonData.answer_choices || []
+                    };
+                }
+            } catch (e) {
+                // Not JSON, continue with text parsing
+            }
+
+            // Split the input into lines
+            const lines = inputText.split('\n');
+
+            // Find where answer choices begin
+            let answerStartIndex = -1;
+            const answerPrefixes = ['A.', 'B.', 'C.', 'D.', 'E.', 'A)', 'B)', 'C)', 'D)', 'E)'];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (answerPrefixes.some(prefix => line.startsWith(prefix))) {
+                    answerStartIndex = i;
+                    break;
+                }
+            }
+
+            // If no answer choices found, treat entire text as question
+            if (answerStartIndex === -1) {
+                return {
+                    question: inputText,
+                    answers: []
+                };
+            }
+
+            // Extract question text (everything before answer choices)
+            const questionText = lines.slice(0, answerStartIndex).join('\n').trim();
+
+            // Extract answer choices
+            const answers = [];
+            for (let i = answerStartIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.length > 0) {
+                    // Remove the prefix (A., B., etc.) and trim
+                    let answer = line;
+                    for (const prefix of answerPrefixes) {
+                        if (line.startsWith(prefix)) {
+                            answer = line.substring(prefix.length).trim();
+                            break;
+                        }
+                    }
+                    answers.push(answer);
+                }
+            }
+
+            return {
+                question: questionText,
+                answers: answers
+            };
+        }
+    </script>
+</body>
+
+</html>

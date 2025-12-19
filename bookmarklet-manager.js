@@ -51,14 +51,9 @@
             script: '/gmat-hero/gmat-hero-quant-auto-scraping.js'
         },
         {
-            name: "GMAT Hero - CR Auto",
-            description: "Auto-scrape GMAT Hero questions",
-            script: '/gmat-hero/gmat-hero-cr-autoscraping.js'
-        },
-        {
-            name: "GMAT Hero - RC Auto",
-            description: "Auto-scrape GMAT Hero questions",
-            script: '/gmat-hero/gmat-hero-rc-autoscraping.js'
+            name: "GMAT Hero - Verbal Auto",
+            description: "Auto-scrape GMAT Hero Verbal questions",
+            script: '/gmat-hero/gmat-hero-unified-autoscraping.js'
         },
         {
             name: "GMAT Hero - DI Auto",

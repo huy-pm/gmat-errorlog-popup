@@ -53,7 +53,7 @@
         {
             name: "GMAT Hero - Verbal Auto",
             description: "Auto-scrape GMAT Hero Verbal questions",
-            script: '/gmat-hero/gmat-hero-unified-autoscraping.js'
+            script: '/gmat-hero/gmat-hero-verbal-autoscraping.js'
         },
         {
             name: "GMAT Hero - DI Auto",

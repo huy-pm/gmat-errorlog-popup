@@ -112,44 +112,31 @@ function getPracticeUrl() {
 }
 
 /**
- * Detect GMAT section from GMAT Hero page URL
+ * Detect GMAT section from GMAT Hero page based on HTML structure
+ * This is more stable than URL-based detection as it reflects actual page content
  */
 function detectGMATHeroSection() {
-  let section = "Unknown";
-
-  // First priority: Check the current page URL
-  const url = window.location.href.toLowerCase();
-  if (url.includes('quant') || url.includes('rq') || url.includes('qt')) {
-    section = "Quant";
-    return section;
-  } else if (url.includes('cr') || url.includes('rcr')) {
-    section = "Critical Reasoning";
-    return section;
-  } else if (url.includes('rc') || url.includes('rrc')) {
-    section = "Reading Comprehension";
-    return section;
+  // RC: Has left panel with passage element
+  const leftPanel = document.getElementById('left-panel');
+  const passageEl = leftPanel?.querySelector('.passage');
+  if (passageEl) {
+    return "Reading Comprehension";
   }
 
-  // Fallback: Look for href attributes in the page
-  const links = document.querySelectorAll('a[href]');
-
-  for (let link of links) {
-    const href = link.getAttribute('href').toLowerCase();
-
-    if (href.includes('quant') || href.includes('rq') || href.includes('qt')) {
-      section = "Quant";
-      break;
-    }
-    else if (href.includes('cr') || href.includes('rcr')) {
-      section = "Critical Reasoning";
-      break;
-    } else if (href.includes('rc') || href.includes('rrc')) {
-      section = "Reading Comprehension";
-      break;
-    }
+  // Quant: Has KaTeX math elements in the question
+  const rightPanel = document.getElementById('right-panel');
+  const hasMath = rightPanel?.querySelector('.katex');
+  if (hasMath) {
+    return "Quant";
   }
 
-  return section;
+  // Default to CR for verbal questions without passage
+  const questionStem = rightPanel?.querySelector('.question-stem');
+  if (questionStem) {
+    return "Critical Reasoning";
+  }
+
+  return "Unknown";
 }
 
 /**
@@ -160,6 +147,7 @@ function extractGMATHeroMetadata() {
   const metadata = {
     isReviewMode: false,
     category: null,
+    topic: null,
     selectedAnswer: null,
     difficulty: null,
     timeSpent: null,
@@ -173,8 +161,25 @@ function extractGMATHeroMetadata() {
   // 2. Extract category from .hide-small.centered
   const categoryEl = document.querySelector('.hide-small.centered');
   const url = window.location.href.toLowerCase();
-  if (url.includes('quant') || url.includes('qt' || url.includes('rq'))
-    || url.includes('cr') || url.includes('rcr')) {
+
+  // Check for RC questions first (matching autoscraping script logic)
+  if (url.includes('rc') || url.includes('rrc') || url.includes('og-rc') || url.includes('prep-rc')) {
+    if (categoryEl) {
+      const fullText = categoryEl.textContent.trim();
+      const parts = fullText.split('-');
+      if (parts.length > 1) {
+        metadata.topic = parts[parts.length - 1].trim();
+      } else {
+        metadata.topic = fullText;
+      }
+    }
+    metadata.category = "rc";
+  }
+  // Check for Quant and CR questions
+  else if (url.includes('quant') || url.includes('qt') || url.includes('rq') ||
+    url.includes('og-quant') || url.includes('prep-quant') ||
+    url.includes('cr') || url.includes('rcr') ||
+    url.includes('og-cr') || url.includes('prep-cr')) {
     if (categoryEl) {
       const fullText = categoryEl.textContent.trim();
       const parts = fullText.split('-');
@@ -184,8 +189,6 @@ function extractGMATHeroMetadata() {
         metadata.category = fullText;
       }
     }
-  } else if (url.includes('rc') || url.includes('rrc')) {
-    metadata.category = "rc"
   }
   else {
     metadata.category = "";
@@ -674,6 +677,7 @@ function extractGMATHeroRCContent() {
       "correctAnswer": metadata.correctAnswer || "",
       "timeSpent": metadata.timeSpent || "",
       "category": metadata.category || "",
+      "topic": metadata.topic || "",
       "content": {
         "passage": passage,
         "questionText": question,

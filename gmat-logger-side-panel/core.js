@@ -617,22 +617,29 @@ async function refreshData(root, isAutoRefresh = false) {
     // Build new auto-populated notes
     let autoNotes = '';
 
-    // Add section based on questionType if available
+    // Add section and questionType based on questionType if available
     if (questionData.questionType) {
       const questionType = questionData.questionType.toLowerCase();
       if (questionType === 'quant') {
         autoNotes += 'quant';
-      } else if (questionType === 'cr' || questionType === 'rc') {
-        autoNotes += 'verbal';
+      } else if (questionType === 'cr') {
+        autoNotes += 'verbal cr';
+      } else if (questionType === 'rc') {
+        autoNotes += 'verbal rc';
       } else if (questionType === 'di') {
         autoNotes += 'di';
       }
     }
 
-    // Add category if available
+    // Add category if available (but skip if it's the same as questionType)
     if (questionData.category) {
-      if (autoNotes) autoNotes += ' ';
-      autoNotes += questionData.category;
+      const category = questionData.category.toLowerCase();
+      const questionType = (questionData.questionType || '').toLowerCase();
+      // Only add category if it's not just repeating the questionType
+      if (category !== questionType && category !== 'rc' && category !== 'cr') {
+        if (autoNotes) autoNotes += ' ';
+        autoNotes += questionData.category;
+      }
     }
 
     // Add difficulty if available

@@ -168,7 +168,7 @@ javascript: (function () {
       // Create JSON structure for Quant question
       var jsonData = {
         "question_link": "",
-        "source": "",
+        "source": "GMAT HERO",
         "difficulty": "",
         "type": "Quant",
         "questionType": "quant",

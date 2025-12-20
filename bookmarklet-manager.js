@@ -58,7 +58,7 @@
         {
             name: "GMAT Hero - Quant Auto",
             description: "Auto-scrape GMAT Hero questions",
-            script: '/gmat-hero/gmat-hero-quant-auto-scraping.js'
+            script: '/gmat-hero/gmat-hero-quant-autoscraping.js'
         },
         {
             name: "GMAT Hero - Verbal Auto",

@@ -336,7 +336,7 @@ javascript: (function () {
             // Create JSON structure for RC question
             var jsonData = {
                 "questionLink": getPracticeUrl(),
-                "source": "OG",
+                "source": "GMAT HERO",
                 "difficulty": metadata.difficulty || "",
                 "section": "verbal",
                 "questionType": "rc",

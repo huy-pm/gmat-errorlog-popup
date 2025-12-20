@@ -233,7 +233,7 @@ javascript: (function () {
             // Construct Final JSON
             var jsonData = {
                 "questionLink": getPracticeUrl(),
-                "source": "OG",
+                "source": "GMAT HERO",
                 "difficulty": metadata.difficulty || "",
                 "section": "di",
                 "questionType": "di",

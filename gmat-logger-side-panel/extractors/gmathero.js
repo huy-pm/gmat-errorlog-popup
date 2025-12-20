@@ -13,6 +13,78 @@ function decodeHtmlEntities(text) {
 }
 
 /**
+ * Escape currency symbols in plain text (e.g., $650, $21,300)
+ * This should be called BEFORE KaTeX processing, when currency is plain text
+ * and math expressions are still inside KaTeX elements.
+ * 
+ * Uses callback to check character after match to avoid regex backtracking issues
+ */
+function escapeCurrencyInTextNode(textNode) {
+  var text = textNode.textContent;
+  if (!text.includes('$')) return;
+
+  // Match $NUMBER and use callback to check what follows
+  var newText = text.replace(/\$(\d[\d,]*(?:\.\d+)?)/g, function (match, number, offset, str) {
+    // Check character immediately after the match
+    var charAfter = str.charAt(offset + match.length);
+
+    // If followed by a letter, it's a LaTeX variable like $0.125k - don't escape
+    if (/[a-zA-Z]/.test(charAfter)) {
+      return match;
+    }
+
+    // Otherwise, it's currency - escape it
+    return '\\$' + number;
+  });
+
+  if (newText !== text) {
+    textNode.textContent = newText;
+  }
+}
+
+/**
+ * Normalize currency format in extracted text
+ * Converts KaTeX-wrapped currency like $\$247.00$ to just \$247.00
+ * This ensures consistent output regardless of how GMAT Hero renders currency
+ */
+function normalizeCurrency(text) {
+  // Pattern: $\$NUMBER$ - KaTeX wrapped escaped currency
+  // Convert to just \$NUMBER
+  return text.replace(/\$\\?\\\$(\d[\d,]*(?:\.\d+)?)\$/g, '\\$$1');
+}
+
+/**
+ * Walk through text nodes in an element and escape currency
+ * Skips nodes that are inside KaTeX elements
+ */
+function escapeCurrencyInElement(element) {
+  var walker = document.createTreeWalker(
+    element,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: function (node) {
+        // Skip if inside a KaTeX element
+        var parent = node.parentNode;
+        while (parent && parent !== element) {
+          if (parent.classList && parent.classList.contains('katex')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          parent = parent.parentNode;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+
+  var textNodes = [];
+  while (walker.nextNode()) {
+    textNodes.push(walker.currentNode);
+  }
+
+  textNodes.forEach(escapeCurrencyInTextNode);
+}
+
+/**
  * Convert styled spans to markdown format for boldface questions
  * - Italicized spans (font-style: italic) -> *text*
  * - Bold spans or default -> **text**
@@ -280,11 +352,32 @@ function extractGMATHeroQuantContent() {
       return null;
     }
 
+    // Extract image if exists
+    var questionImage = null;
+    var imgElement = questionStem.querySelector('img');
+    if (imgElement) {
+      // Use .src property to get absolute URL instead of .getAttribute('src')
+      questionImage = imgElement.src;
+    }
+
     var questionHTML = questionStem.innerHTML;
 
     // Convert KaTeX to TeX format for JSON
     var tempDiv = document.createElement("div");
     tempDiv.innerHTML = questionHTML;
+
+    // Replace <br> tags with newline markers BEFORE processing KaTeX
+    // This preserves the line structure in questions with Roman numerals
+    var htmlWithLineBreaks = tempDiv.innerHTML;
+    // Replace double <br> tags with double newlines (paragraph breaks)
+    htmlWithLineBreaks = htmlWithLineBreaks.replace(/<br\s*\/?>/gi, '\n\n');
+    // Replace single <br> tags with single newlines
+    htmlWithLineBreaks = htmlWithLineBreaks.replace(/<br\s*\/?>/gi, '\n');
+    tempDiv.innerHTML = htmlWithLineBreaks;
+
+    // IMPORTANT: Escape currency symbols BEFORE processing KaTeX
+    // At this point, currency like $650 is plain text, while math is in .katex elements
+    escapeCurrencyInElement(tempDiv);
 
     // Process all Katex math expressions
     var katexElements = tempDiv.querySelectorAll(".katex");
@@ -302,7 +395,15 @@ function extractGMATHeroQuantContent() {
       }
     });
 
-    var questionText = tempDiv.textContent.trim();
+    // Get text content and clean up while preserving newlines
+    var questionText = tempDiv.textContent;
+    // Clean up excessive whitespace on each line but preserve newlines
+    questionText = questionText.split('\n').map(function (line) {
+      return line.trim();
+    }).join('\n');
+    // Remove excessive blank lines (more than 2 consecutive newlines)
+    questionText = questionText.replace(/\n{3,}/g, '\n\n');
+    questionText = questionText.trim();
 
     // Extract answer choices
     var answerChoices = [];
@@ -320,6 +421,9 @@ function extractGMATHeroQuantContent() {
           if (katexElements.length > 0) {
             var tempDiv = document.createElement("div");
             tempDiv.innerHTML = label.innerHTML;
+
+            // Escape currency BEFORE KaTeX processing
+            escapeCurrencyInElement(tempDiv);
 
             var katexElementsInLabel = tempDiv.querySelectorAll(".katex");
             katexElementsInLabel.forEach(function (katexElem) {
@@ -348,8 +452,8 @@ function extractGMATHeroQuantContent() {
         }
 
         if (answerText) {
-          answerText = answerText.replace(/^[A-Ea-e][\.\)]\s*/, '').trim();
-          answerChoices.push(answerText);
+          answerText = answerText.replace(/^[A-Ea-e][\.\\)]\s*/, '').trim();
+          answerChoices.push(normalizeCurrency(answerText));
         }
       });
     }
@@ -369,8 +473,9 @@ function extractGMATHeroQuantContent() {
       "timeSpent": metadata.timeSpent || "",
       "category": metadata.category || "",
       "content": {
-        "questionText": decodeHtmlEntities(questionText),
-        "answerChoices": answerChoices
+        "questionText": normalizeCurrency(decodeHtmlEntities(questionText)),
+        "answerChoices": answerChoices,
+        "image": questionImage
       }
     };
 

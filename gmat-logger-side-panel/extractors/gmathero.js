@@ -412,6 +412,13 @@ function extractGMATHeroCRContent() {
     var isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
     var isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
 
+    // Also detect Complete Argument questions by content pattern (underscore blanks)
+    // This handles cases where metadata doesn't explicitly indicate the question type
+    if (!isCompleteArgumentQuestion && (stemContent.includes('_____') || stemContent.includes('________'))) {
+      console.log("Detected Complete Argument question by content pattern (underscores)");
+      isCompleteArgumentQuestion = true;
+    }
+
     // If it's a Boldface or Complete the Argument question, convert styled spans to markdown
     if (isBoldfaceQuestion || isCompleteArgumentQuestion) {
       stemContent = convertStyledSpansToMarkdown(stemContent);
@@ -422,42 +429,16 @@ function extractGMATHeroCRContent() {
     var passage = "";
     var question = "";
 
-    var questionIndex = -1;
-    for (var i = parts.length - 1; i >= 0; i--) {
-      var part = parts[i].trim();
-      if (part.length > 0) {
-        var cleanPart = part
-          .replace(/<[^>]*>/g, '')
-          .replace(/&ldquo;/g, '"')
-          .replace(/&rdquo;/g, '"')
-          .replace(/&amp;/g, '&')
-          .replace(/&[a-zA-Z0-9#]+;/g, '')
-          .trim();
+    // Special handling for Complete the Argument questions
+    // Structure: Question (with ?) comes FIRST, then <br><br>, then Passage (ending with _____)
+    if (isCompleteArgumentQuestion) {
+      console.log("Processing Complete the Argument question");
 
-        if (cleanPart.includes("?")) {
-          var lowerPart = cleanPart.toLowerCase();
-          if (lowerPart.includes("which") ||
-            lowerPart.includes("what") ||
-            lowerPart.includes("how") ||
-            lowerPart.includes("why") ||
-            lowerPart.includes("except") ||
-            lowerPart.includes("vulnerable") ||
-            lowerPart.includes("flaw") ||
-            lowerPart.includes("assumption") ||
-            lowerPart.includes("conclusion") ||
-            lowerPart.includes("inference") ||
-            lowerPart.includes("strengthen") ||
-            lowerPart.includes("weaken")) {
-            questionIndex = i;
-            question = cleanPart;
-            break;
-          }
-        }
-      }
-    }
+      // Find the first non-empty part with a question mark - that's the question
+      var questionPartIndex = -1;
+      var passagePartIndex = -1;
 
-    if (questionIndex === -1) {
-      for (var i = parts.length - 1; i >= 0; i--) {
+      for (var i = 0; i < parts.length; i++) {
         var part = parts[i].trim();
         if (part.length > 0) {
           var cleanPart = part
@@ -467,43 +448,120 @@ function extractGMATHeroCRContent() {
             .replace(/&amp;/g, '&')
             .replace(/&[a-zA-Z0-9#]+;/g, '')
             .trim();
-          if (cleanPart.includes("?")) {
-            questionIndex = i;
+
+          if (cleanPart.includes("?") && questionPartIndex === -1) {
+            questionPartIndex = i;
             question = cleanPart;
-            break;
+          } else if (cleanPart.includes("_____") || cleanPart.includes("________")) {
+            // This is the passage/argument with blanks to complete
+            passagePartIndex = i;
+            passage = cleanPart;
           }
         }
       }
-    }
 
-    // Edge case: Sentence-completion style questions without question mark
-    // Uses shared isCompletionStyleQuestion utility
-    if (questionIndex === -1) {
-      for (var i = parts.length - 1; i >= 0; i--) {
-        var part = parts[i].trim();
-        if (part.length > 0) {
-          var cleanPart = part
-            .replace(/<[^>]*>/g, '')
-            .replace(/&ldquo;/g, '"')
-            .replace(/&rdquo;/g, '"')
-            .replace(/&amp;/g, '&')
-            .replace(/&[a-zA-Z0-9#]+;/g, '')
-            .trim();
-          if (isCompletionStyleQuestion(cleanPart)) {
-            questionIndex = i;
-            question = cleanPart;
-            console.log("Detected sentence-completion question pattern:", cleanPart);
-            break;
-          }
-        }
+      // If we found both, we're done
+      if (questionPartIndex >= 0 && passagePartIndex >= 0) {
+        console.log("Complete Argument: Found question at index", questionPartIndex, "and passage at index", passagePartIndex);
+      } else if (passagePartIndex >= 0) {
+        // If we only found the passage with blanks, combine all non-blank parts as passage
+        // and use a default question text
+        passage = parts.filter(function (p, idx) {
+          return p.trim().length > 0;
+        }).map(function (p) {
+          return p.replace(/<[^>]*>/g, '').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&amp;/g, '&').replace(/&[a-zA-Z0-9#]+;/g, '').trim();
+        }).join(" ");
+        question = "Which of the following most logically completes the argument?";
+      } else {
+        // Fallback: treat the whole stem as passage
+        console.log("Complete Argument: Could not identify structure, using fallback");
+        passage = stemContent.replace(/<[^>]*>/g, '').trim();
       }
-    }
-
-    if (questionIndex >= 0) {
-      var passageParts = parts.slice(0, questionIndex);
-      passage = passageParts.join(" ").trim();
     } else {
-      passage = stemContent;
+      // Original logic for standard CR questions (question at the end)
+      var questionIndex = -1;
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var part = parts[i].trim();
+        if (part.length > 0) {
+          var cleanPart = part
+            .replace(/<[^>]*>/g, '')
+            .replace(/&ldquo;/g, '"')
+            .replace(/&rdquo;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&[a-zA-Z0-9#]+;/g, '')
+            .trim();
+
+          if (cleanPart.includes("?")) {
+            var lowerPart = cleanPart.toLowerCase();
+            if (lowerPart.includes("which") ||
+              lowerPart.includes("what") ||
+              lowerPart.includes("how") ||
+              lowerPart.includes("why") ||
+              lowerPart.includes("except") ||
+              lowerPart.includes("vulnerable") ||
+              lowerPart.includes("flaw") ||
+              lowerPart.includes("assumption") ||
+              lowerPart.includes("conclusion") ||
+              lowerPart.includes("inference") ||
+              lowerPart.includes("strengthen") ||
+              lowerPart.includes("weaken")) {
+              questionIndex = i;
+              question = cleanPart;
+              break;
+            }
+          }
+        }
+      }
+
+      if (questionIndex === -1) {
+        for (var i = parts.length - 1; i >= 0; i--) {
+          var part = parts[i].trim();
+          if (part.length > 0) {
+            var cleanPart = part
+              .replace(/<[^>]*>/g, '')
+              .replace(/&ldquo;/g, '"')
+              .replace(/&rdquo;/g, '"')
+              .replace(/&amp;/g, '&')
+              .replace(/&[a-zA-Z0-9#]+;/g, '')
+              .trim();
+            if (cleanPart.includes("?")) {
+              questionIndex = i;
+              question = cleanPart;
+              break;
+            }
+          }
+        }
+      }
+
+      // Edge case: Sentence-completion style questions without question mark
+      // Uses shared isCompletionStyleQuestion utility
+      if (questionIndex === -1) {
+        for (var i = parts.length - 1; i >= 0; i--) {
+          var part = parts[i].trim();
+          if (part.length > 0) {
+            var cleanPart = part
+              .replace(/<[^>]*>/g, '')
+              .replace(/&ldquo;/g, '"')
+              .replace(/&rdquo;/g, '"')
+              .replace(/&amp;/g, '&')
+              .replace(/&[a-zA-Z0-9#]+;/g, '')
+              .trim();
+            if (isCompletionStyleQuestion(cleanPart)) {
+              questionIndex = i;
+              question = cleanPart;
+              console.log("Detected sentence-completion question pattern:", cleanPart);
+              break;
+            }
+          }
+        }
+      }
+
+      if (questionIndex >= 0) {
+        var passageParts = parts.slice(0, questionIndex);
+        passage = passageParts.join(" ").trim();
+      } else {
+        passage = stemContent;
+      }
     }
 
     passage = passage

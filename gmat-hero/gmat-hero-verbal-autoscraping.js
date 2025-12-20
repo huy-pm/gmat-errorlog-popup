@@ -73,7 +73,7 @@ javascript: (function () {
         // 2. Extract category from .hide-small.centered
         var categoryEl = document.querySelector('.hide-small.centered');
         var url = window.location.href.toLowerCase();
-        
+
         // Check for RC questions first
         if (url.includes('rc') || url.includes('rrc') || url.includes('og-rc') || url.includes('prep-rc')) {
             if (categoryEl) {
@@ -86,10 +86,10 @@ javascript: (function () {
                 }
             }
             metadata.category = "rc";
-        } 
+        }
         // Check for CR questions
         else if (url.includes('og-quant') || url.includes('prep-quant') ||
-                 url.includes('og-cr') || url.includes('prep-cr')) {
+            url.includes('og-cr') || url.includes('prep-cr')) {
             if (categoryEl) {
                 var fullText = categoryEl.textContent.trim();
                 var parts = fullText.split('-');
@@ -231,7 +231,7 @@ javascript: (function () {
     function isRCQuestion() {
         var url = window.location.href.toLowerCase();
         return url.includes('rc') || url.includes('rrc') || url.includes('og-rc') || url.includes('prep-rc') ||
-               document.getElementById('left-panel') !== null;
+            document.getElementById('left-panel') !== null;
     }
 
     // Function to extract RC data from current question
@@ -389,6 +389,13 @@ javascript: (function () {
             var metadata = extractGMATHeroMetadata();
             var isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
             var isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
+
+            // Also detect Complete Argument questions by content pattern (underscore blanks)
+            // This handles cases where metadata doesn't explicitly indicate the question type
+            if (!isCompleteArgumentQuestion && (stemContent.includes('_____') || stemContent.includes('________'))) {
+                console.log("Detected Complete Argument question by content pattern (underscores)");
+                isCompleteArgumentQuestion = true;
+            }
 
             // If it's a Boldface or Complete the Argument question, convert styled spans to markdown
             if (isBoldfaceQuestion || isCompleteArgumentQuestion) {
@@ -649,11 +656,11 @@ javascript: (function () {
 
             var categoryPart = "";
             var questionType = "question";
-            
+
             if (extractedQuestions.length > 0) {
                 // Determine question type from first question
                 questionType = extractedQuestions[0].questionType || "question";
-                
+
                 // Get category/topic
                 var categoryOrTopic = extractedQuestions[0].topic || extractedQuestions[0].category;
                 if (categoryOrTopic) {

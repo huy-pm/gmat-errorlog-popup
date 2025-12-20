@@ -46,6 +46,16 @@
             script: '/gmat_hero_extract_html_bookmarklet.js'
         },
         {
+            name: "Fullscreen Mode",
+            description: "Add fullscreen toggle button to GMAT Hero header",
+            script: '/gmat-hero/gmat-hero-fullscreen.js'
+        },
+        {
+            name: "Auto answer",
+            description: "Auto answer GMAT questions",
+            script: '/gmat-auto-answer.js'
+        },
+        {
             name: "GMAT Hero - Quant Auto",
             description: "Auto-scrape GMAT Hero questions",
             script: '/gmat-hero/gmat-hero-quant-auto-scraping.js'
@@ -74,11 +84,6 @@
             name: "GMAT Hero - DI MSR Auto",
             description: "Auto-scrape Multi-Source Reasoning questions",
             script: '/gmat-hero/gmat-hero-di-msr-autoscraping.js'
-        },
-        {
-            name: "Fullscreen Mode",
-            description: "Add fullscreen toggle button to GMAT Hero header",
-            script: '/gmat-hero/gmat-hero-fullscreen.js'
         },
         {
             name: "GMAT OG - Auto",

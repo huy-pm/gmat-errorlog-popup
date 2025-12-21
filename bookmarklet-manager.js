@@ -56,34 +56,9 @@
             script: '/gmat-auto-answer.js'
         },
         {
-            name: "GMAT Hero - Quant Auto",
+            name: "GMAT Hero Question Auto",
             description: "Auto-scrape GMAT Hero questions",
-            script: '/gmat-hero/gmat-hero-quant-autoscraping.js'
-        },
-        {
-            name: "GMAT Hero - Verbal Auto",
-            description: "Auto-scrape GMAT Hero Verbal questions",
-            script: '/gmat-hero/gmat-hero-verbal-autoscraping.js'
-        },
-        {
-            name: "GMAT Hero - DI Auto",
-            description: "Auto-scrape GMAT Hero questions",
-            script: '/gmat-hero/gmat-hero-di-autoscraping.js'
-        },
-        {
-            name: "GMAT Hero - DI TPA Auto",
-            description: "Auto-scrape Two-Part Analysis questions",
-            script: '/gmat-hero/gmat-hero-di-tpa-autoscraping.js'
-        },
-        {
-            name: "GMAT Hero - DI TA Auto",
-            description: "Auto-scrape Table Analysis questions",
-            script: '/gmat-hero/gmat-hero-di-ta-autoscraping.js'
-        },
-        {
-            name: "GMAT Hero - DI MSR Auto",
-            description: "Auto-scrape Multi-Source Reasoning questions",
-            script: '/gmat-hero/gmat-hero-di-msr-autoscraping.js'
+            script: '/gmat-hero-autoscraping/loader.js'
         },
         {
             name: "GMAT OG - Auto",

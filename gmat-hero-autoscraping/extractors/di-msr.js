@@ -65,6 +65,100 @@ function isNewQuestionSet() {
 }
 
 /**
+ * Extract complex table with multi-row headers and section rows
+ * @param {HTMLTableElement} table - The table element to extract
+ * @returns {Object|null} Table data with headers, headerGroups, and rows
+ */
+function extractComplexTable(table) {
+    const result = {
+        title: '',
+        headers: [],
+        headerGroups: [],
+        rows: []
+    };
+
+    // Extract table title if present (usually in a centered paragraph before the table)
+    const prevSibling = table.previousElementSibling;
+    if (prevSibling && prevSibling.querySelector('strong')) {
+        result.title = prevSibling.textContent.trim();
+    }
+
+    // Extract headers from thead
+    const thead = table.querySelector('thead');
+    if (thead) {
+        const headerRows = thead.querySelectorAll('tr');
+
+        // Process each header row
+        headerRows.forEach((tr, rowIndex) => {
+            const cells = tr.querySelectorAll('th');
+            cells.forEach(th => {
+                const text = th.textContent.trim();
+                const colspan = parseInt(th.getAttribute('colspan')) || 1;
+                const rowspan = parseInt(th.getAttribute('rowspan')) || 1;
+
+                if (rowIndex === 0 && colspan > 1) {
+                    // This is a header group (e.g., "Loan Type" spanning multiple columns)
+                    result.headerGroups.push({
+                        text: text,
+                        colspan: colspan
+                    });
+                } else if (rowspan === 1 || rowIndex > 0) {
+                    // This is a regular header in subsequent row or not spanning
+                    if (text && rowIndex > 0) {
+                        result.headers.push(text);
+                    } else if (text && rowIndex === 0 && colspan === 1 && rowspan === 1) {
+                        result.headers.push(text);
+                    }
+                }
+            });
+        });
+    }
+
+    // Extract rows from tbody
+    const tbody = table.querySelector('tbody');
+    if (tbody) {
+        const tableRows = tbody.querySelectorAll('tr');
+
+        tableRows.forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length === 0) return;
+
+            const firstCell = cells[0];
+            const colspan = parseInt(firstCell.getAttribute('colspan')) || 1;
+
+            // Check if this is a section header row (spans all columns)
+            if (cells.length === 1 && colspan >= 2) {
+                // This is a section header (e.g., "Seasonality:", "Security:", "Purpose:")
+                result.rows.push({
+                    type: 'section',
+                    text: firstCell.textContent.trim()
+                });
+            } else {
+                // This is a data row
+                const rowData = [];
+                cells.forEach(td => {
+                    rowData.push(td.textContent.trim());
+                });
+
+                if (rowData.length > 0) {
+                    result.rows.push({
+                        type: 'data',
+                        cells: rowData
+                    });
+                }
+            }
+        });
+    }
+
+    // Return null if no meaningful data extracted
+    if (result.headers.length === 0 && result.rows.length === 0) {
+        return null;
+    }
+
+    return result;
+}
+
+/**
  * Extract data sources from tabs
  * @returns {Object|null} Data sources object
  */
@@ -110,45 +204,33 @@ async function extractDataSources() {
             // Clone the div to manipulate
             const clonedDiv = textDiv.cloneNode(true);
 
-            // Remove table and img elements to get clean text
-            const tablesToRemove = clonedDiv.querySelectorAll('table');
-            tablesToRemove.forEach(t => t.remove());
-            const imgsToRemove = clonedDiv.querySelectorAll('img');
-            imgsToRemove.forEach(img => img.remove());
-
             // Process KaTeX math expressions
             escapeCurrencyInElement(clonedDiv);
             processKaTeX(clonedDiv);
+
+            // Handle table and its title to avoid duplication in text
+            const tableInClone = clonedDiv.querySelector('table.embed-table') || clonedDiv.querySelector('table');
+            if (tableInClone) {
+                const prevSibling = tableInClone.previousElementSibling;
+                // If the previous element is a paragraph with bold text (likely the title)
+                if (prevSibling && (prevSibling.querySelector('strong') || prevSibling.tagName === 'STRONG')) {
+                    prevSibling.remove();
+                }
+                tableInClone.remove();
+            }
+
+            // Remove any remaining images to get clean text
+            const imgsToRemove = clonedDiv.querySelectorAll('img');
+            imgsToRemove.forEach(img => img.remove());
 
             content.text = normalizeCurrency(decodeHtmlEntities(clonedDiv.textContent.trim()));
 
             // Extract table if present
             const table = textDiv.querySelector('table.embed-table') || textDiv.querySelector('table');
             if (table) {
-                const headers = [];
-                const rows = [];
-
-                // Extract headers
-                const headerCells = table.querySelectorAll('thead th');
-                headerCells.forEach(th => {
-                    headers.push(th.textContent.trim());
-                });
-
-                // Extract rows
-                const tableRows = table.querySelectorAll('tbody tr');
-                tableRows.forEach(tr => {
-                    const rowData = [];
-                    const cells = tr.querySelectorAll('td');
-                    cells.forEach(td => {
-                        rowData.push(td.textContent.trim());
-                    });
-                    if (rowData.length > 0) {
-                        rows.push(rowData);
-                    }
-                });
-
-                if (headers.length > 0 || rows.length > 0) {
-                    content.table = { headers, rows };
+                const tableData = extractComplexTable(table);
+                if (tableData) {
+                    content.table = tableData;
                 }
             }
 

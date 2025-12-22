@@ -386,7 +386,12 @@ export async function processLoop() {
                     // Normal question types - push each question
                     state.extractedQuestions.push(data);
                 }
-                updateCount(state.extractedQuestions.length);
+                // Calculate total question count (MSR sets contain multiple questions)
+                const totalCount = state.extractedQuestions.reduce((sum, q) => {
+                    // MSR question sets have a questions array
+                    return sum + (q.questions ? q.questions.length : 1);
+                }, 0);
+                updateCount(totalCount);
                 console.log(`Extracted ${questionType} question:`, data);
             }
         } catch (error) {

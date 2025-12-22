@@ -1,0 +1,1896 @@
+{
+  "exportedAt": "2025-12-21T16:18:08.275Z",
+  "totalRecords": 14,
+  "questions": [
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/41",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Year 10",
+            "content": {
+              "text": "At the Moslund Plant, the assembly line consists of 3 conveyor belts. In addition, there are 3 inspection posts, one at the end of each conveyor belt. In Year 10 (Y10), 15 workers were employed directly on the line; 3 of these workers staffed the inspection posts, one at each post.\nIn Y10, the Moslund Plant assembly line had an output of 250,000 units and generated a profit of $15,000,000.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Year 11",
+            "content": {
+              "text": "For Year 11 (Y11), the Moslund Plant assembly line was modernized as follows:\n\nConveyor-belt speeds were increased by a fixed percentage. \nThe assembly line’s administrative unit was restructured to maximize efficiency. \nEach inspection post was automated, and the 3 workers who formerly staffed the posts were laid off and were not replaced.\n\nThere were no other personnel changes on the assembly line for Y11.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Table",
+            "content": {
+              "text": "Moslund Plant Assembly Line Modernization, Y11",
+              "table": {
+                "headers": [
+                  "Element of modernization project",
+                  "Resulting increase in output for Y11 as % of Y10 output",
+                  "Resulting increase in profit for Y11 as % of Y10 profit",
+                  "Total cost to implement"
+                ],
+                "rows": [
+                  [
+                    "Inspection-post automation",
+                    "2%",
+                    "5%",
+                    "$100,000"
+                  ],
+                  [
+                    "Conveyor-belt speed increase",
+                    "3%",
+                    "4%",
+                    "$45,000"
+                  ],
+                  [
+                    "Administrative unit restructuring",
+                    "—",
+                    "1%",
+                    "$15,000"
+                  ],
+                  [
+                    "Total",
+                    "5%",
+                    "10%",
+                    "$160,000"
+                  ]
+                ]
+              },
+              "images": []
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "For each of the following statements about the Moslund Plant assembly line in Y11, select Yes if it is true based solely on the information provided. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "The assembly line generated a profit of $16,500,000.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Total output from the assembly line increased by 25,000 units over the total output for Y10.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Administrative unit restructuring accounted for 1% of the total profit.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 1
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/42",
+      "source": "GMAT HERO",
+      "difficulty": "easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Projects",
+            "content": {
+              "text": "At a certain company, successful projects proceed through 8 stages—Stages A through H. An active project is one that is currently in one of these 8 stages. If a stage of a project is completed during a given day, the project is immediately moved to the next stage. At the end of each day, the current stage of each active project is recorded. Some stages require as little as 1 day of work, and none requires more than 3 days of work. A project is said to be delayed if it spends more time at a stage than is required to complete the work. If a project is canceled, the current stage for the day is recorded as Stage X, and the project is no longer considered an active project.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Stages and Clusters",
+            "content": {
+              "text": "For any given project, the diagram shows the progression of the stages of the project as well as the department of the individuals responsible for each stage. The stages—divided into the initial, intermediate, and final clusters—are each assumed to constitute some nominal fixed percentage (NFP) of the project's lifetime. In the diagram, each cluster percentage is the sum of the NFPs for the stages within the cluster.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID2277.png"
+              ]
+            }
+          },
+          {
+            "name": "Status History Reports",
+            "content": {
+              "text": "A status history report—a report containing the daily project status for any project that was active within a given timeframe—is produced by a computer program. Below is the report that was generated at the end of the day today, which is the fifth day of Week 7. The report shows, for example, that Project 75039 began on the second day of Week 6, spent 3 days each in Stages A and B, and has been in its current stage, Stage C, for 3 days.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID2278.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "Which one of the following statements is most strongly supported by the information presented in the tabs?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "The first stage of each project is handled by an individual from the administration department.",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "The final stage of each project is handled by an individual from the development department.",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "Stage F typically lasts 4–6 days.",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "Stage H typically lasts 1 day.",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Stage X typically comes immediately after Stage C.",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 1
+        },
+        {
+          "questionText": "For each of the following projects, select Delayed if it can be inferred from the information in the tabs that the project must have experienced a delay at one or more stages. Otherwise, select Not necessarily delayed.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Delayed",
+            "Not necessarily delayed"
+          ],
+          "statements": [
+            {
+              "text": "74154",
+              "correctAnswer": "Delayed"
+            },
+            {
+              "text": "74854",
+              "correctAnswer": "Delayed"
+            },
+            {
+              "text": "75745",
+              "correctAnswer": "Not necessarily delayed"
+            }
+          ],
+          "questionId": 2
+        },
+        {
+          "questionText": "For each of the following clusters of stages, select Yes if at least two active projects are currently in a stage within that cluster. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Initial cluster",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Intermediate cluster",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Final cluster",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/42",
+      "source": "GMAT HERO",
+      "difficulty": "easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Projects",
+            "content": {
+              "text": "At a certain company, successful projects proceed through 8 stages—Stages A through H. An active project is one that is currently in one of these 8 stages. If a stage of a project is completed during a given day, the project is immediately moved to the next stage. At the end of each day, the current stage of each active project is recorded. Some stages require as little as 1 day of work, and none requires more than 3 days of work. A project is said to be delayed if it spends more time at a stage than is required to complete the work. If a project is canceled, the current stage for the day is recorded as Stage X, and the project is no longer considered an active project.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Stages and Clusters",
+            "content": {
+              "text": "For any given project, the diagram shows the progression of the stages of the project as well as the department of the individuals responsible for each stage. The stages—divided into the initial, intermediate, and final clusters—are each assumed to constitute some nominal fixed percentage (NFP) of the project's lifetime. In the diagram, each cluster percentage is the sum of the NFPs for the stages within the cluster.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID2277.png"
+              ]
+            }
+          },
+          {
+            "name": "Status History Reports",
+            "content": {
+              "text": "A status history report—a report containing the daily project status for any project that was active within a given timeframe—is produced by a computer program. Below is the report that was generated at the end of the day today, which is the fifth day of Week 7. The report shows, for example, that Project 75039 began on the second day of Week 6, spent 3 days each in Stages A and B, and has been in its current stage, Stage C, for 3 days.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID2278.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "Which one of the following statements is most strongly supported by the information presented in the tabs?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "The first stage of each project is handled by an individual from the administration department.",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "The final stage of each project is handled by an individual from the development department.",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "Stage F typically lasts 4–6 days.",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "Stage H typically lasts 1 day.",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Stage X typically comes immediately after Stage C.",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 1
+        },
+        {
+          "questionText": "For each of the following projects, select Delayed if it can be inferred from the information in the tabs that the project must have experienced a delay at one or more stages. Otherwise, select Not necessarily delayed.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Delayed",
+            "Not necessarily delayed"
+          ],
+          "statements": [
+            {
+              "text": "74154",
+              "correctAnswer": "Delayed"
+            },
+            {
+              "text": "74854",
+              "correctAnswer": "Delayed"
+            },
+            {
+              "text": "75745",
+              "correctAnswer": "Not necessarily delayed"
+            }
+          ],
+          "questionId": 2
+        },
+        {
+          "questionText": "For each of the following clusters of stages, select Yes if at least two active projects are currently in a stage within that cluster. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Initial cluster",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Intermediate cluster",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Final cluster",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/42",
+      "source": "GMAT HERO",
+      "difficulty": "easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Projects",
+            "content": {
+              "text": "At a certain company, successful projects proceed through 8 stages—Stages A through H. An active project is one that is currently in one of these 8 stages. If a stage of a project is completed during a given day, the project is immediately moved to the next stage. At the end of each day, the current stage of each active project is recorded. Some stages require as little as 1 day of work, and none requires more than 3 days of work. A project is said to be delayed if it spends more time at a stage than is required to complete the work. If a project is canceled, the current stage for the day is recorded as Stage X, and the project is no longer considered an active project.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Stages and Clusters",
+            "content": {
+              "text": "For any given project, the diagram shows the progression of the stages of the project as well as the department of the individuals responsible for each stage. The stages—divided into the initial, intermediate, and final clusters—are each assumed to constitute some nominal fixed percentage (NFP) of the project's lifetime. In the diagram, each cluster percentage is the sum of the NFPs for the stages within the cluster.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID2277.png"
+              ]
+            }
+          },
+          {
+            "name": "Status History Reports",
+            "content": {
+              "text": "A status history report—a report containing the daily project status for any project that was active within a given timeframe—is produced by a computer program. Below is the report that was generated at the end of the day today, which is the fifth day of Week 7. The report shows, for example, that Project 75039 began on the second day of Week 6, spent 3 days each in Stages A and B, and has been in its current stage, Stage C, for 3 days.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID2278.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "Which one of the following statements is most strongly supported by the information presented in the tabs?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "The first stage of each project is handled by an individual from the administration department.",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "The final stage of each project is handled by an individual from the development department.",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "Stage F typically lasts 4–6 days.",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "Stage H typically lasts 1 day.",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Stage X typically comes immediately after Stage C.",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 1
+        },
+        {
+          "questionText": "For each of the following projects, select Delayed if it can be inferred from the information in the tabs that the project must have experienced a delay at one or more stages. Otherwise, select Not necessarily delayed.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Delayed",
+            "Not necessarily delayed"
+          ],
+          "statements": [
+            {
+              "text": "74154",
+              "correctAnswer": "Delayed"
+            },
+            {
+              "text": "74854",
+              "correctAnswer": "Delayed"
+            },
+            {
+              "text": "75745",
+              "correctAnswer": "Not necessarily delayed"
+            }
+          ],
+          "questionId": 2
+        },
+        {
+          "questionText": "For each of the following clusters of stages, select Yes if at least two active projects are currently in a stage within that cluster. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Initial cluster",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Intermediate cluster",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Final cluster",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/45",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "CCC",
+            "content": {
+              "text": "The ChildCare Center (CCC) is a medium-sized child care facility that offers daytime supervision and instruction on weekdays (Monday through Friday) for children up to the age of 5. There are many children who attend CCC every weekday, and a relatively small number attend fewer than 3 days per week.\nThe classroom assignment and daily fee paid to CCC for each child are determined by the child's age on Friday of the previous week.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1509.png"
+              ]
+            }
+          },
+          {
+            "name": "Regulations",
+            "content": {
+              "text": "The ratio of the number of classroom staff in a particular classroom to the number of children in that classroom is subject to local regulations—certain minimum staff-to-child ratios are to be met or exceeded in every classroom. The minimum ratio for a particular classroom is determined by the age of the youngest child in the classroom. The table shows these minimums. Each day, CCC assigns to each classroom the least number of staff members needed to comply with the local regulations.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1510.png"
+              ]
+            }
+          },
+          {
+            "name": "Week 2 Enrollment",
+            "content": {
+              "text": "The table shows the daily attendance at CCC for Week 2 of a recent fiscal year. The roster of children attending CCC—as well as the days of the week each child attended—was unchanged from Week 1 through Week 3.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1511.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "From the Saturday before Week 2 through the Friday of Week 2, exactly eight of the children in attendance at CCC had birthdays. Two children turned 1, one child turned 2, one child turned 3, and four children turned 4. All changes to classroom attendance from Week 2 to Week 3 were due to these birthdays. For each of the following classrooms, select More staff if more classroom staff members were assigned to that classroom on the Monday of Week 3 than on the Monday of Week 2. Otherwise, select Same/fewer staff.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "More staff",
+            "Same/fewer staff"
+          ],
+          "statements": [
+            {
+              "text": "Twos",
+              "correctAnswer": "Same/fewer staff"
+            },
+            {
+              "text": "Threes",
+              "correctAnswer": "Same/fewer staff"
+            },
+            {
+              "text": "FourFives",
+              "correctAnswer": "More staff"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "In the Ones classroom in Week 2, for which one of the following days was the ratio of classroom staff to children least?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "Monday",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "Tuesday",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "Wednesday",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "Thursday",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Friday",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "Suppose that, in an effort to reduce staffing costs for the Friday of Week 2, the director of CCC had considered combining some classes for that day. For each of the following combinations, select Decrease if combining those classes would have decreased the number of classroom staff needed, provided that no other changes had occurred. Otherwise, select Increase/no change.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Decrease",
+            "Increase/no change"
+          ],
+          "statements": [
+            {
+              "text": "Infant, Ones",
+              "correctAnswer": "Decrease"
+            },
+            {
+              "text": "Ones, Twos",
+              "correctAnswer": "Increase/no change"
+            },
+            {
+              "text": "Threes, FourFives",
+              "correctAnswer": "Decrease"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/45",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "CCC",
+            "content": {
+              "text": "The ChildCare Center (CCC) is a medium-sized child care facility that offers daytime supervision and instruction on weekdays (Monday through Friday) for children up to the age of 5. There are many children who attend CCC every weekday, and a relatively small number attend fewer than 3 days per week.\nThe classroom assignment and daily fee paid to CCC for each child are determined by the child's age on Friday of the previous week.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1509.png"
+              ]
+            }
+          },
+          {
+            "name": "Regulations",
+            "content": {
+              "text": "The ratio of the number of classroom staff in a particular classroom to the number of children in that classroom is subject to local regulations—certain minimum staff-to-child ratios are to be met or exceeded in every classroom. The minimum ratio for a particular classroom is determined by the age of the youngest child in the classroom. The table shows these minimums. Each day, CCC assigns to each classroom the least number of staff members needed to comply with the local regulations.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1510.png"
+              ]
+            }
+          },
+          {
+            "name": "Week 2 Enrollment",
+            "content": {
+              "text": "The table shows the daily attendance at CCC for Week 2 of a recent fiscal year. The roster of children attending CCC—as well as the days of the week each child attended—was unchanged from Week 1 through Week 3.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1511.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "From the Saturday before Week 2 through the Friday of Week 2, exactly eight of the children in attendance at CCC had birthdays. Two children turned 1, one child turned 2, one child turned 3, and four children turned 4. All changes to classroom attendance from Week 2 to Week 3 were due to these birthdays. For each of the following classrooms, select More staff if more classroom staff members were assigned to that classroom on the Monday of Week 3 than on the Monday of Week 2. Otherwise, select Same/fewer staff.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "More staff",
+            "Same/fewer staff"
+          ],
+          "statements": [
+            {
+              "text": "Twos",
+              "correctAnswer": "Same/fewer staff"
+            },
+            {
+              "text": "Threes",
+              "correctAnswer": "Same/fewer staff"
+            },
+            {
+              "text": "FourFives",
+              "correctAnswer": "More staff"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "In the Ones classroom in Week 2, for which one of the following days was the ratio of classroom staff to children least?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "Monday",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "Tuesday",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "Wednesday",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "Thursday",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Friday",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "Suppose that, in an effort to reduce staffing costs for the Friday of Week 2, the director of CCC had considered combining some classes for that day. For each of the following combinations, select Decrease if combining those classes would have decreased the number of classroom staff needed, provided that no other changes had occurred. Otherwise, select Increase/no change.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Decrease",
+            "Increase/no change"
+          ],
+          "statements": [
+            {
+              "text": "Infant, Ones",
+              "correctAnswer": "Decrease"
+            },
+            {
+              "text": "Ones, Twos",
+              "correctAnswer": "Increase/no change"
+            },
+            {
+              "text": "Threes, FourFives",
+              "correctAnswer": "Decrease"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/45",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "CCC",
+            "content": {
+              "text": "The ChildCare Center (CCC) is a medium-sized child care facility that offers daytime supervision and instruction on weekdays (Monday through Friday) for children up to the age of 5. There are many children who attend CCC every weekday, and a relatively small number attend fewer than 3 days per week.\nThe classroom assignment and daily fee paid to CCC for each child are determined by the child's age on Friday of the previous week.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1509.png"
+              ]
+            }
+          },
+          {
+            "name": "Regulations",
+            "content": {
+              "text": "The ratio of the number of classroom staff in a particular classroom to the number of children in that classroom is subject to local regulations—certain minimum staff-to-child ratios are to be met or exceeded in every classroom. The minimum ratio for a particular classroom is determined by the age of the youngest child in the classroom. The table shows these minimums. Each day, CCC assigns to each classroom the least number of staff members needed to comply with the local regulations.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1510.png"
+              ]
+            }
+          },
+          {
+            "name": "Week 2 Enrollment",
+            "content": {
+              "text": "The table shows the daily attendance at CCC for Week 2 of a recent fiscal year. The roster of children attending CCC—as well as the days of the week each child attended—was unchanged from Week 1 through Week 3.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1511.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "From the Saturday before Week 2 through the Friday of Week 2, exactly eight of the children in attendance at CCC had birthdays. Two children turned 1, one child turned 2, one child turned 3, and four children turned 4. All changes to classroom attendance from Week 2 to Week 3 were due to these birthdays. For each of the following classrooms, select More staff if more classroom staff members were assigned to that classroom on the Monday of Week 3 than on the Monday of Week 2. Otherwise, select Same/fewer staff.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "More staff",
+            "Same/fewer staff"
+          ],
+          "statements": [
+            {
+              "text": "Twos",
+              "correctAnswer": "Same/fewer staff"
+            },
+            {
+              "text": "Threes",
+              "correctAnswer": "Same/fewer staff"
+            },
+            {
+              "text": "FourFives",
+              "correctAnswer": "More staff"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "In the Ones classroom in Week 2, for which one of the following days was the ratio of classroom staff to children least?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "Monday",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "Tuesday",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "Wednesday",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "Thursday",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Friday",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "Suppose that, in an effort to reduce staffing costs for the Friday of Week 2, the director of CCC had considered combining some classes for that day. For each of the following combinations, select Decrease if combining those classes would have decreased the number of classroom staff needed, provided that no other changes had occurred. Otherwise, select Increase/no change.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Decrease",
+            "Increase/no change"
+          ],
+          "statements": [
+            {
+              "text": "Infant, Ones",
+              "correctAnswer": "Decrease"
+            },
+            {
+              "text": "Ones, Twos",
+              "correctAnswer": "Increase/no change"
+            },
+            {
+              "text": "Threes, FourFives",
+              "correctAnswer": "Decrease"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/48",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Discussion",
+            "content": {
+              "text": "The passage is based on a document published in 2005.\nThe rate of growth in global coffee consumption has been falling behind the rate of growth in global production, creating a scenario of recurring price crises that take a heavy toll on coffee producing countries. Programs to expand coffee consumption in coffee producing countries can improve the situation and make the cyclical crises less acute.\nIn mature markets, costs to increase consumption are probably higher than in emerging markets, such as Brazil, the largest coffee producer. The case of Brazil shows that probably the highest returns for institutional investments to develop coffee consumption are to be found in the emerging markets of coffee producing countries. A Brazilian institutional investment valued at US$25 million in 10 years brought about an increase in yearly coffee sales worth 40 times as much. Promotion of coffee consumption in coffee producing countries is likely to represent the best investment of scarce promotion resources because of this multiplier effect. There are huge gaps in per capita consumption between Brazil and many other smaller producers, some (such as Indonesia) with large populations.\nIt is often argued that the Brazilian promotion program worked only because there was a marked income increase within the same period. But income increases alone, without promotion, are not sufficient to increase coffee consumption. Actually, for the 20 years up to 2003 in Brazil, it was only during the period 1993 to 1998 that coffee consumption increased as income was increasing.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "First Graph",
+            "content": {
+              "text": "This graph shows the gaps between the quantities of coffee produced and the quantities of coffee consumed in the coffee producing countries. Only consumption is shown for Brazil; its 2003 production was much higher than that of Central America.\nCoffee Consumption in the Major Coffee Producing Countries",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0100.jpg"
+              ]
+            }
+          },
+          {
+            "name": "Second Graph",
+            "content": {
+              "text": "",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0099.jpg"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "For each of the following statements, select Yes if, based on the information provided in the passage or the first graph or both, the statement would have been true in 2003. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Coffee production and per capita coffee consumption in Brazil are significantly higher than in most of the major coffee producing countries.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The coffee consumed in the major coffee producing countries comes entirely from domestic production.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "As a means of boosting world coffee demand, increasing consumption of domestically produced coffee has greater potential in India than in China.",
+              "correctAnswer": "Yes"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "Which one of the following data ranges in the second graph most clearly indicates that the final sentence of the Discussion tab involves oversimplification?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "1998 to 2003",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "1992 to 1994",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "1987 to 1988",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "1988 to 1989",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "1994 to 1996",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "Assuming each of the following statements is true, select Yes if the statement helps explain trends shown in the second graph in a way that is consistent with information in the passage. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Brazil’s 10-year program to promote domestic coffee consumption through institutional investment began in 1993.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Worldwide demand for coffee began to fall in 1999, resulting in economic recessions in most coffee producing countries.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The Brazilian institutional investment that brought about a significant increase in yearly coffee sales had a positive impact on job growth and wages in Brazil for many years afterwards.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/48",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Discussion",
+            "content": {
+              "text": "The passage is based on a document published in 2005.\nThe rate of growth in global coffee consumption has been falling behind the rate of growth in global production, creating a scenario of recurring price crises that take a heavy toll on coffee producing countries. Programs to expand coffee consumption in coffee producing countries can improve the situation and make the cyclical crises less acute.\nIn mature markets, costs to increase consumption are probably higher than in emerging markets, such as Brazil, the largest coffee producer. The case of Brazil shows that probably the highest returns for institutional investments to develop coffee consumption are to be found in the emerging markets of coffee producing countries. A Brazilian institutional investment valued at US$25 million in 10 years brought about an increase in yearly coffee sales worth 40 times as much. Promotion of coffee consumption in coffee producing countries is likely to represent the best investment of scarce promotion resources because of this multiplier effect. There are huge gaps in per capita consumption between Brazil and many other smaller producers, some (such as Indonesia) with large populations.\nIt is often argued that the Brazilian promotion program worked only because there was a marked income increase within the same period. But income increases alone, without promotion, are not sufficient to increase coffee consumption. Actually, for the 20 years up to 2003 in Brazil, it was only during the period 1993 to 1998 that coffee consumption increased as income was increasing.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "First Graph",
+            "content": {
+              "text": "This graph shows the gaps between the quantities of coffee produced and the quantities of coffee consumed in the coffee producing countries. Only consumption is shown for Brazil; its 2003 production was much higher than that of Central America.\nCoffee Consumption in the Major Coffee Producing Countries",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0100.jpg"
+              ]
+            }
+          },
+          {
+            "name": "Second Graph",
+            "content": {
+              "text": "",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0099.jpg"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "For each of the following statements, select Yes if, based on the information provided in the passage or the first graph or both, the statement would have been true in 2003. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Coffee production and per capita coffee consumption in Brazil are significantly higher than in most of the major coffee producing countries.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The coffee consumed in the major coffee producing countries comes entirely from domestic production.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "As a means of boosting world coffee demand, increasing consumption of domestically produced coffee has greater potential in India than in China.",
+              "correctAnswer": "Yes"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "Which one of the following data ranges in the second graph most clearly indicates that the final sentence of the Discussion tab involves oversimplification?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "1998 to 2003",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "1992 to 1994",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "1987 to 1988",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "1988 to 1989",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "1994 to 1996",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "Assuming each of the following statements is true, select Yes if the statement helps explain trends shown in the second graph in a way that is consistent with information in the passage. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Brazil’s 10-year program to promote domestic coffee consumption through institutional investment began in 1993.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Worldwide demand for coffee began to fall in 1999, resulting in economic recessions in most coffee producing countries.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The Brazilian institutional investment that brought about a significant increase in yearly coffee sales had a positive impact on job growth and wages in Brazil for many years afterwards.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/48",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Discussion",
+            "content": {
+              "text": "The passage is based on a document published in 2005.\nThe rate of growth in global coffee consumption has been falling behind the rate of growth in global production, creating a scenario of recurring price crises that take a heavy toll on coffee producing countries. Programs to expand coffee consumption in coffee producing countries can improve the situation and make the cyclical crises less acute.\nIn mature markets, costs to increase consumption are probably higher than in emerging markets, such as Brazil, the largest coffee producer. The case of Brazil shows that probably the highest returns for institutional investments to develop coffee consumption are to be found in the emerging markets of coffee producing countries. A Brazilian institutional investment valued at US$25 million in 10 years brought about an increase in yearly coffee sales worth 40 times as much. Promotion of coffee consumption in coffee producing countries is likely to represent the best investment of scarce promotion resources because of this multiplier effect. There are huge gaps in per capita consumption between Brazil and many other smaller producers, some (such as Indonesia) with large populations.\nIt is often argued that the Brazilian promotion program worked only because there was a marked income increase within the same period. But income increases alone, without promotion, are not sufficient to increase coffee consumption. Actually, for the 20 years up to 2003 in Brazil, it was only during the period 1993 to 1998 that coffee consumption increased as income was increasing.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "First Graph",
+            "content": {
+              "text": "This graph shows the gaps between the quantities of coffee produced and the quantities of coffee consumed in the coffee producing countries. Only consumption is shown for Brazil; its 2003 production was much higher than that of Central America.\nCoffee Consumption in the Major Coffee Producing Countries",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0100.jpg"
+              ]
+            }
+          },
+          {
+            "name": "Second Graph",
+            "content": {
+              "text": "",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0099.jpg"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "For each of the following statements, select Yes if, based on the information provided in the passage or the first graph or both, the statement would have been true in 2003. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Coffee production and per capita coffee consumption in Brazil are significantly higher than in most of the major coffee producing countries.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The coffee consumed in the major coffee producing countries comes entirely from domestic production.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "As a means of boosting world coffee demand, increasing consumption of domestically produced coffee has greater potential in India than in China.",
+              "correctAnswer": "Yes"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "Which one of the following data ranges in the second graph most clearly indicates that the final sentence of the Discussion tab involves oversimplification?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "1998 to 2003",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "1992 to 1994",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "1987 to 1988",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "1988 to 1989",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "1994 to 1996",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "Assuming each of the following statements is true, select Yes if the statement helps explain trends shown in the second graph in a way that is consistent with information in the passage. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Brazil’s 10-year program to promote domestic coffee consumption through institutional investment began in 1993.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Worldwide demand for coffee began to fall in 1999, resulting in economic recessions in most coffee producing countries.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The Brazilian institutional investment that brought about a significant increase in yearly coffee sales had a positive impact on job growth and wages in Brazil for many years afterwards.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/51",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Credit Discussion",
+            "content": {
+              "text": "Credit in developing countries can be granted through formal or informal channels. Formal channels include institutions such as banks, credit cooperatives, and government agencies. Loans of this type accrue positive interest and are typically court enforced. Informal credit channels include relatives, friends, community members, moneylenders, rotating savings and credit associations, and informal intermediaries. Loans such as these may or may not accrue positive interest. Loans of either type may be used by the borrower for consumption or investment in a business.\nIn 1930s rural China, informal credit was sometimes court enforced. However, it was more often self-enforcing, especially in remote areas. With a positive–interest rate loan, the borrower would pay principal and interest. With a zero–interest rate loan, the borrower would repay the principal and provide some non-monetary resource in lieu of interest. For example, the borrower might have supplied land, labor, or draft animal services to the lender.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Loans Table",
+            "content": {
+              "text": "The table shows data from a comprehensive survey, conducted in 1936, of all households in 21 villages in what is now northeast China. It includes all loans reported as occurring during 1935. A loan involves security if and only if it involves a written (as opposed to a verbal) contract, the presence of a third-party guarantor, or collateral. Loans of fixed duration involve a well-defined repayment period.\nInformal Loans by Type and Attribute",
+              "table": {
+                "headers": [
+                  "",
+                  "Loan Type",
+                  "Zero Interest",
+                  "Positive Interest"
+                ],
+                "rows": [
+                  [
+                    "Number of loans",
+                    "363",
+                    "300"
+                  ],
+                  [
+                    "Seasonality:"
+                  ],
+                  [
+                    "Jan—Mar (%)",
+                    "32.5",
+                    "38.7"
+                  ],
+                  [
+                    "April—June (%)",
+                    "20.7",
+                    "21.3"
+                  ],
+                  [
+                    "July—Sep (%)",
+                    "13.2",
+                    "8.7"
+                  ],
+                  [
+                    "Oct—Dec (%)",
+                    "33.6",
+                    "31.3"
+                  ],
+                  [
+                    "Security:"
+                  ],
+                  [
+                    "Written (%)",
+                    "1.4",
+                    "10.3"
+                  ],
+                  [
+                    "Third Party (%)",
+                    "2.8",
+                    "12.7"
+                  ],
+                  [
+                    "Collateral (%)",
+                    "1.4",
+                    "10.3"
+                  ],
+                  [
+                    "Fixed duration (%)",
+                    "25.3",
+                    "51.3"
+                  ],
+                  [
+                    "Purpose:"
+                  ],
+                  [
+                    "Consumption (%)",
+                    "62.0",
+                    "58.7"
+                  ],
+                  [
+                    "Investment (%)",
+                    "33.1",
+                    "38.0"
+                  ],
+                  [
+                    "Other (%)",
+                    "5.0",
+                    "3.3"
+                  ]
+                ]
+              },
+              "images": []
+            }
+          },
+          {
+            "name": "Interest Rates",
+            "content": {
+              "text": "For the loans presented in the table, the graph shows the relationship between the average (arithmetic mean) annual interest rate by village and the percent of loan contracts that were negotiated at zero interest.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0675.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "If one of the loans in the survey is considered at random, with no prior knowledge of the village in which it was issued, which of the following factors would, if known, increase the probability that the loan is a zero–interest rate loan? Select Yes for each option that applies on the basis of the given information. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "The village’s mean annual interest rate in 1935 was greater than 45%.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The lender anticipated that the borrower would be unable to supply land, labor, or draft animal services in the future.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "The village’s mean annual interest rate in 1935 was less than 20%.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "The information in the table and graph most strongly indicates that which one of the following is true of the loans in the table?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "A greater number of zero–interest rate loans were negotiated in the village with the highest average annual interest rate than in the village with the second-highest rate.",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "A greater number of zero–interest rate loans than positive–interest rate loans were negotiated.",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "At least one zero–interest rate loan of fixed duration was used for consumption.",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "In more than half of the villages with average annual interest rates ranging from 20% to 30%, zero–interest rate loans predominated.",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Among loans that were not zero–interest rate loans, the majority were issued at interest rates of less than 40%.",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "According to the information provided, a lender who offered one of the zero–interest rate loans included in the table would accurately be described as making which of the following trade-offs? Select Yes for each option that applies. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Giving up a fixed duration of repayment in exchange for security",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Giving up interest payments in exchange for security",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Giving up interest payments in exchange for access to other resources",
+              "correctAnswer": "Yes"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/51",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Credit Discussion",
+            "content": {
+              "text": "Credit in developing countries can be granted through formal or informal channels. Formal channels include institutions such as banks, credit cooperatives, and government agencies. Loans of this type accrue positive interest and are typically court enforced. Informal credit channels include relatives, friends, community members, moneylenders, rotating savings and credit associations, and informal intermediaries. Loans such as these may or may not accrue positive interest. Loans of either type may be used by the borrower for consumption or investment in a business.\nIn 1930s rural China, informal credit was sometimes court enforced. However, it was more often self-enforcing, especially in remote areas. With a positive–interest rate loan, the borrower would pay principal and interest. With a zero–interest rate loan, the borrower would repay the principal and provide some non-monetary resource in lieu of interest. For example, the borrower might have supplied land, labor, or draft animal services to the lender.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Loans Table",
+            "content": {
+              "text": "The table shows data from a comprehensive survey, conducted in 1936, of all households in 21 villages in what is now northeast China. It includes all loans reported as occurring during 1935. A loan involves security if and only if it involves a written (as opposed to a verbal) contract, the presence of a third-party guarantor, or collateral. Loans of fixed duration involve a well-defined repayment period.\nInformal Loans by Type and Attribute",
+              "table": {
+                "headers": [
+                  "",
+                  "Loan Type",
+                  "Zero Interest",
+                  "Positive Interest"
+                ],
+                "rows": [
+                  [
+                    "Number of loans",
+                    "363",
+                    "300"
+                  ],
+                  [
+                    "Seasonality:"
+                  ],
+                  [
+                    "Jan—Mar (%)",
+                    "32.5",
+                    "38.7"
+                  ],
+                  [
+                    "April—June (%)",
+                    "20.7",
+                    "21.3"
+                  ],
+                  [
+                    "July—Sep (%)",
+                    "13.2",
+                    "8.7"
+                  ],
+                  [
+                    "Oct—Dec (%)",
+                    "33.6",
+                    "31.3"
+                  ],
+                  [
+                    "Security:"
+                  ],
+                  [
+                    "Written (%)",
+                    "1.4",
+                    "10.3"
+                  ],
+                  [
+                    "Third Party (%)",
+                    "2.8",
+                    "12.7"
+                  ],
+                  [
+                    "Collateral (%)",
+                    "1.4",
+                    "10.3"
+                  ],
+                  [
+                    "Fixed duration (%)",
+                    "25.3",
+                    "51.3"
+                  ],
+                  [
+                    "Purpose:"
+                  ],
+                  [
+                    "Consumption (%)",
+                    "62.0",
+                    "58.7"
+                  ],
+                  [
+                    "Investment (%)",
+                    "33.1",
+                    "38.0"
+                  ],
+                  [
+                    "Other (%)",
+                    "5.0",
+                    "3.3"
+                  ]
+                ]
+              },
+              "images": []
+            }
+          },
+          {
+            "name": "Interest Rates",
+            "content": {
+              "text": "For the loans presented in the table, the graph shows the relationship between the average (arithmetic mean) annual interest rate by village and the percent of loan contracts that were negotiated at zero interest.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0675.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "If one of the loans in the survey is considered at random, with no prior knowledge of the village in which it was issued, which of the following factors would, if known, increase the probability that the loan is a zero–interest rate loan? Select Yes for each option that applies on the basis of the given information. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "The village’s mean annual interest rate in 1935 was greater than 45%.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The lender anticipated that the borrower would be unable to supply land, labor, or draft animal services in the future.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "The village’s mean annual interest rate in 1935 was less than 20%.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "The information in the table and graph most strongly indicates that which one of the following is true of the loans in the table?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "A greater number of zero–interest rate loans were negotiated in the village with the highest average annual interest rate than in the village with the second-highest rate.",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "A greater number of zero–interest rate loans than positive–interest rate loans were negotiated.",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "At least one zero–interest rate loan of fixed duration was used for consumption.",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "In more than half of the villages with average annual interest rates ranging from 20% to 30%, zero–interest rate loans predominated.",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Among loans that were not zero–interest rate loans, the majority were issued at interest rates of less than 40%.",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "According to the information provided, a lender who offered one of the zero–interest rate loans included in the table would accurately be described as making which of the following trade-offs? Select Yes for each option that applies. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Giving up a fixed duration of repayment in exchange for security",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Giving up interest payments in exchange for security",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Giving up interest payments in exchange for access to other resources",
+              "correctAnswer": "Yes"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/51",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Credit Discussion",
+            "content": {
+              "text": "Credit in developing countries can be granted through formal or informal channels. Formal channels include institutions such as banks, credit cooperatives, and government agencies. Loans of this type accrue positive interest and are typically court enforced. Informal credit channels include relatives, friends, community members, moneylenders, rotating savings and credit associations, and informal intermediaries. Loans such as these may or may not accrue positive interest. Loans of either type may be used by the borrower for consumption or investment in a business.\nIn 1930s rural China, informal credit was sometimes court enforced. However, it was more often self-enforcing, especially in remote areas. With a positive–interest rate loan, the borrower would pay principal and interest. With a zero–interest rate loan, the borrower would repay the principal and provide some non-monetary resource in lieu of interest. For example, the borrower might have supplied land, labor, or draft animal services to the lender.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Loans Table",
+            "content": {
+              "text": "The table shows data from a comprehensive survey, conducted in 1936, of all households in 21 villages in what is now northeast China. It includes all loans reported as occurring during 1935. A loan involves security if and only if it involves a written (as opposed to a verbal) contract, the presence of a third-party guarantor, or collateral. Loans of fixed duration involve a well-defined repayment period.\nInformal Loans by Type and Attribute",
+              "table": {
+                "headers": [
+                  "",
+                  "Loan Type",
+                  "Zero Interest",
+                  "Positive Interest"
+                ],
+                "rows": [
+                  [
+                    "Number of loans",
+                    "363",
+                    "300"
+                  ],
+                  [
+                    "Seasonality:"
+                  ],
+                  [
+                    "Jan—Mar (%)",
+                    "32.5",
+                    "38.7"
+                  ],
+                  [
+                    "April—June (%)",
+                    "20.7",
+                    "21.3"
+                  ],
+                  [
+                    "July—Sep (%)",
+                    "13.2",
+                    "8.7"
+                  ],
+                  [
+                    "Oct—Dec (%)",
+                    "33.6",
+                    "31.3"
+                  ],
+                  [
+                    "Security:"
+                  ],
+                  [
+                    "Written (%)",
+                    "1.4",
+                    "10.3"
+                  ],
+                  [
+                    "Third Party (%)",
+                    "2.8",
+                    "12.7"
+                  ],
+                  [
+                    "Collateral (%)",
+                    "1.4",
+                    "10.3"
+                  ],
+                  [
+                    "Fixed duration (%)",
+                    "25.3",
+                    "51.3"
+                  ],
+                  [
+                    "Purpose:"
+                  ],
+                  [
+                    "Consumption (%)",
+                    "62.0",
+                    "58.7"
+                  ],
+                  [
+                    "Investment (%)",
+                    "33.1",
+                    "38.0"
+                  ],
+                  [
+                    "Other (%)",
+                    "5.0",
+                    "3.3"
+                  ]
+                ]
+              },
+              "images": []
+            }
+          },
+          {
+            "name": "Interest Rates",
+            "content": {
+              "text": "For the loans presented in the table, the graph shows the relationship between the average (arithmetic mean) annual interest rate by village and the percent of loan contracts that were negotiated at zero interest.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID0675.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "If one of the loans in the survey is considered at random, with no prior knowledge of the village in which it was issued, which of the following factors would, if known, increase the probability that the loan is a zero–interest rate loan? Select Yes for each option that applies on the basis of the given information. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "The village’s mean annual interest rate in 1935 was greater than 45%.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "The lender anticipated that the borrower would be unable to supply land, labor, or draft animal services in the future.",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "The village’s mean annual interest rate in 1935 was less than 20%.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 1
+        },
+        {
+          "questionText": "The information in the table and graph most strongly indicates that which one of the following is true of the loans in the table?",
+          "questionType": "multipleChoice",
+          "options": [
+            {
+              "letter": "A",
+              "text": "A greater number of zero–interest rate loans were negotiated in the village with the highest average annual interest rate than in the village with the second-highest rate.",
+              "isCorrect": false
+            },
+            {
+              "letter": "B",
+              "text": "A greater number of zero–interest rate loans than positive–interest rate loans were negotiated.",
+              "isCorrect": false
+            },
+            {
+              "letter": "C",
+              "text": "At least one zero–interest rate loan of fixed duration was used for consumption.",
+              "isCorrect": false
+            },
+            {
+              "letter": "D",
+              "text": "In more than half of the villages with average annual interest rates ranging from 20% to 30%, zero–interest rate loans predominated.",
+              "isCorrect": false
+            },
+            {
+              "letter": "E",
+              "text": "Among loans that were not zero–interest rate loans, the majority were issued at interest rates of less than 40%.",
+              "isCorrect": false
+            }
+          ],
+          "correctAnswer": null,
+          "questionId": 2
+        },
+        {
+          "questionText": "According to the information provided, a lender who offered one of the zero–interest rate loans included in the table would accurately be described as making which of the following trade-offs? Select Yes for each option that applies. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Giving up a fixed duration of repayment in exchange for security",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Giving up interest payments in exchange for security",
+              "correctAnswer": "No"
+            },
+            {
+              "text": "Giving up interest payments in exchange for access to other resources",
+              "correctAnswer": "Yes"
+            }
+          ],
+          "questionId": 3
+        }
+      ]
+    },
+    {
+      "questionSetLink": "https://gmat-hero-v2.web.app/pages/study/og-di/OG-IR-01/practice/54",
+      "source": "GMAT HERO",
+      "difficulty": "medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Discussion",
+            "content": {
+              "text": "Metro Research is moving into a new office space, configured as shown in the Floor Plan, with eight individual offices (111, 112, 114, 115, 116, 117, 120, and 121) and four cubicles (119A through 119D). Each employee will be assigned exactly one workspace—an office or a cubicle—with no more than one employee per office or cubicle. Supervisors will not be assigned workspace in cubicles. If an employee has an immediate supervisor, the employee’s office or cubicle must be adjacent to that supervisor’s office.",
+              "table": null,
+              "images": []
+            }
+          },
+          {
+            "name": "Table",
+            "content": {
+              "text": "The table lists the ten employees at Metro Research and shows each employee’s immediate supervisor, if any. The supervisors are also employees, so each supervisor’s name appears in both columns.",
+              "table": {
+                "headers": [
+                  "Employee",
+                  "Supervisor"
+                ],
+                "rows": [
+                  [
+                    "Salena",
+                    "Ciaran"
+                  ],
+                  [
+                    "Richard",
+                    "Kim"
+                  ],
+                  [
+                    "Kim",
+                    ""
+                  ],
+                  [
+                    "Pablo",
+                    "Leila"
+                  ],
+                  [
+                    "Leila",
+                    ""
+                  ],
+                  [
+                    "Atticus",
+                    "Jamal"
+                  ],
+                  [
+                    "Elena",
+                    "Ciaran"
+                  ],
+                  [
+                    "Jamal",
+                    ""
+                  ],
+                  [
+                    "Mei",
+                    "Jamal"
+                  ],
+                  [
+                    "Ciaran",
+                    "Leila"
+                  ]
+                ]
+              },
+              "images": []
+            }
+          },
+          {
+            "name": "Floor Plan",
+            "content": {
+              "text": "The floor plan shows the office space that Metro Research will occupy, in the northeast corner of one floor of a building. Two offices are adjacent to each other if and only if they are separated by a common wall. A different definition of adjacent applies to cubicles: cubicles 119A and 119B are adjacent only to office 121, while 119C and 119D are adjacent only to office 120.",
+              "table": null,
+              "images": [
+                "../../../assets/img/question/amazonaws/GID1253.png"
+              ]
+            }
+          }
+        ]
+      },
+      "questions": [
+        {
+          "questionText": "For each of the following situations, select Yes if, based on the information and workspace assignment rules provided, it would PREVENT some employees from being assigned workspace using the current rules. Otherwise, select No.",
+          "questionType": "binary",
+          "choiceLabels": [
+            "Yes",
+            "No"
+          ],
+          "statements": [
+            {
+              "text": "Mei, Pablo, and Selena need offices because the projects they work on require the highest levels of security.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Two additional employees are hired and will be supervised by Jamal.",
+              "correctAnswer": "Yes"
+            },
+            {
+              "text": "Richard resigns his position at Metro Research.",
+              "correctAnswer": "No"
+            }
+          ],
+          "questionId": 1
+        }
+      ]
+    }
+  ]
+}

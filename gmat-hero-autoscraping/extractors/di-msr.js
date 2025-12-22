@@ -7,17 +7,61 @@ import {
     decodeHtmlEntities,
     delay,
     getPracticeUrl,
-    extractGMATHeroMetadata
+    extractGMATHeroMetadata,
+    escapeCurrencyInElement,
+    normalizeCurrency,
+    processKaTeX
 } from '../utils.js';
 
 // MSR state - questions share data sources
 let questionSet = null;
+let lastTabSignature = null;  // Track tab headers to detect new question sets
 
 /**
  * Reset the question set (call when starting a new extraction session)
  */
 export function reset() {
     questionSet = null;
+    lastTabSignature = null;
+}
+
+/**
+ * Get a signature of the current tab headers to detect new question sets
+ * @returns {string} Concatenated tab header names
+ */
+function getTabSignature() {
+    const irMsr = document.querySelector('.ir-msr');
+    if (!irMsr) return '';
+
+    const tabHeaders = irMsr.querySelectorAll('.p-tabview-nav li a span');
+    const names = [];
+    tabHeaders.forEach(th => {
+        names.push(th.textContent.trim());
+    });
+    return names.join('|');
+}
+
+/**
+ * Check if we've moved to a new question set (different data sources)
+ * @returns {boolean} True if this is a new question set
+ */
+function isNewQuestionSet() {
+    const currentSignature = getTabSignature();
+
+    // If no previous signature, it's the first set
+    if (!lastTabSignature) {
+        return true;
+    }
+
+    // Compare signatures - different tabs = new question set
+    if (currentSignature !== lastTabSignature) {
+        console.log('New MSR question set detected - tab signature changed');
+        console.log('Previous:', lastTabSignature);
+        console.log('Current:', currentSignature);
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -72,7 +116,11 @@ async function extractDataSources() {
             const imgsToRemove = clonedDiv.querySelectorAll('img');
             imgsToRemove.forEach(img => img.remove());
 
-            content.text = decodeHtmlEntities(clonedDiv.textContent.trim());
+            // Process KaTeX math expressions
+            escapeCurrencyInElement(clonedDiv);
+            processKaTeX(clonedDiv);
+
+            content.text = normalizeCurrency(decodeHtmlEntities(clonedDiv.textContent.trim()));
 
             // Extract table if present
             const table = textDiv.querySelector('table.embed-table') || textDiv.querySelector('table');
@@ -106,9 +154,22 @@ async function extractDataSources() {
 
             // Extract images
             const images = textDiv.querySelectorAll('img');
+            const BASE_URL = 'https://gmat-hero-v2.web.app';
             images.forEach(img => {
-                const src = img.getAttribute('src');
+                let src = img.getAttribute('src');
                 if (src) {
+                    // Normalize to full URL if relative path
+                    if (!src.startsWith('http')) {
+                        // Handle relative paths - use fixed GMAT Hero base URL
+                        if (src.startsWith('../') || src.startsWith('./')) {
+                            // Resolve relative to /assets/img/question/
+                            src = new URL(src, BASE_URL + '/assets/img/question/').href;
+                        } else if (src.startsWith('/')) {
+                            src = BASE_URL + src;
+                        } else {
+                            src = BASE_URL + '/' + src;
+                        }
+                    }
                     content.images.push(src);
                 }
             });
@@ -116,6 +177,9 @@ async function extractDataSources() {
 
         tabs.push({ name: tabName, content });
     }
+
+    // Update the tab signature after successful extraction
+    lastTabSignature = getTabSignature();
 
     return { tabs };
 }
@@ -131,7 +195,12 @@ function extractQuestion() {
         console.warn('No question stem found');
         return null;
     }
-    const questionText = decodeHtmlEntities(questionStem.textContent.trim());
+
+    // Clone and process question stem for KaTeX
+    const stemClone = questionStem.cloneNode(true);
+    escapeCurrencyInElement(stemClone);
+    processKaTeX(stemClone);
+    const questionText = normalizeCurrency(decodeHtmlEntities(stemClone.textContent.trim()));
 
     // Detect question type
     const yesNoQuestion = document.querySelector('.yes-no-question');
@@ -160,7 +229,11 @@ function extractQuestion() {
 
             if (!statementTextDiv) break;
 
-            const statementText = statementTextDiv.textContent.trim();
+            // Process KaTeX in statement text
+            const statementClone = statementTextDiv.cloneNode(true);
+            escapeCurrencyInElement(statementClone);
+            processKaTeX(statementClone);
+            const statementText = normalizeCurrency(statementClone.textContent.trim());
 
             // Find correct answer
             let correctAnswer = null;
@@ -183,13 +256,21 @@ function extractQuestion() {
 
         const options = standardChoices.querySelectorAll('.option');
         options.forEach(option => {
-            const radioButton = option.querySelector('p-radiobutton input');
+            // The input is nested: p-radiobutton > div > div.p-hidden-accessible > input
+            const radioButton = option.querySelector('p-radiobutton input') ||
+                option.querySelector('p-radiobutton div input');
             const label = option.querySelector('label span');
 
-            if (radioButton && label) {
-                const letter = radioButton.value;
-                const text = decodeHtmlEntities(label.textContent.trim());
-                const isCorrect = option.querySelector('p-radiobutton')?.classList.contains('correct-answer');
+            if (label) {
+                const letter = radioButton?.value || '';
+
+                // Process KaTeX in option text
+                const labelClone = label.cloneNode(true);
+                escapeCurrencyInElement(labelClone);
+                processKaTeX(labelClone);
+                const text = normalizeCurrency(decodeHtmlEntities(labelClone.textContent.trim()));
+                const isCorrect = option.querySelector('p-radiobutton')?.classList.contains('correct-answer') ||
+                    option.classList.contains('correct-answer');
 
                 question.options.push({ letter, text, isCorrect });
 
@@ -212,8 +293,16 @@ export async function extractQuestionData() {
         // Extract metadata
         const metadata = extractGMATHeroMetadata();
 
-        // If this is the first question, extract data sources
-        if (!questionSet) {
+        // Check if we've moved to a new question set (different data sources)
+        const needsNewSet = isNewQuestionSet();
+
+        // If this is a new question set or first question, extract data sources
+        if (!questionSet || needsNewSet) {
+            // Reset if this is a new set
+            if (needsNewSet && questionSet) {
+                console.log('Resetting question set for new data sources');
+            }
+
             const dataSources = await extractDataSources();
             if (!dataSources) {
                 console.error('Failed to extract data sources');
@@ -223,12 +312,12 @@ export async function extractQuestionData() {
             questionSet = {
                 questionSetLink: getPracticeUrl(),
                 source: 'GMAT HERO',
-                difficulty: metadata.difficulty || '',
                 section: 'di',
                 questionType: 'di',
                 category: 'MSR',
                 dataSources: dataSources,
-                questions: []
+                questions: [],
+                _tabSignature: lastTabSignature  // Internal field for matching
             };
         }
 
@@ -239,8 +328,10 @@ export async function extractQuestionData() {
             return null;
         }
 
-        // Add question ID
+        // Add question ID, difficulty, and link
         question.questionId = questionSet.questions.length + 1;
+        question.questionLink = getPracticeUrl();
+        question.difficulty = metadata.difficulty || '';
 
         // Add question to set
         questionSet.questions.push(question);
@@ -254,3 +345,4 @@ export async function extractQuestionData() {
 }
 
 export default { extractQuestionData, reset };
+

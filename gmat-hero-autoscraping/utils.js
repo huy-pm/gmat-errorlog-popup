@@ -388,7 +388,7 @@ export function extractGMATHeroMetadata() {
 
 /**
  * Detect the current question type based on DOM structure
- * @returns {string|null} Question type: 'quant', 'cr', 'rc', 'di-gi', 'di-msr', 'di-ta', 'di-tpa', or null
+ * @returns {string|null} Question type: 'quant', 'ds', 'cr', 'rc', 'di-gi', 'di-msr', 'di-ta', 'di-tpa', or null
  */
 export function detectQuestionType() {
     // DI Types (check first as they have specific containers)
@@ -400,11 +400,36 @@ export function detectQuestionType() {
     // Verbal Types (use panel structure)
     if (document.querySelector('#left-panel .passage')) return 'rc';
 
-    // CR: has question stem but no passage and no KaTeX math
+    // Check for Data Sufficiency - look for DS answer choices pattern
+    // DS questions have standard answer choices containing "Statement (1)" or "Statement (2)"
+    const standardChoices = document.querySelector('.standard-choices');
+    if (standardChoices) {
+        const choicesText = standardChoices.textContent || '';
+        // Check if answer choices contain DS-specific patterns
+        if (choicesText.includes('Statement (1) ALONE') ||
+            choicesText.includes('Statement (2) ALONE') ||
+            choicesText.includes('BOTH statements (1) and (2)')) {
+            return 'ds';
+        }
+    }
+
     const hasQuestionStem = document.querySelector('#right-panel .question-stem');
     const hasPassage = document.querySelector('#left-panel .passage');
     const hasKaTeX = document.querySelector('.katex');
 
+    // Also check question stem for (1) and (2) pattern as backup
+    if (hasQuestionStem) {
+        const stemText = hasQuestionStem.textContent || '';
+        // DS questions have (1) and (2) statements in the question stem
+        const hasStatement1 = /\(1\)\s/.test(stemText);
+        const hasStatement2 = /\(2\)\s/.test(stemText);
+
+        if (hasStatement1 && hasStatement2) {
+            return 'ds';
+        }
+    }
+
+    // CR: has question stem but no passage and no KaTeX math
     if (hasQuestionStem && !hasPassage && !hasKaTeX) return 'cr';
 
     // Quant (has KaTeX math and not DI selectors)
@@ -422,6 +447,7 @@ export function getSectionFromType(questionType) {
     if (!questionType) return 'unknown';
 
     if (questionType === 'quant') return 'quant';
+    if (questionType === 'ds') return 'di';  // DS is under DI section
     if (questionType === 'cr' || questionType === 'rc') return 'verbal';
     if (questionType.startsWith('di-')) return 'di';
 
@@ -439,6 +465,7 @@ export function getCategoryFromType(questionType) {
         'di-msr': 'MSR',
         'di-ta': 'TA',
         'di-tpa': 'TPA',
+        'ds': 'DS',
         'cr': 'CR',
         'rc': 'RC',
         'quant': '' // Quant uses custom category from metadata

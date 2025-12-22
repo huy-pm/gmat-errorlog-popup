@@ -188,6 +188,7 @@ export function updateTypeBadge(type) {
         if (badgeEl) {
             const typeLabels = {
                 'quant': '📐 Quant',
+                'ds': '🧮 Data Sufficiency',
                 'cr': '💭 Critical Reasoning',
                 'rc': '📖 Reading Comprehension',
                 'di-gi': '📊 Graphics Interpretation',
@@ -273,6 +274,7 @@ export async function loadExtractor(type) {
 
     const extractorMap = {
         'quant': 'quant.js',
+        'ds': 'ds.js',
         'cr': 'cr.js',
         'rc': 'rc.js',
         'di-gi': 'di-gi.js',
@@ -366,7 +368,24 @@ export async function processLoop() {
         try {
             const data = await extractor.extractQuestionData();
             if (data) {
-                state.extractedQuestions.push(data);
+                // Special handling for MSR - it returns a question SET that accumulates
+                // We need to update the existing entry instead of pushing duplicates
+                if (questionType === 'di-msr') {
+                    // Find existing entry with same tab signature (same data sources)
+                    const existingIndex = state.extractedQuestions.findIndex(
+                        q => q._tabSignature && q._tabSignature === data._tabSignature
+                    );
+                    if (existingIndex >= 0) {
+                        // Update existing entry with accumulated questions
+                        state.extractedQuestions[existingIndex] = data;
+                    } else {
+                        // New question set
+                        state.extractedQuestions.push(data);
+                    }
+                } else {
+                    // Normal question types - push each question
+                    state.extractedQuestions.push(data);
+                }
                 updateCount(state.extractedQuestions.length);
                 console.log(`Extracted ${questionType} question:`, data);
             }

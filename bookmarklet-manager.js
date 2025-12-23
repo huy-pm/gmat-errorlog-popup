@@ -61,6 +61,11 @@
             script: '/gmat-hero-autoscraping/loader.js'
         },
         {
+            name: "GMAT OG - DI Auto",
+            description: "Auto-scrape GMAT Official Practice questions",
+            script: '/gmat-og-autoscraping/loader.js'
+        },
+        {
             name: "GMAT OG - Auto",
             description: "Auto-scrape GMAT Official Practice questions",
             script: '/gmat-og/gmat-og-autoscraping.js'

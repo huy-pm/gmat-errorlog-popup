@@ -1,0 +1,809 @@
+{
+  "totalRecords": 15,
+  "questions": [
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378443",
+      "source": "GMAT Official",
+      "difficulty": "Easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "GI",
+      "content": {
+        "image": "https://s3.amazonaws.com/wmx-api-production/courses/88452/images/GID0676.gif",
+        "questionText": "A company surveyed its managers and employees to determine how important flexibility is to them and whether they use any of the company's flexible offerings themselves.\n\nBased on the information provided, select from each drop-down menu the option that creates the most accurate statement.\n\nHourly employees Managers  are the group most likely to change their schedule.\n\nManagers  are the group least likely to telecommute and the group least likely to work a part-time schedule.",
+        "statements": [
+          {
+            "text": "Hourly employees Managers  are the group most likely to change their schedule.",
+            "options": [],
+            "correctAnswer": "Managers",
+            "userAnswer": "Hourly employees"
+          },
+          {
+            "text": "Managers  are the group least likely to telecommute and the group least likely to work a part-time schedule.",
+            "options": [],
+            "correctAnswer": "Managers",
+            "userAnswer": "Managers"
+          }
+        ]
+      },
+      "questionId": "100310"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378473",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "TA",
+      "content": {
+        "introText": "The table shows a jazz critic’s rankings of the sixteen best jazz albums.",
+        "table": {
+          "headers": [
+            "Rank",
+            "Main artist",
+            "Title",
+            "Label",
+            "Style",
+            "Year"
+          ],
+          "rows": [
+            [
+              "1",
+              "Miles Davis",
+              "Kind of Blue",
+              "Columbia",
+              "modal",
+              "1959"
+            ],
+            [
+              "2",
+              "John Coltrane",
+              "A Love Supreme",
+              "Impulse!",
+              "avant-garde",
+              "1964"
+            ],
+            [
+              "3",
+              "Charles Mingus",
+              "Mingus Ah Um",
+              "Columbia",
+              "soul jazz",
+              "1959"
+            ],
+            [
+              "4",
+              "Dave Brubeck",
+              "Time Out",
+              "Columbia",
+              "West Coast",
+              "1959"
+            ],
+            [
+              "5",
+              "Cannonball Adderly",
+              "Somethin' Else",
+              "Blue Note",
+              "hard bop",
+              "1958"
+            ],
+            [
+              "6",
+              "Sonny Rollins",
+              "Saxophone Colossus",
+              "Prestige",
+              "mixed",
+              "1956"
+            ],
+            [
+              "7",
+              "John Coltrane",
+              "Giant Steps",
+              "Atlantic",
+              "hard bop",
+              "1959"
+            ],
+            [
+              "8",
+              "Art Blakely",
+              "Moanin'",
+              "Blue Note",
+              "hard bop",
+              "1958"
+            ],
+            [
+              "9",
+              "Herbie Hancock",
+              "Maiden Voyage",
+              "Blue Note",
+              "modal",
+              "1965"
+            ],
+            [
+              "10",
+              "Thelonious Monk",
+              "Brilliant Corners",
+              "Riverside",
+              "bebop",
+              "1956"
+            ],
+            [
+              "11",
+              "Bill Evans",
+              "Waltz for Debby",
+              "Riverside",
+              "modal",
+              "1961"
+            ],
+            [
+              "12",
+              "Keith Jarrett",
+              "The Köln Concert",
+              "Universal",
+              "free jazz",
+              "1975"
+            ],
+            [
+              "13",
+              "Stan Getz, João Gilberto",
+              "Getz/Gilberto",
+              "Verve",
+              "bossa nova",
+              "1963"
+            ],
+            [
+              "14",
+              "Eric Dolphy",
+              "Out to Lunch!",
+              "Blue Note",
+              "avant-garde",
+              "1964"
+            ],
+            [
+              "15",
+              "John Coltrane",
+              "Blue Train",
+              "Blue Note",
+              "hard bop",
+              "1957"
+            ],
+            [
+              "16",
+              "Louis Armstrong",
+              "Hot Fives & Sevens",
+              "Columbia",
+              "Dixieland",
+              "1928"
+            ]
+          ]
+        },
+        "questionInstruction": "For each of the following statements, select Yes if the statement is true based on the information provided. Otherwise select No.",
+        "choiceLabels": [
+          "Yes",
+          "No"
+        ],
+        "statements": [
+          {
+            "text": "The most recent hard bop album listed is a John Coltrane album.",
+            "correctAnswer": "Yes"
+          },
+          {
+            "text": "Most of the Blue Note albums listed were released later than most of the Columbia albums listed.",
+            "correctAnswer": "No"
+          },
+          {
+            "text": "At least half of the albums listed as being released in the 1950s were in the hard bop style.",
+            "correctAnswer": "No"
+          }
+        ]
+      },
+      "questionId": "100325"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378483",
+      "source": "GMAT Official",
+      "difficulty": "Easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "TPA",
+      "content": {
+        "questionText": "Four students from Mistville and four from Fogtown will attend school in New York City this year, and each group will rent an apartment.\n\nType A apartments are each 1,390 square feet, have 2 bedrooms, a 10-by-10-foot kitchen, and are 4 miles from the school. The price per square foot per month is $1.94.\n\nType B apartments are each 1,250 square feet, have 3 bedrooms, an 11-by-11-foot kitchen, and are 3 miles from the school. The rent is $2,250 per month.\n\nType C apartments are each 1,210 square feet, have 2 bedrooms, a 7-by-9-foot kitchen, and are 4.5 miles from the school. The rent is $2,190 per month.\n\nThe Mistville students choose a type C apartment and the Fogtown students choose a type A apartment.\n\nAssume, for each group of students, that the group's choice of apartment type was based solely on an accurate assessment, using only the information above, of which apartment type met a particular criterion listed in the table. For each group, select that group's criterion. Make only two selections, one in each column.",
+        "columnHeaders": [
+          "Mistville students",
+          "Fogtown students"
+        ],
+        "rows": [
+          {
+            "text": "Lowest rent",
+            "optionValue": "A"
+          },
+          {
+            "text": "Largest kitchen (square footage)",
+            "optionValue": "B"
+          },
+          {
+            "text": "Greatest number of bedrooms",
+            "optionValue": "C"
+          },
+          {
+            "text": "Largest total square footage",
+            "optionValue": "D"
+          },
+          {
+            "text": "Fewest miles from school",
+            "optionValue": "E"
+          },
+          {
+            "text": "Lowest price per square foot",
+            "optionValue": "F"
+          }
+        ],
+        "correctAnswers": {
+          "column1": "A",
+          "column2": "D"
+        }
+      },
+      "questionId": "100379"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378503",
+      "source": "GMAT Official",
+      "difficulty": "Easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "TA",
+      "content": {
+        "introText": "The table lists 21 options for one-way air travel from Milwaukee, Wisconsin, to Seattle, Washington, on March 20, 2011. Each option is either a nonstop flight or a flight involving one or more stops and possible transfer to a different flight. For each option, the originating flight is the first flight in the sequence (or the single flight if it is nonstop), and the corresponding airline is the originating airline; the base price is the price quoted for the option, and the total price is the base price plus all applicable taxes and fees. The total trip time is the elapsed time from scheduled departure of the originating flight to scheduled arrival at the final destination.",
+        "table": {
+          "headers": [
+            "Originating airline",
+            "Originating flight number",
+            "Base price",
+            "Total price (base price plus faxes and fees)",
+            "Total trip time (hours)"
+          ],
+          "rows": [
+            [
+              "Air Tran",
+              "430",
+              "$201",
+              "$210",
+              "4.23"
+            ],
+            [
+              "Alaska",
+              "4171",
+              "$139",
+              "$158",
+              "7.38"
+            ],
+            [
+              "Continental",
+              "8091",
+              "$167",
+              "$186",
+              "7.28"
+            ],
+            [
+              "Delta",
+              "1071",
+              "$162",
+              "$181",
+              "8.45"
+            ],
+            [
+              "Delta",
+              "1756",
+              "$162",
+              "$177",
+              "7.13"
+            ],
+            [
+              "Delta",
+              "2588",
+              "$162",
+              "$181",
+              "7.50"
+            ],
+            [
+              "Delta",
+              "2784",
+              "$139",
+              "$158",
+              "8.08"
+            ],
+            [
+              "Delta",
+              "2788",
+              "$162",
+              "$181",
+              "6.20"
+            ],
+            [
+              "Delta",
+              "2881",
+              "$119",
+              "$138",
+              "8.22"
+            ],
+            [
+              "Delta",
+              "2883",
+              "$119",
+              "$138",
+              "6.38"
+            ],
+            [
+              "Delta",
+              "2885",
+              "$152",
+              "$171",
+              "6.07"
+            ],
+            [
+              "Delta",
+              "3914",
+              "$162",
+              "$177",
+              "7.32"
+            ],
+            [
+              "Delta",
+              "3954",
+              "$119",
+              "$138",
+              "7.12"
+            ],
+            [
+              "Frontier",
+              "212",
+              "$124",
+              "$143",
+              "7.35"
+            ],
+            [
+              "Frontier",
+              "369",
+              "$124",
+              "$143",
+              "6.20"
+            ],
+            [
+              "Frontier",
+              "371",
+              "$124",
+              "$143",
+              "7.53"
+            ],
+            [
+              "Frontier",
+              "789",
+              "$124",
+              "$143",
+              "5.90"
+            ],
+            [
+              "Frontier",
+              "1745",
+              "$124",
+              "$143",
+              "6.43"
+            ],
+            [
+              "United",
+              "6680",
+              "$167",
+              "$186",
+              "7.28"
+            ],
+            [
+              "US Airways",
+              "522",
+              "$119",
+              "$138",
+              "8.33"
+            ],
+            [
+              "US Airways",
+              "627",
+              "$152",
+              "$171",
+              "7.98"
+            ]
+          ]
+        },
+        "questionInstruction": "For each of the following statements, select Yes if the statement is true based on the information provided; otherwise select No.",
+        "choiceLabels": [
+          "Yes",
+          "No"
+        ],
+        "statements": [
+          {
+            "text": "For all options having the same base price, the applicable taxes and fees are equal.",
+            "correctAnswer": "No"
+          },
+          {
+            "text": "The median total trip time for the listed options is 7.28 hours.",
+            "correctAnswer": "Yes"
+          },
+          {
+            "text": "Assuming mean speeds of the planes are roughly equal and only one of the airlines listed offers a nonstop flight, Air Tran is that flight’s originating airline.",
+            "correctAnswer": "Yes"
+          }
+        ]
+      },
+      "questionId": "100394"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378513",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "GI",
+      "content": {
+        "image": "https://s3.amazonaws.com/wmx-api-production/courses/88452/images/GID1437.gif",
+        "questionText": "For each of the years 1995 through 2010, the graphic shows the year-end price, in pounds sterling (£), of 1 troy ounce of gold. The troy ounce is a unit of mass, and 1 troy ounce is approximately 31.1 grams.\n\nFrom each drop-down menu, select the option that creates the most accurate statement based on the information provided.\n\nIn2008 , the year-end price of 100 grams of gold was approximately £1,900 .",
+        "statements": [
+          {
+            "text": "In2008 , the year-end price of 100 grams of gold was approximately £1,900 .",
+            "options": [],
+            "correctAnswer": "1,900",
+            "userAnswer": "1,900"
+          }
+        ]
+      },
+      "questionId": "100472"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378523",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "TPA",
+      "content": {
+        "questionText": "For the last fiscal year, University X had total operating expenses of $750,000,000, of which staff compensation accounted for 52%. For the next fiscal year, University X will increase its total operating expenses by 2%, and staff compensation will account for 55% of total operating expenses. For each fiscal year, wages account for two-thirds of total staff compensation and benefits account for one-third of total staff compensation.\n\nIn the table, select for Total wages for next fiscal year and Total benefits for next fiscal year the total operating expenses devoted to wages and benefits, respectively, for the next fiscal year that are jointly consistent with the information provided. Make only two selections, one in each column.",
+        "columnHeaders": [
+          "Total wages for\n\t\t\t\tnext fiscal year",
+          "Total benefits for\n\t\t\t\tnext fiscal year"
+        ],
+        "rows": [
+          {
+            "text": "$130,000,000",
+            "optionValue": "A"
+          },
+          {
+            "text": "$132,600,000",
+            "optionValue": "B"
+          },
+          {
+            "text": "$140,250,000",
+            "optionValue": "C"
+          },
+          {
+            "text": "$260,000,000",
+            "optionValue": "D"
+          },
+          {
+            "text": "$265,200,000",
+            "optionValue": "E"
+          },
+          {
+            "text": "$280,500,000",
+            "optionValue": "F"
+          }
+        ],
+        "correctAnswers": {
+          "column1": "F",
+          "column2": "C"
+        }
+      },
+      "questionId": "100473"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378543",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Parking Study",
+            "content": {
+              "text": "City X conducted a one-day study of accumulation patterns in a city-owned parking garage that contains a total of 1,200 parking spaces. The graph summarizes the cumulative arrivals (number of automobiles that had arrived at the garage), cumulative departures (number of automobiles that had departed the garage), and accumulation (number of automobiles occupying the garage) at one-hour intervals from 5:00 a.m. to 7:00 p.m. on the day of the study.",
+              "images": [
+                "https://s3.amazonaws.com/wmx-api-production/courses/88452/images/GID1159.gif"
+              ]
+            }
+          },
+          {
+            "name": "Second",
+            "content": {
+              "text": "To monitor congestion, especially during the morning, City X is considering installation of a detection system at the parking garage. The system’s components include detectors at each of the garage’s 1,200 parking spaces, together with software and hardware to communicate real-time parking data to city residents via the Internet. In particular, the detection system communicates three types of parking alerts: a Green Alert is in effect whenever accumulation is in the range 0–500; a Yellow Alert is in effect whenever accumulation is in the range 501–1,000; and a Red Alert is in effect whenever accumulation is greater than 1,000.\n\nFor the detection system in this parking garage, City X estimates that the capital cost—the total cost associated with initial construction and implementation—would be $6,000,000, while the annual operating cost would be $800,000.",
+              "images": []
+            }
+          },
+          {
+            "name": "Third",
+            "content": {
+              "text": "City X is also considering building a new parking garage to ease congestion at the existing garage. For the new parking garage, the city estimates the average (arithmetic mean) capital cost per parking space would be $15,000 and the annual average operating cost per parking space would be $400. The estimated life span of the new garage is 30 years, at which time major reconstruction or replacement would be necessary.",
+              "images": []
+            }
+          }
+        ]
+      },
+      "content": {
+        "questionText": "Each of the following options describes a condition that occurred at least once between 5:00 a.m. and 7:00 p.m. on the day of the parking study. For each option, select Before 1:00 p.m. if the first such occurrence was before 1:00 p.m. Otherwise, select 1:00 p.m. or later.",
+        "questionType": "binary",
+        "statements": [
+          {
+            "text": "Cumulative arrivals were greater than accumulation.",
+            "correctAnswer": "Before 1:00 p.m.",
+            "userAnswer": "1:00 p.m. or later"
+          },
+          {
+            "text": "Cumulative arrivals were greater than 2 times cumulative departures.",
+            "correctAnswer": "Before 1:00 p.m.",
+            "userAnswer": "Before 1:00 p.m."
+          },
+          {
+            "text": "Cumulative departures were greater than accumulation.",
+            "correctAnswer": "1:00 p.m. or later",
+            "userAnswer": "1:00 p.m. or later"
+          }
+        ],
+        "choiceLabels": [
+          "Before 1:00 p.m.",
+          "1:00 p.m. or later"
+        ]
+      },
+      "questionId": "100441"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378563",
+      "source": "GMAT Official",
+      "difficulty": "Easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "MSR",
+      "dataSources": {
+        "tabs": [
+          {
+            "name": "Parking Study",
+            "content": {
+              "text": "City X conducted a one-day study of accumulation patterns in a city-owned parking garage that contains a total of 1,200 parking spaces. The graph summarizes the cumulative arrivals (number of automobiles that had arrived at the garage), cumulative departures (number of automobiles that had departed the garage), and accumulation (number of automobiles occupying the garage) at one-hour intervals from 5:00 a.m. to 7:00 p.m. on the day of the study.",
+              "images": [
+                "https://s3.amazonaws.com/wmx-api-production/courses/88452/images/GID1159.gif"
+              ]
+            }
+          },
+          {
+            "name": "Second",
+            "content": {
+              "text": "To monitor congestion, especially during the morning, City X is considering installation of a detection system at the parking garage. The system’s components include detectors at each of the garage’s 1,200 parking spaces, together with software and hardware to communicate real-time parking data to city residents via the Internet. In particular, the detection system communicates three types of parking alerts: a Green Alert is in effect whenever accumulation is in the range 0–500; a Yellow Alert is in effect whenever accumulation is in the range 501–1,000; and a Red Alert is in effect whenever accumulation is greater than 1,000.\n\nFor the detection system in this parking garage, City X estimates that the capital cost—the total cost associated with initial construction and implementation—would be $6,000,000, while the annual operating cost would be $800,000.",
+              "images": []
+            }
+          },
+          {
+            "name": "Third",
+            "content": {
+              "text": "City X is also considering building a new parking garage to ease congestion at the existing garage. For the new parking garage, the city estimates the average (arithmetic mean) capital cost per parking space would be $15,000 and the annual average operating cost per parking space would be $400. The estimated life span of the new garage is 30 years, at which time major reconstruction or replacement would be necessary.",
+              "images": []
+            }
+          }
+        ]
+      },
+      "content": {
+        "questionText": "If the detection system had been in operation on the day of the parking study, at which one of the following times would a Red Alert have been in effect?",
+        "questionType": "multipleChoice",
+        "options": [
+          {
+            "letter": "A",
+            "text": "3:00 p.m.",
+            "isCorrect": true
+          },
+          {
+            "letter": "B",
+            "text": "4:00 p.m.",
+            "isCorrect": false
+          },
+          {
+            "letter": "C",
+            "text": "5:00 p.m.",
+            "isCorrect": false
+          },
+          {
+            "letter": "D",
+            "text": "6:00 p.m.",
+            "isCorrect": false
+          },
+          {
+            "letter": "E",
+            "text": "7:00 p.m.",
+            "isCorrect": false
+          }
+        ],
+        "correctAnswer": "A"
+      },
+      "questionId": "100442"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378593",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "B",
+      "content": {
+        "questionText": "A scientist recorded the number of eggs in each of 10 birds’ nests. What was the standard deviation of the numbers of eggs in the 10 nests?",
+        "statements": [
+          "(1) The average (arithmetic mean) number of eggs for the 10 nests was 4.",
+          "(2) Each of the 10 nests contained the same number of eggs."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": null
+      },
+      "questionId": "100624"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378613",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "E",
+      "content": {
+        "questionText": "Guy's net income equals his gross income minus his deductions. By what percent did Guy's net income change on January 1, 1989, when both his gross income and his deductions increased?",
+        "statements": [
+          "(1) Guy's gross income increased by 4 percent on January 1, 1989.",
+          "(2) Guy's deductions increased by 15 percent on January 1, 1989."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": null
+      },
+      "questionId": "100862"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378633",
+      "source": "GMAT Official",
+      "difficulty": "Easy",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "D",
+      "content": {
+        "questionText": "The number of seats in the first row of an auditorium is 18 and the number of seats in each row thereafter is 2 more than in the previous row. What is the total number of seats in the rows of the auditorium?",
+        "statements": [
+          "(1) The number of rows of seats in the auditorium is 27.",
+          "(2) The number of seats in the last row is 70."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": null
+      },
+      "questionId": "100921"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378653",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "E",
+      "content": {
+        "questionText": "A certain high school with a total enrollment of 900 students held a science fair for three days last week. How many of the students enrolled in the high school attended the science fair on all three days?",
+        "statements": [
+          "(1) Of the students enrolled in the school, 30 percent attended the science fair on two or more days.",
+          "(2) Of the students enrolled in the school, 10 percent of those that attended the science fair on at least one day attended on all three days."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": null
+      },
+      "questionId": "100929"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378673",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "D",
+      "content": {
+        "questionText": "A collection of 36 cards consists of 4 sets of 9 cards each. The 9 cards in each set are numbered 1 through 9. If one card has been removed from the collection, what is the number on that card?",
+        "statements": [
+          "(1) The units digit of the sum of the numbers on the remaining 35 cards is 6.",
+          "(2) The sum of the numbers on the remaining 35 cards is 176."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": null
+      },
+      "questionId": "100993"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378693",
+      "source": "GMAT Official",
+      "difficulty": "Hard",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "C",
+      "content": {
+        "questionText": "A total of $60,000 was invested for one year. Part of this amount earned simple annual interest at the rate of x percent per year, and the rest earned simple annual interest at the rate of y percent per year. If the total interest earned by the $60,000 for that year was $4,080, what is the value of x ?",
+        "statements": [
+          "(1) ​​",
+          "(2) The ratio of the amount that earned interest at the rate of x percent per year to the amount that earned interest at the rate of y percent per year was 3 to 2."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": "data:image/svg+xml;base64,PHN2ZyBzdHlsZT0idmVydGljYWwtYWxpZ246IC0wLjc4MWV4OyIgeG1sbnM9%0AImh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNi44OWV4IiBo%0AZWlnaHQ9IjIuOTQyZXgiIHJvbGU9ImltZyIgZm9jdXNhYmxlPSJmYWxzZSIg%0Admlld0JveD0iMCAtOTU1LjIgMzA0NS42IDEzMDAuMiI+PGcgc3Ryb2tlPSJj%0AdXJyZW50Q29sb3IiIGZpbGw9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRo%0APSIwIiB0cmFuc2Zvcm09InNjYWxlKDEsLTEpIj48ZyBkYXRhLW1tbC1ub2Rl%0APSJtYXRoIj48ZyBkYXRhLW1tbC1ub2RlPSJtaSI+PHBhdGggZGF0YS1jPSIx%0ARDQ2NSIgZD0iTTUyIDI4OVE1OSAzMzEgMTA2IDM4NlQyMjIgNDQyUTI1NyA0%0ANDIgMjg2IDQyNFQzMjkgMzc5UTM3MSA0NDIgNDMwIDQ0MlE0NjcgNDQyIDQ5%0ANCA0MjBUNTIyIDM2MVE1MjIgMzMyIDUwOCAzMTRUNDgxIDI5MlQ0NTggMjg4%0AUTQzOSAyODggNDI3IDI5OVQ0MTUgMzI4UTQxNSAzNzQgNDY1IDM5MVE0NTQg%0ANDA0IDQyNSA0MDRRNDEyIDQwNCA0MDYgNDAyUTM2OCAzODYgMzUwIDMzNlEy%0AOTAgMTE1IDI5MCA3OFEyOTAgNTAgMzA2IDM4VDM0MSAyNlEzNzggMjYgNDE0%0AIDU5VDQ2MyAxNDBRNDY2IDE1MCA0NjkgMTUxVDQ4NSAxNTNINDg5UTUwNCAx%0ANTMgNTA0IDE0NVE1MDQgMTQ0IDUwMiAxMzRRNDg2IDc3IDQ0MCAzM1QzMzMg%0ALTExUTI2MyAtMTEgMjI3IDUyUTE4NiAtMTAgMTMzIC0xMEgxMjdRNzggLTEw%0AIDU3IDE2VDM1IDcxUTM1IDEwMyA1NCAxMjNUOTkgMTQzUTE0MiAxNDMgMTQy%0AIDEwMVExNDIgODEgMTMwIDY2VDEwNyA0NlQ5NCA0MUw5MSA0MFE5MSAzOSA5%0ANyAzNlQxMTMgMjlUMTMyIDI2UTE2OCAyNiAxOTQgNzFRMjAzIDg3IDIxNyAx%0AMzlUMjQ1IDI0N1QyNjEgMzEzUTI2NiAzNDAgMjY2IDM1MlEyNjYgMzgwIDI1%0AMSAzOTJUMjE3IDQwNFExNzcgNDA0IDE0MiAzNzJUOTMgMjkwUTkxIDI4MSA4%0AOCAyODBUNzIgMjc4SDU4UTUyIDI4NCA1MiAyODlaIj48L3BhdGg+PC9nPjxn%0AIGRhdGEtbW1sLW5vZGU9Im1vIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4NDku%0AOCwwKSI+PHBhdGggZGF0YS1jPSIzRCIgZD0iTTU2IDM0N1E1NiAzNjAgNzAg%0AMzY3SDcwN1E3MjIgMzU5IDcyMiAzNDdRNzIyIDMzNiA3MDggMzI4TDM5MCAz%0AMjdINzJRNTYgMzMyIDU2IDM0N1pNNTYgMTUzUTU2IDE2OCA3MiAxNzNINzA4%0AUTcyMiAxNjMgNzIyIDE1M1E3MjIgMTQwIDcwNyAxMzNINzBRNTYgMTQwIDU2%0AIDE1M1oiPjwvcGF0aD48L2c+PGcgZGF0YS1tbWwtbm9kZT0ibWZyYWMiIHRy%0AYW5zZm9ybT0idHJhbnNsYXRlKDE5MDUuNiwwKSI+PGcgZGF0YS1tbWwtbm9k%0AZT0ibXJvdyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjIwLDQ4NSkgc2NhbGUo%0AMC43MDcpIj48ZyBkYXRhLW1tbC1ub2RlPSJtbiI+PHBhdGggZGF0YS1jPSIz%0AMyIgZD0iTTEyNyA0NjNRMTAwIDQ2MyA4NSA0ODBUNjkgNTI0UTY5IDU3OSAx%0AMTcgNjIyVDIzMyA2NjVRMjY4IDY2NSAyNzcgNjY0UTM1MSA2NTIgMzkwIDYx%0AMVQ0MzAgNTIyUTQzMCA0NzAgMzk2IDQyMVQzMDIgMzUwTDI5OSAzNDhRMjk5%0AIDM0NyAzMDggMzQ1VDMzNyAzMzZUMzc1IDMxNVE0NTcgMjYyIDQ1NyAxNzVR%0ANDU3IDk2IDM5NSAzN1QyMzggLTIyUTE1OCAtMjIgMTAwIDIxVDQyIDEzMFE0%0AMiAxNTggNjAgMTc1VDEwNSAxOTNRMTMzIDE5MyAxNTEgMTc1VDE2OSAxMzBR%0AMTY5IDExOSAxNjYgMTEwVDE1OSA5NFQxNDggODJUMTM2IDc0VDEyNiA3MFQx%0AMTggNjdMMTE0IDY2UTE2NSAyMSAyMzggMjFRMjkzIDIxIDMyMSA3NFEzMzgg%0AMTA3IDMzOCAxNzVWMTk1UTMzOCAyOTAgMjc0IDMyMlEyNTkgMzI4IDIxMyAz%0AMjlMMTcxIDMzMEwxNjggMzMyUTE2NiAzMzUgMTY2IDM0OFExNjYgMzY2IDE3%0ANCAzNjZRMjAyIDM2NiAyMzIgMzcxUTI2NiAzNzYgMjk0IDQxM1QzMjIgNTI1%0AVjUzM1EzMjIgNTkwIDI4NyA2MTJRMjY1IDYyNiAyNDAgNjI2UTIwOCA2MjYg%0AMTgxIDYxNVQxNDMgNTkyVDEzMiA1ODBIMTM1UTEzOCA1NzkgMTQzIDU3OFQx%0ANTMgNTczVDE2NSA1NjZUMTc1IDU1NVQxODMgNTQwVDE4NiA1MjBRMTg2IDQ5%0AOCAxNzIgNDgxVDEyNyA0NjNaIj48L3BhdGg+PC9nPjxnIGRhdGEtbW1sLW5v%0AZGU9Im1pIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1MDAsMCkiPjxwYXRoIGRh%0AdGEtYz0iMUQ0NjYiIGQ9Ik0yMSAyODdRMjEgMzAxIDM2IDMzNVQ4NCA0MDZU%0AMTU4IDQ0MlExOTkgNDQyIDIyNCA0MTlUMjUwIDM1NVEyNDggMzM2IDI0NyAz%0AMzRRMjQ3IDMzMSAyMzEgMjg4VDE5OCAxOTFUMTgyIDEwNVExODIgNjIgMTk2%0AIDQ1VDIzOCAyN1EyNjEgMjcgMjgxIDM4VDMxMiA2MVQzMzkgOTRRMzM5IDk1%0AIDM0NCAxMTRUMzU4IDE3M1QzNzcgMjQ3UTQxNSAzOTcgNDE5IDQwNFE0MzIg%0ANDMxIDQ2MiA0MzFRNDc1IDQzMSA0ODMgNDI0VDQ5NCA0MTJUNDk2IDQwM1E0%0AOTYgMzkwIDQ0NyAxOTNUMzkxIC0yM1EzNjMgLTEwNiAyOTQgLTE1NVQxNTYg%0ALTIwNVExMTEgLTIwNSA3NyAtMTgzVDQzIC0xMTdRNDMgLTk1IDUwIC04MFQ2%0AOSAtNThUODkgLTQ4VDEwNiAtNDVRMTUwIC00NSAxNTAgLTg3UTE1MCAtMTA3%0AIDEzOCAtMTIyVDExNSAtMTQyVDEwMiAtMTQ3TDk5IC0xNDhRMTAxIC0xNTMg%0AMTE4IC0xNjBUMTUyIC0xNjdIMTYwUTE3NyAtMTY3IDE4NiAtMTY1UTIxOSAt%0AMTU2IDI0NyAtMTI3VDI5MCAtNjVUMzEzIC05VDMyMSAyMUwzMTUgMTdRMzA5%0AIDEzIDI5NiA2VDI3MCAtNlEyNTAgLTExIDIzMSAtMTFRMTg1IC0xMSAxNTAg%0AMTFUMTA0IDgyUTEwMyA4OSAxMDMgMTEzUTEwMyAxNzAgMTM4IDI2MlQxNzMg%0AMzc5UTE3MyAzODAgMTczIDM4MVExNzMgMzkwIDE3MyAzOTNUMTY5IDQwMFQx%0ANTggNDA0SDE1NFExMzEgNDA0IDExMiAzODVUODIgMzQ0VDY1IDMwMlQ1NyAy%0AODBRNTUgMjc4IDQxIDI3OEgyN1EyMSAyODQgMjEgMjg3WiI+PC9wYXRoPjwv%0AZz48L2c+PGcgZGF0YS1tbWwtbm9kZT0ibW4iIHRyYW5zZm9ybT0idHJhbnNs%0AYXRlKDM5My4yLC0zNDUpIHNjYWxlKDAuNzA3KSI+PHBhdGggZGF0YS1jPSIz%0ANCIgZD0iTTQ2MiAwUTQ0NCAzIDMzMyAzUTIxNyAzIDE5OSAwSDE5MFY0Nkgy%0AMjFRMjQxIDQ2IDI0OCA0NlQyNjUgNDhUMjc5IDUzVDI4NiA2MVEyODcgNjMg%0AMjg3IDExNVYxNjVIMjhWMjExTDE3OSA0NDJRMzMyIDY3NCAzMzQgNjc1UTMz%0ANiA2NzcgMzU1IDY3N0gzNzNMMzc5IDY3MVYyMTFINDcxVjE2NUgzNzlWMTE0%0AUTM3OSA3MyAzNzkgNjZUMzg1IDU0UTM5MyA0NyA0NDIgNDZINDcxVjBINDYy%0AWk0yOTMgMjExVjU0NUw3NCAyMTJMMTgzIDIxMUgyOTNaIj48L3BhdGg+PC9n%0APjxyZWN0IHdpZHRoPSI5MDAiIGhlaWdodD0iNjAiIHg9IjEyMCIgeT0iMjIw%0AIj48L3JlY3Q+PC9nPjwvZz48L2c+PC9zdmc+%0A"
+      },
+      "questionId": "100118"
+    },
+    {
+      "questionLink": "https://gmatofficialpractice.mba.com/app/gmat-official-guide-2025-2026-online-question-bank#exams/answers/326581302/24378723",
+      "source": "GMAT Official",
+      "difficulty": "Medium",
+      "section": "di",
+      "questionType": "di",
+      "category": "DS",
+      "correctAnswer": "E",
+      "content": {
+        "questionText": "If the ratio of the number of teachers to the number of students is the same in School District M and School District P, what is the ratio of the number of students in School District M to the number of students in School District P ?",
+        "statements": [
+          "(1) There are 10,000 more students in School District M than there are in School District P.",
+          "(2) The ratio of the number of teachers to the number of students in School District M is 1 to 20."
+        ],
+        "answerChoices": [
+          "Statement (1) ALONE is sufficient, but statement (2) alone is not sufficient.",
+          "Statement (2) ALONE is sufficient, but statement (1) alone is not sufficient.",
+          "BOTH statements TOGETHER are sufficient, but NEITHER statement ALONE is sufficient.",
+          "EACH statement ALONE is sufficient.",
+          "Statements (1) and (2) TOGETHER are NOT sufficient."
+        ],
+        "image": null
+      },
+      "questionId": "100164"
+    }
+  ]
+}

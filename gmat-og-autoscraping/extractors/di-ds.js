@@ -104,11 +104,8 @@ export function extractQuestionData(difficulty = '') {
                     statement2 = text;
                 }
             } else {
-                // This is part of the question text (before statements)
-                // Only add if we haven't found any statements yet
-                if (!statement1 && !statement2) {
-                    questionParts.push(text);
-                }
+                // This is part of the question text (not a statement paragraph)
+                questionParts.push(text);
             }
         }
 

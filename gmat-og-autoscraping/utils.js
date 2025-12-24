@@ -53,8 +53,8 @@ export function delay(ms) {
 
 // Detect question type from OG Practice page (DI types)
 export function detectQuestionType() {
-    // Graphics Interpretation: has inline dropdown results
-    if (document.querySelector('.inline-result')) {
+    // Graphics Interpretation: has inline dropdown results or inline select elements
+    if (document.querySelector('.inline-result') || document.querySelector('select.question-choices-inline')) {
         return "GI";
     }
 
@@ -73,9 +73,21 @@ export function detectQuestionType() {
         return "TPA";
     }
 
-    // Data Sufficiency: has DS statements
+    // Data Sufficiency: has DS statements classes OR has the specific DS answer choices
     if (document.querySelector('.ds-statement1') || document.querySelector('.ds-statement2')) {
         return "DS";
+    }
+
+    // Check for DS by looking at the answer choices text pattern
+    // DS questions always have this specific answer choice: "Statement (1) ALONE is sufficient"
+    var choiceContainer = document.querySelector('.question-choices-multi');
+    if (choiceContainer) {
+        var choiceTexts = choiceContainer.textContent || '';
+        if (choiceTexts.includes('Statement (1) ALONE is sufficient') ||
+            choiceTexts.includes('BOTH statements TOGETHER are sufficient') ||
+            choiceTexts.includes('EACH statement ALONE is sufficient')) {
+            return "DS";
+        }
     }
 
     return "Unknown";

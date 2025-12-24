@@ -62,25 +62,14 @@ export function extractQuestionData(difficulty = '') {
             image = src;
         }
 
-        // 2. Extract Question Text (first paragraph that's not e_id or ds-statement)
+        // 2. Extract Question Text and Statements
         var questionText = '';
-        var paragraphs = questionContainer.querySelectorAll('p');
-
-        for (var i = 0; i < paragraphs.length; i++) {
-            var p = paragraphs[i];
-            if (p.classList.contains('e_id')) continue;
-            if (p.classList.contains('ds-statement1')) continue;
-            if (p.classList.contains('ds-statement2')) continue;
-
-            // This is the question text paragraph
-            questionText = processElementForMath(p);
-            break;
-        }
-
-        // 3. Extract Statements directly from their specific elements
         var statement1 = '';
         var statement2 = '';
+        var paragraphs = questionContainer.querySelectorAll('p');
+        var questionParts = [];
 
+        // First, try to find statements using class selectors (format 1)
         var stmt1El = questionContainer.querySelector('.ds-statement1');
         var stmt2El = questionContainer.querySelector('.ds-statement2');
 
@@ -90,6 +79,41 @@ export function extractQuestionData(difficulty = '') {
         if (stmt2El) {
             statement2 = processElementForMath(stmt2El);
         }
+
+        // Process paragraphs for question text and fallback statement extraction
+        for (var i = 0; i < paragraphs.length; i++) {
+            var p = paragraphs[i];
+            if (p.classList.contains('e_id')) continue;
+            if (p.classList.contains('ds-statement1')) continue;
+            if (p.classList.contains('ds-statement2')) continue;
+            // Skip paragraphs that only contain images
+            if (p.querySelector('img') && !p.textContent.trim()) continue;
+
+            var text = processElementForMath(p);
+            if (!text) continue;
+
+            // Check if this paragraph is a statement (format 2: starts with "(1)" or "(2)")
+            if (text.match(/^\s*\(1\)/)) {
+                // This is statement 1 - only use if not found via class
+                if (!statement1) {
+                    statement1 = text;
+                }
+            } else if (text.match(/^\s*\(2\)/)) {
+                // This is statement 2 - only use if not found via class
+                if (!statement2) {
+                    statement2 = text;
+                }
+            } else {
+                // This is part of the question text (before statements)
+                // Only add if we haven't found any statements yet
+                if (!statement1 && !statement2) {
+                    questionParts.push(text);
+                }
+            }
+        }
+
+        // Join question parts
+        questionText = questionParts.join('\n\n');
 
         // 4. Extract Correct Answer
         var correctAnswer = '';
@@ -119,7 +143,7 @@ export function extractQuestionData(difficulty = '') {
             difficulty: difficulty,
             section: 'di',
             questionType: 'di',
-            category: 'ds',
+            category: 'DS',
             correctAnswer: correctAnswer,
             content: {
                 questionText: questionText,

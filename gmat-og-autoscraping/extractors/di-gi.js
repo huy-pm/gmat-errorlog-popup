@@ -52,57 +52,156 @@ export function extractQuestionData(difficulty = '') {
 
         var questionText = questionParts.join('\n\n');
 
-        // 3. Extract Statements with Dropdown Results (Review Mode)
+        // 3. Extract Statements with Dropdowns
+        // Supports both Practice Mode (select elements) and Review Mode (inline-result divs)
         var statements = [];
+
+        // Check if we're in Practice Mode (has select elements) or Review Mode (has inline-results)
+        var selectElements = questionContainer.querySelectorAll('select.question-choices-inline');
         var inlineResults = questionContainer.querySelectorAll('.inline-result');
 
-        // Process inline results in groups
-        // Pattern: text before dropdown, dropdown result, text after
-        var currentStatement = {
-            text: '',
-            options: [],
-            correctAnswer: null,
-            userAnswer: null
-        };
+        if (selectElements.length > 0) {
+            // PRACTICE MODE: Extract from select elements
+            var selectParagraphs = questionContainer.querySelectorAll('p:has(select.question-choices-inline)');
 
-        // Find all paragraphs containing inline-results (the actual question statements)
-        var statementParagraphs = questionContainer.querySelectorAll('p:has(.inline-result)');
+            selectParagraphs.forEach(function (p) {
+                var dropdowns = [];
 
-        statementParagraphs.forEach(function (p) {
-            var statement = {
-                text: '',
-                options: [],
-                correctAnswer: null,
-                userAnswer: null
-            };
+                // Clone the paragraph to manipulate
+                var pClone = p.cloneNode(true);
 
-            // Get the full text content
-            var fullText = p.innerHTML;
+                // Find all select elements in this paragraph
+                var selects = pClone.querySelectorAll('select.question-choices-inline');
 
-            // Find inline results in this paragraph
-            var results = p.querySelectorAll('.inline-result');
+                selects.forEach(function (select) {
+                    var options = [];
 
-            results.forEach(function (result) {
-                var answerText = result.textContent.trim();
+                    // Get all options (skip the "Select one" placeholder)
+                    var optionEls = select.querySelectorAll('option');
+                    optionEls.forEach(function (opt) {
+                        var optText = opt.textContent.trim();
+                        // Skip placeholder options like "Select one"
+                        if (opt.value && opt.value !== '' && optText !== 'Select one') {
+                            options.push(optText);
+                        }
+                    });
 
-                if (result.classList.contains('correct')) {
-                    statement.correctAnswer = answerText;
-                    statement.userAnswer = answerText;
-                } else if (result.classList.contains('corrected')) {
-                    statement.correctAnswer = answerText;
-                } else if (result.classList.contains('incorrect')) {
-                    statement.userAnswer = answerText;
+                    dropdowns.push({
+                        options: options,
+                        correctAnswer: null // Not available in practice mode
+                    });
+
+                    // Replace select with placeholder text
+                    var placeholder = document.createTextNode('{dropdown}');
+                    select.parentNode.replaceChild(placeholder, select);
+                });
+
+                // Get the text with placeholders
+                var textContent = pClone.textContent.trim();
+                // Clean up multiple spaces and &nbsp;
+                textContent = textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+
+                var statement = {
+                    text: decodeHtmlEntities(textContent),
+                    dropdowns: dropdowns
+                };
+
+                if (statement.text) {
+                    statements.push(statement);
                 }
             });
+        } else if (inlineResults.length > 0) {
+            // REVIEW MODE: Extract from inline-result divs
+            var statementParagraphs = questionContainer.querySelectorAll('p:has(.inline-result)');
 
-            // Replace inline-result divs with placeholders to get statement text
-            var textContent = p.textContent.trim();
-            statement.text = decodeHtmlEntities(textContent);
+            statementParagraphs.forEach(function (p) {
+                var dropdowns = [];
 
-            if (statement.text) {
-                statements.push(statement);
-            }
-        });
+                // Clone the paragraph to manipulate
+                var pClone = p.cloneNode(true);
+
+                // Find inline results in this paragraph
+                var results = pClone.querySelectorAll('.inline-result');
+
+                // Group inline-results that are adjacent (they represent one dropdown's options)
+                // In GMAT OG, adjacent .inline-result divs before any text represent dropdown options
+                var dropdownGroups = [];
+                var currentGroup = [];
+                var lastResult = null;
+
+                results.forEach(function (result, index) {
+                    // Check if this result is immediately after the previous one (same dropdown)
+                    if (lastResult && result.previousSibling === lastResult) {
+                        currentGroup.push(result);
+                    } else if (lastResult && lastResult.nextSibling &&
+                        lastResult.nextSibling.nodeType === 3 &&
+                        lastResult.nextSibling.textContent.trim() === '' &&
+                        lastResult.nextSibling.nextSibling === result) {
+                        // Handle whitespace between adjacent results
+                        currentGroup.push(result);
+                    } else {
+                        if (currentGroup.length > 0) {
+                            dropdownGroups.push(currentGroup);
+                        }
+                        currentGroup = [result];
+                    }
+                    lastResult = result;
+                });
+                if (currentGroup.length > 0) {
+                    dropdownGroups.push(currentGroup);
+                }
+
+                // Process each dropdown group
+                dropdownGroups.forEach(function (group) {
+                    var options = [];
+                    var correctAnswer = null;
+
+                    group.forEach(function (result) {
+                        var answerText = result.textContent.trim();
+                        options.push(answerText);
+
+                        if (result.classList.contains('correct') || result.classList.contains('corrected')) {
+                            // This is the correct answer
+                            correctAnswer = answerText;
+                        }
+                    });
+
+                    dropdowns.push({
+                        options: options,
+                        correctAnswer: correctAnswer
+                    });
+                });
+
+                // Now build the statement text with {dropdown} placeholders
+                // Replace each dropdown group with {dropdown}
+                dropdownGroups.forEach(function (group) {
+                    group.forEach(function (result, index) {
+                        if (index === 0) {
+                            // Replace first result with placeholder
+                            var placeholder = document.createTextNode('{dropdown}');
+                            result.parentNode.replaceChild(placeholder, result);
+                        } else {
+                            // Remove subsequent results in the group
+                            result.parentNode.removeChild(result);
+                        }
+                    });
+                });
+
+                // Get the text with placeholders
+                var textContent = pClone.textContent.trim();
+                // Clean up multiple spaces
+                textContent = textContent.replace(/\s+/g, ' ').trim();
+
+                var statement = {
+                    text: decodeHtmlEntities(textContent),
+                    dropdowns: dropdowns
+                };
+
+                if (statement.text) {
+                    statements.push(statement);
+                }
+            });
+        }
 
         // 4. Extract Question ID
         var questionId = extractQuestionId();

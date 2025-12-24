@@ -184,7 +184,7 @@ export function extractQuestionData(difficulty = '') {
             source: 'GMAT Official',
             section: 'di',
             questionType: 'di',
-            category: 'MSR',
+            category: 'msr',
             dataSources: dataSources,
             questions: [question],
             _tabSignature: tabSignature

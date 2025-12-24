@@ -101,7 +101,7 @@ export function extractQuestionData(difficulty = '') {
             difficulty: difficulty,
             section: 'di',
             questionType: 'di',
-            category: 'tpa',
+            category: 'TPA',
             content: {
                 questionText: decodeHtmlEntities(questionText),
                 choiceLabels: columnHeaders,

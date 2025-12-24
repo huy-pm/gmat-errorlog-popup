@@ -119,7 +119,7 @@ export function extractQuestionData(difficulty = '') {
             difficulty: difficulty,
             section: 'di',
             questionType: 'di',
-            category: 'DS',
+            category: 'ds',
             correctAnswer: correctAnswer,
             content: {
                 questionText: questionText,

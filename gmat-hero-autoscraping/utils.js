@@ -77,7 +77,7 @@ export function normalizeCurrency(text) {
     if (!text) return '';
     // Pattern: $\$NUMBER$ - KaTeX wrapped escaped currency
     // Convert to just \$NUMBER
-    return text.replace(/\$\\?\\\$(\d[\d,]*(?:\.\d+)?)\$/g, '\\$$1');
+    return text.replace(/\$\\?\\\$(\d[\d,]*(?:\.\d+)?)\$/g, '\\$$$1');
 }
 
 /**

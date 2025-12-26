@@ -128,9 +128,25 @@ export function processKaTeX(container) {
             const annotation = mathml.querySelector('annotation');
             if (annotation) {
                 const texContent = annotation.textContent;
-                const isDisplay = texContent.includes('\\dfrac') || texContent.includes('\\frac') ||
+
+                // Check if this katex element is inside a katex-display wrapper
+                // Structure: <span><span class="katex-display"><span class="katex">...</span></span></span>
+                const isDisplayMode = katexElem.closest('.katex-display') !== null;
+
+                const isDisplay = isDisplayMode || texContent.includes('\\dfrac') || texContent.includes('\\frac') ||
                     texContent.includes('\\int') || texContent.includes('\\sum');
-                const mathPlaceholder = document.createTextNode(isDisplay ? '$$' + texContent + '$$' : '$' + texContent + '$');
+
+                let mathText;
+                if (isDisplayMode) {
+                    // Display mode: add newlines before and after for proper separation
+                    mathText = '\n\n$$' + texContent + '$$\n\n';
+                } else if (isDisplay) {
+                    mathText = '$$' + texContent + '$$';
+                } else {
+                    mathText = '$' + texContent + '$';
+                }
+
+                const mathPlaceholder = document.createTextNode(mathText);
                 katexElem.replaceWith(mathPlaceholder);
             }
         }

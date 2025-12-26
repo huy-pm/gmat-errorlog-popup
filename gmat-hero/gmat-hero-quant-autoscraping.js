@@ -280,9 +280,24 @@ javascript: (function () {
                     var annotation = mathml.querySelector("annotation");
                     if (annotation) {
                         var texContent = annotation.textContent;
-                        var isDisplay = texContent.includes("\\dfrac") || texContent.includes("\\frac") ||
+
+                        // Check if this katex element is inside a katex-display wrapper
+                        var isDisplayMode = katexElem.closest('.katex-display') !== null;
+
+                        var isDisplay = isDisplayMode || texContent.includes("\\dfrac") || texContent.includes("\\frac") ||
                             texContent.includes("\\int") || texContent.includes("\\sum");
-                        var mathPlaceholder = document.createTextNode(isDisplay ? "$$" + texContent + "$$" : "$" + texContent + "$");
+
+                        var mathText;
+                        if (isDisplayMode) {
+                            // Display mode: add newlines before and after for proper separation
+                            mathText = '\n\n$$' + texContent + '$$\n\n';
+                        } else if (isDisplay) {
+                            mathText = '$$' + texContent + '$$';
+                        } else {
+                            mathText = '$' + texContent + '$';
+                        }
+
+                        var mathPlaceholder = document.createTextNode(mathText);
                         katexElem.replaceWith(mathPlaceholder);
                     }
                 }

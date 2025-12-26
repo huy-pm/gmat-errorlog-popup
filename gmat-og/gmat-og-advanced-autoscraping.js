@@ -12,6 +12,7 @@ javascript: (function () {
     var totalProcessed = 0;  // Track total processed (success + fail)
     var failedCount = 0;     // Track failed extractions
     var currentPageNumber = 1;  // Track which pagination page we're on
+    var extractIncorrectOnly = false;  // Toggle to extract only incorrect questions
 
     // ============================================
     // HELPER FUNCTIONS (from gmatOG.js)
@@ -572,6 +573,13 @@ javascript: (function () {
         return difficultyCell.textContent.trim();
     }
 
+    // Check if a question row is marked as incorrect
+    function isIncorrectQuestion(row) {
+        var correctnessCell = row.querySelector('.li-cell.correctness');
+        if (!correctnessCell) return false;
+        return correctnessCell.classList.contains('incorrect');
+    }
+
     // Get the review link from a question row
     function getReviewLink(row) {
         var actionCell = row.querySelector('.li-cell.action');
@@ -759,6 +767,17 @@ javascript: (function () {
         currentDifficulty = extractDifficultyFromRow(row);
         console.log("Extracted difficulty:", currentDifficulty);
 
+        // Check if we should skip this question based on incorrectOnly filter
+        if (extractIncorrectOnly && !isIncorrectQuestion(row)) {
+            console.log("Skipping correct question " + questionNumber + " (incorrect only mode)");
+            totalProcessed++;  // Count as processed (skipped)
+            failedCount++;
+            updateCount();
+            currentQuestionIndex++;
+            setTimeout(processCurrentQuestion, 100);
+            return;
+        }
+
         // Get the review link
         var reviewLink = getReviewLink(row);
         if (!reviewLink) {
@@ -870,6 +889,11 @@ javascript: (function () {
         totalProcessed = 0;
         failedCount = 0;
         currentPageNumber = 1;
+
+        // Get checkbox state from popup
+        var checkbox = popup.document.getElementById('incorrect-only');
+        extractIncorrectOnly = checkbox ? checkbox.checked : false;
+        console.log("Extract incorrect only:", extractIncorrectOnly);
 
         // Update UI
         popup.document.getElementById('start-btn').disabled = true;
@@ -994,6 +1018,10 @@ javascript: (function () {
         '</ol>' +
         '</div>' +
         '<div class="controls">' +
+        '<label style="display: block; margin-bottom: 15px; font-size: 16px;">' +
+        '<input type="checkbox" id="incorrect-only" style="width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;">' +
+        'Extract incorrect questions only' +
+        '</label>' +
         '<button id="start-btn" onclick="window.opener.startAdvancedExtraction()">Start</button>' +
         '<button id="stop-btn" onclick="window.opener.stopAdvancedExtraction()" disabled>Stop</button>' +
         '</div>' +

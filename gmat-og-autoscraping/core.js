@@ -11,6 +11,7 @@ import {
     getQuestionRows,
     getReviewLink,
     extractDifficultyFromRow,
+    isIncorrectQuestion,
     hasNextPage,
     clickNextPage,
     getPaginationInfo,
@@ -31,7 +32,8 @@ let state = {
     totalProcessed: 0,
     failedCount: 0,
     currentPageNumber: 1,
-    popup: null
+    popup: null,
+    extractIncorrectOnly: false
 };
 
 // ============================================
@@ -158,6 +160,17 @@ async function processCurrentQuestion() {
     state.currentDifficulty = extractDifficultyFromRow(row);
     console.log('Extracted difficulty:', state.currentDifficulty);
 
+    // Check if we should skip this question based on incorrectOnly filter
+    if (state.extractIncorrectOnly && !isIncorrectQuestion(row)) {
+        console.log(`Skipping correct question ${questionNumber} (incorrect only mode)`);
+        state.totalProcessed++;
+        state.failedCount++;
+        updateCount();
+        state.currentQuestionIndex++;
+        setTimeout(processCurrentQuestion, 100);
+        return;
+    }
+
     // Get the review link
     const reviewLink = getReviewLink(row);
     if (!reviewLink) {
@@ -268,6 +281,11 @@ export function startExtraction(popup) {
     state.failedCount = 0;
     state.currentPageNumber = 1;
     state.popup = popup;
+
+    // Get checkbox state from popup
+    const checkbox = popup.document.getElementById('incorrect-only');
+    state.extractIncorrectOnly = checkbox ? checkbox.checked : false;
+    console.log('Extract incorrect only:', state.extractIncorrectOnly);
 
     // Update UI
     if (popup && !popup.closed) {

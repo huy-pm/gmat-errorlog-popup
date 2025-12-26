@@ -136,6 +136,13 @@ export function extractDifficultyFromRow(row) {
     return difficultyCell.textContent.trim();
 }
 
+// Check if a question row is marked as incorrect
+export function isIncorrectQuestion(row) {
+    var correctnessCell = row.querySelector('.li-cell.correctness');
+    if (!correctnessCell) return false;
+    return correctnessCell.classList.contains('incorrect');
+}
+
 // ============================================
 // TEXT PROCESSING
 // ============================================

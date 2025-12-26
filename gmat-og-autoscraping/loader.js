@@ -117,6 +117,10 @@
     </div>
     
     <div class="controls">
+        <label style="display: block; margin-bottom: 15px; font-size: 16px;">
+            <input type="checkbox" id="incorrect-only" style="width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;">
+            Extract incorrect questions only
+        </label>
         <button id="start-btn">Start</button>
         <button id="stop-btn" disabled>Stop</button>
     </div>

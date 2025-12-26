@@ -90,6 +90,63 @@ javascript: (function () {
     }
 
     /**
+     * Extract table data from a container and remove it from DOM
+     */
+    function extractTable(container) {
+        var tableElem = container.querySelector('table');
+        if (!tableElem) return null;
+
+        var rows = tableElem.querySelectorAll('tr');
+        var headers = [];
+        var data = [];
+
+        rows.forEach(function (row, index) {
+            var cells = row.querySelectorAll('td, th');
+            var rowData = Array.from(cells).map(function (cell) {
+                // Process any KaTeX in cell and get text
+                var cellClone = cell.cloneNode(true);
+                var katexElems = cellClone.querySelectorAll('.katex');
+                katexElems.forEach(function (katexElem) {
+                    var annotation = katexElem.querySelector('annotation');
+                    if (annotation) {
+                        katexElem.replaceWith(document.createTextNode('$' + annotation.textContent + '$'));
+                    }
+                });
+
+                // Convert <sup> tags to LaTeX ^{content}
+                var supElems = cellClone.querySelectorAll('sup');
+                supElems.forEach(function (sup) {
+                    sup.replaceWith(document.createTextNode('^{' + sup.textContent + '}'));
+                });
+
+                // Convert <sub> tags to LaTeX _{content}
+                var subElems = cellClone.querySelectorAll('sub');
+                subElems.forEach(function (sub) {
+                    sub.replaceWith(document.createTextNode('_{' + sub.textContent + '}'));
+                });
+
+                // Get text and wrap in $ if it contains math notation
+                var text = cellClone.textContent.trim();
+                if (text.indexOf('^{') !== -1 || text.indexOf('_{') !== -1) {
+                    text = '$' + text + '$';
+                }
+                return text;
+            });
+
+            if (index === 0) {
+                headers = headers.concat(rowData);
+            } else {
+                data.push(rowData);
+            }
+        });
+
+        // Remove the table from container to clean up questionText
+        tableElem.remove();
+
+        return { headers: headers, rows: data };
+    }
+
+    /**
      * Get practice URL from current URL (replace /review/ with /practice/)
      */
     function getPracticeUrl() {
@@ -268,6 +325,9 @@ javascript: (function () {
             htmlWithLineBreaks = htmlWithLineBreaks.replace(/\<br\s*\/?\>/gi, '\n');
             tempDiv.innerHTML = htmlWithLineBreaks;
 
+            // Extract table data BEFORE other processing (also removes table from DOM)
+            var tableData = extractTable(tempDiv);
+
             // IMPORTANT: Escape currency symbols BEFORE processing KaTeX
             // At this point, currency like $650 is plain text, while math is in .katex elements
             escapeCurrencyInElement(tempDiv);
@@ -385,7 +445,8 @@ javascript: (function () {
                     "answerChoices": answerChoices.map(function (choice) {
                         return normalizeCurrency(choice);
                     }),
-                    "image": questionImage
+                    "image": questionImage,
+                    "table": tableData
                 }
             };
 

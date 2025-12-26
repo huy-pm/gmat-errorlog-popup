@@ -8,6 +8,7 @@ import {
     escapeCurrencyInElement,
     normalizeCurrency,
     processKaTeX,
+    extractTable,
     getPracticeUrl,
     extractGMATHeroMetadata
 } from '../utils.js';
@@ -77,6 +78,9 @@ export async function extractQuestionData() {
         let htmlWithLineBreaks = tempDiv.innerHTML;
         htmlWithLineBreaks = htmlWithLineBreaks.replace(/<br\s*\/?>/gi, '\n');
         tempDiv.innerHTML = htmlWithLineBreaks;
+
+        // Extract table data BEFORE other processing (also removes table from DOM)
+        const tableData = extractTable(tempDiv);
 
         // IMPORTANT: Escape currency symbols BEFORE processing KaTeX
         escapeCurrencyInElement(tempDiv);
@@ -148,7 +152,8 @@ export async function extractQuestionData() {
             content: {
                 questionText: normalizeCurrency(decodeHtmlEntities(questionText)),
                 answerChoices: answerChoices.map(choice => normalizeCurrency(choice)),
-                image: questionImage
+                image: questionImage,
+                table: tableData
             }
         };
 

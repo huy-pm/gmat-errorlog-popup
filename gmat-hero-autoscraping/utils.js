@@ -113,6 +113,69 @@ export function escapeCurrencyInElement(element) {
 }
 
 // ============================================================================
+// TABLE EXTRACTION
+// ============================================================================
+
+/**
+ * Extract table data from a container and remove it from DOM
+ * @param {Element} container - DOM element that may contain a table
+ * @returns {Object|null} - Table data with headers and rows, or null if no table
+ */
+export function extractTable(container) {
+    const tableElem = container.querySelector('table');
+    if (!tableElem) return null;
+
+    const rows = tableElem.querySelectorAll('tr');
+    const headers = [];
+    const data = [];
+
+    rows.forEach((row, index) => {
+        const cells = row.querySelectorAll('td, th');
+        const rowData = Array.from(cells).map(cell => {
+            // Process any KaTeX in cell and get text
+            const cellClone = cell.cloneNode(true);
+            const katexElems = cellClone.querySelectorAll('.katex');
+            katexElems.forEach(katexElem => {
+                const annotation = katexElem.querySelector('annotation');
+                if (annotation) {
+                    katexElem.replaceWith(document.createTextNode('$' + annotation.textContent + '$'));
+                }
+            });
+
+            // Convert <sup> tags to LaTeX ^{content}
+            const supElems = cellClone.querySelectorAll('sup');
+            supElems.forEach(sup => {
+                sup.replaceWith(document.createTextNode('^{' + sup.textContent + '}'));
+            });
+
+            // Convert <sub> tags to LaTeX _{content}
+            const subElems = cellClone.querySelectorAll('sub');
+            subElems.forEach(sub => {
+                sub.replaceWith(document.createTextNode('_{' + sub.textContent + '}'));
+            });
+
+            // Get text and wrap in $ if it contains math notation
+            let text = cellClone.textContent.trim();
+            if (text.includes('^{') || text.includes('_{')) {
+                text = '$' + text + '$';
+            }
+            return text;
+        });
+
+        if (index === 0) {
+            headers.push(...rowData);
+        } else {
+            data.push(rowData);
+        }
+    });
+
+    // Remove the table from container to clean up questionText
+    tableElem.remove();
+
+    return { headers, rows: data };
+}
+
+// ============================================================================
 // KATEX/MATH PROCESSING
 // ============================================================================
 

@@ -295,42 +295,87 @@ javascript: (function () {
                 // Original logic for other question types
                 // Find the question - look for specific question patterns (search backwards)
                 var questionIndex = -1;
-                for (var i = parts.length - 1; i >= 0; i--) {
-                    var part = parts[i].trim();
-                    if (part.length > 0) {
-                        // Look for common question patterns in CR questions
-                        var cleanPart = part
-                            .replace(/<[^>]*>/g, '')
-                            .replace(/&ldquo;/g, '"')
-                            .replace(/&rdquo;/g, '"')
-                            .replace(/&amp;/g, '&')
-                            .replace(/&[a-zA-Z0-9#]+;/g, '')
-                            .trim();
 
-                        // Check for typical CR question patterns
-                        if (cleanPart.includes("?")) {
+                // For boldface questions, look for specific question starters first
+                if (isBoldfaceQuestion) {
+                    for (var i = 0; i < parts.length; i++) {
+                        var part = parts[i].trim();
+                        if (part.length > 0) {
+                            var cleanPart = part
+                                .replace(/<[^>]*>/g, '')
+                                .replace(/&ldquo;/g, '"')
+                                .replace(/&rdquo;/g, '"')
+                                .replace(/&amp;/g, '&')
+                                .replace(/&[a-zA-Z0-9#]+;/g, '')
+                                .trim();
+
                             var lowerPart = cleanPart.toLowerCase();
-                            if (lowerPart.includes("which") ||
-                                lowerPart.includes("what") ||
-                                lowerPart.includes("how") ||
-                                lowerPart.includes("why") ||
-                                lowerPart.includes("except") ||
-                                lowerPart.includes("vulnerable") ||
-                                lowerPart.includes("flaw") ||
-                                lowerPart.includes("assumption") ||
-                                lowerPart.includes("conclusion") ||
-                                lowerPart.includes("inference") ||
-                                lowerPart.includes("strengthen") ||
-                                lowerPart.includes("weaken")) {
+                            // Look for boldface question starters
+                            if (lowerPart.includes('in the argument') ||
+                                lowerPart.includes('the portions in boldface') ||
+                                lowerPart.includes('the two portions in boldface') ||
+                                lowerPart.includes('the statements in boldface')) {
                                 questionIndex = i;
-                                question = cleanPart;
+                                // For boldface, the question spans from this part to the end
+                                var questionParts = [];
+                                for (var j = i; j < parts.length; j++) {
+                                    var qPart = parts[j].trim()
+                                        .replace(/<[^>]*>/g, '')
+                                        .replace(/&ldquo;/g, '"')
+                                        .replace(/&rdquo;/g, '"')
+                                        .replace(/&amp;/g, '&')
+                                        .replace(/&[a-zA-Z0-9#]+;/g, '')
+                                        .trim();
+                                    if (qPart.length > 0) {
+                                        questionParts.push(qPart);
+                                    }
+                                }
+                                question = questionParts.join(' ');
                                 break;
                             }
                         }
                     }
                 }
 
-                // Fallback: if we didn't find a specific pattern, look for any text ending with ?
+                // Fallback to standard detection if boldface pattern not found
+                if (questionIndex === -1) {
+                    for (var i = parts.length - 1; i >= 0; i--) {
+                        var part = parts[i].trim();
+                        if (part.length > 0) {
+                            // Look for common question patterns in CR questions
+                            var cleanPart = part
+                                .replace(/<[^>]*>/g, '')
+                                .replace(/&ldquo;/g, '"')
+                                .replace(/&rdquo;/g, '"')
+                                .replace(/&amp;/g, '&')
+                                .replace(/&[a-zA-Z0-9#]+;/g, '')
+                                .trim();
+
+                            // Check for typical CR question patterns
+                            if (cleanPart.includes("?")) {
+                                var lowerPart = cleanPart.toLowerCase();
+                                if (lowerPart.includes("which") ||
+                                    lowerPart.includes("what") ||
+                                    lowerPart.includes("how") ||
+                                    lowerPart.includes("why") ||
+                                    lowerPart.includes("except") ||
+                                    lowerPart.includes("vulnerable") ||
+                                    lowerPart.includes("flaw") ||
+                                    lowerPart.includes("assumption") ||
+                                    lowerPart.includes("conclusion") ||
+                                    lowerPart.includes("inference") ||
+                                    lowerPart.includes("strengthen") ||
+                                    lowerPart.includes("weaken")) {
+                                    questionIndex = i;
+                                    question = cleanPart;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
                 if (questionIndex === -1) {
                     for (var i = parts.length - 1; i >= 0; i--) {
                         var part = parts[i].trim();

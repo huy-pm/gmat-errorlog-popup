@@ -158,10 +158,19 @@ javascript: (function () {
         return metadata;
     }
 
+
     // Helper function to convert styled spans to markdown format
+    // Handles: <b>, <strong>, <i>, <em>, and styled <span> tags
     function convertStyledSpansToMarkdown(htmlContent) {
-        // Replace <span> tags with appropriate markdown formatting
         var result = htmlContent;
+
+        // Convert <b> and <strong> tags to **text**
+        result = result.replace(/<b>([^<]*)<\/b>/gi, '**$1**');
+        result = result.replace(/<strong>([^<]*)<\/strong>/gi, '**$1**');
+
+        // Convert <i> and <em> tags to *text*
+        result = result.replace(/<i>([^<]*)<\/i>/gi, '*$1*');
+        result = result.replace(/<em>([^<]*)<\/em>/gi, '*$1*');
 
         // Match span tags and replace based on style
         result = result.replace(/<span[^>]*>(.*?)<\/span>/gi, function (match, content) {
@@ -169,12 +178,28 @@ javascript: (function () {
             if (match.includes('font-style: italic') || match.includes('font-style:italic')) {
                 return '*' + content + '*';
             }
+            // Check if it's highlighted (background-color: yellow)
+            if (match.includes('background-color: yellow') || match.includes('background-color:yellow') ||
+                match.includes('background: yellow') || match.includes('background:yellow')) {
+                return '==' + content + '==';
+            }
             // Otherwise treat as bold (font-weight: bold or default for boldface questions)
             return '**' + content + '**';
         });
 
         return result;
     }
+
+    // Helper function to convert highlighted text to markdown format for RC questions
+    // - Yellow background spans -> ==text==
+    function convertHighlightedTextToMarkdown(htmlContent) {
+        if (!htmlContent) return '';
+        // Match spans with yellow/highlight background - uses (.*?) to handle nested content
+        return htmlContent.replace(/<span[^>]*(?:class="[^"]*highlight[^"]*"|style="[^"]*background[^"]*yellow[^"]*")[^>]*>(.*?)<\/span>/gi, function (match, content) {
+            return '==' + content + '==';
+        });
+    }
+
 
     // Function to extract data from current question
     function extractQuestionData() {

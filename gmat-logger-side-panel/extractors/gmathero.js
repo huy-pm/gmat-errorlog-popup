@@ -160,13 +160,14 @@ function convertStyledSpansToMarkdown(htmlContent) {
 /**
  * Convert highlighted text to markdown format for RC questions
  * - Yellow background spans -> ==text==
+ * Supports both class-based ("highlight") and style-based (background-color: yellow) highlights
  */
 function convertHighlightedTextToMarkdown(htmlContent) {
-  var result = htmlContent.replace(
-    /<span\s+style="[^"]*background-color:\s*yellow[^"]*">([^<]*)<\/span>/gi,
-    '==$1=='
-  );
-  return result;
+  if (!htmlContent) return '';
+  // Match spans with yellow/highlight background - uses (.*?) to handle nested content
+  return htmlContent.replace(/<span[^>]*(?:class="[^"]*highlight[^"]*"|style="[^"]*background[^"]*yellow[^"]*")[^>]*>(.*?)<\/span>/gi, function (match, content) {
+    return '==' + content + '==';
+  });
 }
 
 /**

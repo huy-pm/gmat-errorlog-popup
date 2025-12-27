@@ -6,8 +6,25 @@
 import {
     decodeHtmlEntities,
     getCurrentUrl,
-    extractQuestionId
+    extractQuestionId,
+    processKaTeX
 } from '../utils.js';
+
+/**
+ * Extract text from a node, handling KaTeX math elements properly
+ * @param {Node} node - DOM node to extract text from
+ * @returns {string} Extracted text with KaTeX converted to TeX notation
+ */
+function extractTextWithKaTeX(node) {
+    var clone = node.cloneNode(true);
+    if (clone.nodeType === Node.TEXT_NODE) {
+        return clone.textContent;
+    }
+    if (clone.querySelectorAll) {
+        processKaTeX(clone);
+    }
+    return clone.textContent;
+}
 
 /**
  * Extract Two-Part Analysis question data
@@ -28,7 +45,7 @@ export function extractQuestionData(difficulty = '') {
 
         paragraphs.forEach(function (p) {
             if (p.classList.contains('e_id')) return;
-            var text = p.textContent.trim();
+            var text = extractTextWithKaTeX(p).trim();
             if (text) {
                 questionParts.push(text);
             }
@@ -45,7 +62,7 @@ export function extractQuestionData(difficulty = '') {
             if (thead) {
                 var headerCells = thead.querySelectorAll('th.column-choice');
                 headerCells.forEach(function (th) {
-                    columnHeaders.push(th.textContent.trim());
+                    columnHeaders.push(extractTextWithKaTeX(th).trim());
                 });
             }
         }
@@ -67,7 +84,7 @@ export function extractQuestionData(difficulty = '') {
                     var choiceContent = tr.querySelector('.choice-content');
 
                     if (choiceContent) {
-                        var rowText = decodeHtmlEntities(choiceContent.textContent.trim());
+                        var rowText = decodeHtmlEntities(extractTextWithKaTeX(choiceContent).trim());
                         var rowLetter = String.fromCharCode(65 + rowIndex); // A, B, C, etc.
 
                         rows.push({

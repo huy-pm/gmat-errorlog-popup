@@ -6,8 +6,25 @@
 import {
     decodeHtmlEntities,
     getCurrentUrl,
-    extractQuestionId
+    extractQuestionId,
+    processKaTeX
 } from '../utils.js';
+
+/**
+ * Extract text from a node, handling KaTeX math elements properly
+ * @param {Node} node - DOM node to extract text from
+ * @returns {string} Extracted text with KaTeX converted to TeX notation
+ */
+function extractTextWithKaTeX(node) {
+    var clone = node.cloneNode(true);
+    if (clone.nodeType === Node.TEXT_NODE) {
+        return clone.textContent;
+    }
+    if (clone.querySelectorAll) {
+        processKaTeX(clone);
+    }
+    return clone.textContent;
+}
 
 /**
  * Extract Table Analysis question data
@@ -27,7 +44,7 @@ export function extractQuestionData(difficulty = '') {
         var paragraphs = questionContainer.querySelectorAll('p');
         paragraphs.forEach(function (p) {
             if (p.classList.contains('e_id')) return;
-            var text = p.textContent.trim();
+            var text = extractTextWithKaTeX(p).trim();
             // Get first substantial paragraph as intro
             if (text && !introText && !p.querySelector('img')) {
                 introText = text;
@@ -48,7 +65,7 @@ export function extractQuestionData(difficulty = '') {
                 var headerCells = thead.querySelectorAll('th');
                 headerCells.forEach(function (th) {
                     var headerInner = th.querySelector('.tablesorter-header-inner');
-                    var text = headerInner ? headerInner.textContent.trim() : th.textContent.trim();
+                    var text = headerInner ? extractTextWithKaTeX(headerInner).trim() : extractTextWithKaTeX(th).trim();
                     if (text) {
                         tableData.headers.push(text);
                     }
@@ -64,7 +81,7 @@ export function extractQuestionData(difficulty = '') {
                     var cells = tr.querySelectorAll('td');
                     cells.forEach(function (td) {
                         // Get text, handling italic text
-                        var text = td.textContent.trim();
+                        var text = extractTextWithKaTeX(td).trim();
                         rowData.push(text);
                     });
                     if (rowData.length > 0) {
@@ -79,7 +96,7 @@ export function extractQuestionData(difficulty = '') {
         // Find the paragraph after the table that contains the instruction
         var allParagraphs = Array.from(questionContainer.querySelectorAll('p'));
         for (var i = 0; i < allParagraphs.length; i++) {
-            var text = allParagraphs[i].textContent.trim();
+            var text = extractTextWithKaTeX(allParagraphs[i]).trim();
             if (text.includes('select') && (text.includes('Yes') || text.includes('No'))) {
                 questionInstruction = text;
                 break;
@@ -100,8 +117,8 @@ export function extractQuestionData(difficulty = '') {
                 var choices = firstRow.querySelectorAll('.table-choice');
                 if (choices.length >= 2) {
                     choiceLabels = [
-                        choices[0].textContent.trim(),
-                        choices[1].textContent.trim()
+                        extractTextWithKaTeX(choices[0]).trim(),
+                        extractTextWithKaTeX(choices[1]).trim()
                     ];
                 }
             }
@@ -112,7 +129,7 @@ export function extractQuestionData(difficulty = '') {
                 var choiceContent = row.querySelector('.choice-content');
 
                 var statement = {
-                    text: choiceContent ? decodeHtmlEntities(choiceContent.textContent.trim()) : '',
+                    text: choiceContent ? decodeHtmlEntities(extractTextWithKaTeX(choiceContent).trim()) : '',
                     correctAnswer: null
                 };
 

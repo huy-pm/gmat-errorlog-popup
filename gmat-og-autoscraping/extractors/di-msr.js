@@ -7,8 +7,25 @@
 import {
     decodeHtmlEntities,
     getCurrentUrl,
-    extractQuestionId
+    extractQuestionId,
+    processKaTeX
 } from '../utils.js';
+
+/**
+ * Extract text from a node, handling KaTeX math elements properly
+ * @param {Node} node - DOM node to extract text from
+ * @returns {string} Extracted text with KaTeX converted to TeX notation
+ */
+function extractTextWithKaTeX(node) {
+    var clone = node.cloneNode(true);
+    if (clone.nodeType === Node.TEXT_NODE) {
+        return clone.textContent;
+    }
+    if (clone.querySelectorAll) {
+        processKaTeX(clone);
+    }
+    return clone.textContent;
+}
 
 /**
  * Extract Multi-Source Reasoning question data
@@ -61,7 +78,7 @@ export function extractQuestionData(difficulty = '') {
                 var paragraphs = panel.querySelectorAll('p');
                 var textParts = [];
                 paragraphs.forEach(function (p) {
-                    var text = p.textContent.trim();
+                    var text = extractTextWithKaTeX(p).trim();
                     if (text && !p.querySelector('img')) {
                         textParts.push(text);
                     }
@@ -82,7 +99,7 @@ export function extractQuestionData(difficulty = '') {
 
         paragraphs.forEach(function (p) {
             if (p === eIdEl) return;
-            var text = p.textContent.trim();
+            var text = extractTextWithKaTeX(p).trim();
             if (text && !p.querySelector('.table-choice') && !p.querySelector('.multi-choice')) {
                 questionText = text;
             }
@@ -109,7 +126,7 @@ export function extractQuestionData(difficulty = '') {
                 var labels = [];
                 var choices = firstRow.querySelectorAll('.table-choice');
                 choices.forEach(function (c) {
-                    labels.push(c.textContent.trim());
+                    labels.push(extractTextWithKaTeX(c).trim());
                 });
                 if (labels.length >= 2) {
                     question.choiceLabels = labels;
@@ -123,14 +140,14 @@ export function extractQuestionData(difficulty = '') {
                 var choiceContent = row.querySelector('.choice-content');
 
                 var statement = {
-                    text: choiceContent ? decodeHtmlEntities(choiceContent.textContent.trim()) : '',
+                    text: choiceContent ? decodeHtmlEntities(extractTextWithKaTeX(choiceContent).trim()) : '',
                     correctAnswer: null
                 };
 
                 // Determine correct answer from classes
                 [choiceA, choiceB].forEach(function (choice) {
                     if (!choice) return;
-                    var answerText = choice.textContent.trim();
+                    var answerText = extractTextWithKaTeX(choice).trim();
 
                     if (choice.classList.contains('correct') || choice.classList.contains('corrected')) {
                         statement.correctAnswer = answerText;
@@ -155,7 +172,7 @@ export function extractQuestionData(difficulty = '') {
 
                 if (multiChoice && choiceContent) {
                     var letter = multiChoice.getAttribute('data-choice') || '';
-                    var text = decodeHtmlEntities(choiceContent.textContent.trim());
+                    var text = decodeHtmlEntities(extractTextWithKaTeX(choiceContent).trim());
                     var isCorrect = multiChoice.classList.contains('correct') ||
                         multiChoice.classList.contains('corrected');
 

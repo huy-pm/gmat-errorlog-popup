@@ -7,8 +7,31 @@ import {
     decodeHtmlEntities,
     delay,
     getPracticeUrl,
-    extractGMATHeroMetadata
+    extractGMATHeroMetadata,
+    processKaTeX
 } from '../utils.js';
+
+/**
+ * Extract text from a node, handling KaTeX math elements properly
+ * @param {Node} node - DOM node to extract text from
+ * @returns {string} Extracted text with KaTeX converted to TeX notation
+ */
+function extractTextWithKaTeX(node) {
+    // Clone the node to avoid modifying the original DOM
+    const clone = node.cloneNode(true);
+
+    // If it's a text node, just return its content
+    if (clone.nodeType === Node.TEXT_NODE) {
+        return clone.textContent;
+    }
+
+    // Process KaTeX elements in the clone
+    if (clone.querySelectorAll) {
+        processKaTeX(clone);
+    }
+
+    return clone.textContent;
+}
 
 /**
  * Extract Graphics Interpretation question data
@@ -120,8 +143,8 @@ export async function extractQuestionData() {
                             dropdowns.push({ options: [] });
                         }
                     } else {
-                        // Regular text
-                        statementText += node.textContent;
+                        // Regular text (handle KaTeX if present)
+                        statementText += extractTextWithKaTeX(node);
                     }
                 }
 

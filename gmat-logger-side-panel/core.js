@@ -28,6 +28,9 @@ const state = {
   isCollapsed: false,
   activeTab: 'log',
   isAnalyzing: false,
+  isRefreshing: false,      // Guard flag to prevent concurrent refreshData calls
+  isSubmitting: false,      // Guard flag to prevent concurrent submitQuestionData calls
+  isInitialLoad: true,      // Flag to track initial sidebar load vs re-renders
   apiKey: localStorage.getItem('gemini_api_key') || '',
   logData: {
     url: getPracticeUrl(window.location.href),
@@ -566,11 +569,19 @@ function handleUrlChange(root) {
 async function refreshData(root, isAutoRefresh = false) {
   console.log('[Debug] refreshData called', isAutoRefresh ? '(auto)' : '(manual)');
 
+  // Guard: Prevent concurrent refreshData calls
+  if (state.isRefreshing) {
+    console.log('[Debug] refreshData skipped - already refreshing');
+    return;
+  }
+  state.isRefreshing = true;
+
   if (!state.extractQuestionFn) {
     console.log('[Debug] No extractor available for this page');
     if (!isAutoRefresh) {
       showStatus('⚠️ No extractor available for this page', 'error', root);
     }
+    state.isRefreshing = false;
     return;
   }
 
@@ -579,6 +590,7 @@ async function refreshData(root, isAutoRefresh = false) {
 
   if (!notesTextarea) {
     console.error('[Debug] Notes textarea not found');
+    state.isRefreshing = false;
     return;
   }
 
@@ -724,11 +736,20 @@ async function refreshData(root, isAutoRefresh = false) {
         refreshBtn.disabled = false;
       }
     }
+  } finally {
+    state.isRefreshing = false;
   }
 }
 
 async function submitQuestionData(root) {
   console.log('[Debug] submitQuestionData called');
+
+  // Guard: Prevent concurrent submissions
+  if (state.isSubmitting) {
+    console.log('[Debug] submitQuestionData skipped - already submitting');
+    return;
+  }
+  state.isSubmitting = true;
 
   const questionLink = root.getElementById('gmat-question-link').value.trim();
   const notes = root.getElementById('gmat-notes').value.trim();
@@ -741,6 +762,7 @@ async function submitQuestionData(root) {
   if (!questionLink && !notes) {
     console.log('[Debug] Validation failed - no link or notes');
     showStatus('Please enter either a question link or notes.', 'error', root);
+    state.isSubmitting = false;
     return;
   }
 
@@ -866,6 +888,7 @@ async function submitQuestionData(root) {
     console.error('Submission error:', error);
     showStatus(`❌ Error: ${error.message}`, 'error', root);
   } finally {
+    state.isSubmitting = false;
     submitBtn.disabled = false;
     submitBtn.textContent = 'Quick Add';
   }
@@ -1572,7 +1595,8 @@ export async function createSidebar() {
   render();
 
   // Auto-populate notes with extracted difficulty and category
-  if (state.extractQuestionFn) {
+  // Only run on initial sidebar creation, not on re-renders (e.g., after submission)
+  if (state.extractQuestionFn && state.isInitialLoad) {
     console.log('[Debug] Auto-populate: Extractor available, attempting to extract...');
 
     // Use setTimeout to ensure DOM is ready
@@ -1667,10 +1691,17 @@ export async function createSidebar() {
         }
       } catch (error) {
         console.error('[Debug] Auto-populate error:', error);
+      } finally {
+        // Mark initial load as complete to prevent re-running on subsequent renders
+        state.isInitialLoad = false;
       }
     }, 100);
   } else {
-    console.log('[Debug] Auto-populate: No extractor available for this page');
+    console.log('[Debug] Auto-populate: Skipped -', !state.extractQuestionFn ? 'no extractor' : 'not initial load');
+    // If extractor exists but not initial load, still mark as complete
+    if (state.extractQuestionFn) {
+      state.isInitialLoad = false;
+    }
   }
 
   // ============================================================================

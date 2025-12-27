@@ -95,8 +95,15 @@ export async function extractQuestionData() {
 
         // Extract metadata first to check question type (like the working autoscraping script)
         const metadata = extractGMATHeroMetadata();
-        const isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
-        const isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
+
+        // Check for boldface question: either in metadata category OR in question stem content
+        const stemText = questionStem.textContent.toLowerCase();
+        const isBoldfaceQuestion = (metadata.category && metadata.category.toLowerCase().includes('boldface')) ||
+            stemText.includes('boldface') || stemText.includes('bold face');
+
+        // Check for complete argument question: either in metadata OR by presence of blanks
+        const isCompleteArgumentQuestion = (metadata.category && metadata.category.toLowerCase().includes('complete')) ||
+            questionStem.innerHTML.includes('_____') || questionStem.innerHTML.includes('________');
 
         // Clone and process
         const tempDiv = document.createElement('div');

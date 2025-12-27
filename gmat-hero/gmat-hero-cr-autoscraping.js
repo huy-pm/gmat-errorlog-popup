@@ -230,8 +230,15 @@ javascript: (function () {
 
             // Extract metadata first to check question type
             var metadata = extractGMATHeroMetadata();
-            var isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
-            var isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
+
+            // Check for boldface question: either in metadata category OR in question stem content
+            var stemText = questionStem.textContent.toLowerCase();
+            var isBoldfaceQuestion = (metadata.category && metadata.category.toLowerCase().includes('boldface')) ||
+                stemText.includes('boldface') || stemText.includes('bold face');
+
+            // Check for complete argument question: either in metadata OR by presence of blanks
+            var isCompleteArgumentQuestion = (metadata.category && metadata.category.toLowerCase().includes('complete')) ||
+                stemContent.includes('_____') || stemContent.includes('________');
 
             // If it's a Boldface or Complete the Argument question, convert styled spans to markdown
             if (isBoldfaceQuestion || isCompleteArgumentQuestion) {

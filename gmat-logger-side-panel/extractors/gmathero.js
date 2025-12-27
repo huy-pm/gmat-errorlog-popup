@@ -143,14 +143,31 @@ function extractTable(container) {
 
 /**
  * Convert styled spans to markdown format for boldface questions
+ * Handles: <b>, <strong>, <i>, <em>, and styled <span> tags
  * - Italicized spans (font-style: italic) -> *text*
  * - Bold spans or default -> **text**
  */
 function convertStyledSpansToMarkdown(htmlContent) {
+  if (!htmlContent) return '';
   var result = htmlContent;
+
+  // Convert <b> and <strong> tags to **text**
+  result = result.replace(/<b>([^<]*)<\/b>/gi, '**$1**');
+  result = result.replace(/<strong>([^<]*)<\/strong>/gi, '**$1**');
+
+  // Convert <i> and <em> tags to *text*
+  result = result.replace(/<i>([^<]*)<\/i>/gi, '*$1*');
+  result = result.replace(/<em>([^<]*)<\/em>/gi, '*$1*');
+
+  // Handle styled spans
   result = result.replace(/<span[^>]*>([\s\S]*?)<\/span>/gi, function (match, content) {
     if (match.includes('font-style: italic') || match.includes('font-style:italic')) {
       return '*' + content + '*';
+    }
+    // Check if it's highlighted (background-color: yellow)
+    if (match.includes('background-color: yellow') || match.includes('background-color:yellow') ||
+      match.includes('background: yellow') || match.includes('background:yellow')) {
+      return '==' + content + '==';
     }
     return '**' + content + '**';
   });
@@ -640,15 +657,15 @@ function extractGMATHeroCRContent() {
 
     // Extract metadata first to check question type
     const metadata = extractGMATHeroMetadata();
-    var isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
-    var isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
 
-    // Also detect Complete Argument questions by content pattern (underscore blanks)
-    // This handles cases where metadata doesn't explicitly indicate the question type
-    if (!isCompleteArgumentQuestion && (stemContent.includes('_____') || stemContent.includes('________'))) {
-      console.log("Detected Complete Argument question by content pattern (underscores)");
-      isCompleteArgumentQuestion = true;
-    }
+    // Check for boldface question: either in metadata category OR in question stem content
+    var stemText = questionStem.textContent.toLowerCase();
+    var isBoldfaceQuestion = (metadata.category && metadata.category.toLowerCase().includes('boldface')) ||
+      stemText.includes('boldface') || stemText.includes('bold face');
+
+    // Check for complete argument question: either in metadata OR by presence of blanks
+    var isCompleteArgumentQuestion = (metadata.category && metadata.category.toLowerCase().includes('complete')) ||
+      stemContent.includes('_____') || stemContent.includes('________');
 
     // If it's a Boldface or Complete the Argument question, convert styled spans to markdown
     if (isBoldfaceQuestion || isCompleteArgumentQuestion) {

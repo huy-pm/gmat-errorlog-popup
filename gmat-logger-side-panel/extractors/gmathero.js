@@ -50,7 +50,7 @@ function escapeCurrencyInTextNode(textNode) {
 function normalizeCurrency(text) {
   // Pattern: $\$NUMBER$ - KaTeX wrapped escaped currency
   // Convert to just \$NUMBER
-  return text.replace(/\$\\?\\\$(\d[\d,]*(?:\.\d+)?)\$/g, '\\$$1');
+  return text.replace(/\$\\?\\\$(\d[\d,]*(?:\.\d+)?)\$/g, '\\$$$1');
 }
 
 /**
@@ -82,6 +82,63 @@ function escapeCurrencyInElement(element) {
   }
 
   textNodes.forEach(escapeCurrencyInTextNode);
+}
+
+/**
+ * Extract table data from a container and remove it from DOM
+ */
+function extractTable(container) {
+  var tableElem = container.querySelector('table');
+  if (!tableElem) return null;
+
+  var rows = tableElem.querySelectorAll('tr');
+  var headers = [];
+  var data = [];
+
+  rows.forEach(function (row, index) {
+    var cells = row.querySelectorAll('td, th');
+    var rowData = Array.from(cells).map(function (cell) {
+      // Process any KaTeX in cell and get text
+      var cellClone = cell.cloneNode(true);
+      var katexElems = cellClone.querySelectorAll('.katex');
+      katexElems.forEach(function (katexElem) {
+        var annotation = katexElem.querySelector('annotation');
+        if (annotation) {
+          katexElem.replaceWith(document.createTextNode('$' + annotation.textContent + '$'));
+        }
+      });
+
+      // Convert <sup> tags to LaTeX ^{content}
+      var supElems = cellClone.querySelectorAll('sup');
+      supElems.forEach(function (sup) {
+        sup.replaceWith(document.createTextNode('^{' + sup.textContent + '}'));
+      });
+
+      // Convert <sub> tags to LaTeX _{content}
+      var subElems = cellClone.querySelectorAll('sub');
+      subElems.forEach(function (sub) {
+        sub.replaceWith(document.createTextNode('_{' + sub.textContent + '}'));
+      });
+
+      // Get text and wrap in $ if it contains math notation
+      var text = cellClone.textContent.trim();
+      if (text.indexOf('^{') !== -1 || text.indexOf('_{') !== -1) {
+        text = '$' + text + '$';
+      }
+      return text;
+    });
+
+    if (index === 0) {
+      headers = headers.concat(rowData);
+    } else {
+      data.push(rowData);
+    }
+  });
+
+  // Remove the table from container to clean up questionText
+  tableElem.remove();
+
+  return { headers: headers, rows: data };
 }
 
 /**
@@ -184,31 +241,80 @@ function getPracticeUrl() {
 }
 
 /**
- * Detect GMAT section from GMAT Hero page based on HTML structure
- * This is more stable than URL-based detection as it reflects actual page content
+ * Detect the current question type based on DOM structure
+ * @returns {string|null} Question type: 'quant', 'ds', 'cr', 'rc', 'di-gi', 'di-msr', 'di-ta', 'di-tpa', or null
  */
-function detectGMATHeroSection() {
-  // RC: Has left panel with passage element
-  const leftPanel = document.getElementById('left-panel');
-  const passageEl = leftPanel?.querySelector('.passage');
-  if (passageEl) {
-    return "Reading Comprehension";
+function detectQuestionType() {
+  // DI Types (check first as they have specific containers)
+  if (document.querySelector('.dropdown-selection')) return 'di-gi';
+  if (document.querySelector('.ir-msr')) return 'di-msr';
+  if (document.querySelector('.ir-ta')) return 'di-ta';
+  if (document.querySelector('.tpa-question')) return 'di-tpa';
+
+  // Verbal Types (use panel structure)
+  if (document.querySelector('#left-panel .passage')) return 'rc';
+
+  // Check for Data Sufficiency - look for DS answer choices pattern
+  const standardChoices = document.querySelector('.standard-choices');
+  if (standardChoices) {
+    const choicesText = standardChoices.textContent || '';
+    if (choicesText.includes('Statement (1) ALONE') ||
+      choicesText.includes('Statement (2) ALONE') ||
+      choicesText.includes('BOTH statements (1) and (2)')) {
+      return 'ds';
+    }
   }
 
-  // Quant: Has KaTeX math elements in the question
-  const rightPanel = document.getElementById('right-panel');
-  const hasMath = rightPanel?.querySelector('.katex');
-  if (hasMath) {
-    return "Quant";
+  const hasQuestionStem = document.querySelector('#right-panel .question-stem');
+  const hasPassage = document.querySelector('#left-panel .passage');
+  const hasKaTeX = document.querySelector('.katex');
+
+  // Also check question stem for (1) and (2) pattern as backup for DS
+  if (hasQuestionStem) {
+    const stemText = hasQuestionStem.textContent || '';
+    const hasStatement1 = /\(1\)\s/.test(stemText);
+    const hasStatement2 = /\(2\)\s/.test(stemText);
+    if (hasStatement1 && hasStatement2) {
+      return 'ds';
+    }
   }
 
-  // Default to CR for verbal questions without passage
-  const questionStem = rightPanel?.querySelector('.question-stem');
-  if (questionStem) {
-    return "Critical Reasoning";
-  }
+  // CR: has question stem but no passage and no KaTeX math
+  if (hasQuestionStem && !hasPassage && !hasKaTeX) return 'cr';
 
-  return "Unknown";
+  // Quant (has KaTeX math and not DI selectors)
+  if (hasKaTeX) return 'quant';
+
+  return null;
+}
+
+/**
+ * Get section from question type
+ */
+function getSectionFromType(questionType) {
+  if (!questionType) return 'unknown';
+  if (questionType === 'quant') return 'quant';
+  if (questionType === 'ds') return 'di';  // DS is under DI section
+  if (questionType === 'cr' || questionType === 'rc') return 'verbal';
+  if (questionType.startsWith('di-')) return 'di';
+  return 'unknown';
+}
+
+/**
+ * Get category label from question type
+ */
+function getCategoryFromType(questionType) {
+  const categoryMap = {
+    'di-gi': 'GI',
+    'di-msr': 'MSR',
+    'di-ta': 'TA',
+    'di-tpa': 'TPA',
+    'ds': 'DS',
+    'cr': 'CR',
+    'rc': 'RC',
+    'quant': '' // Quant uses custom category from metadata
+  };
+  return categoryMap[questionType] || '';
 }
 
 /**
@@ -375,6 +481,9 @@ function extractGMATHeroQuantContent() {
     htmlWithLineBreaks = htmlWithLineBreaks.replace(/<br\s*\/?>/gi, '\n');
     tempDiv.innerHTML = htmlWithLineBreaks;
 
+    // Extract table data BEFORE other processing (also removes table from DOM)
+    var tableData = extractTable(tempDiv);
+
     // IMPORTANT: Escape currency symbols BEFORE processing KaTeX
     // At this point, currency like $650 is plain text, while math is in .katex elements
     escapeCurrencyInElement(tempDiv);
@@ -387,9 +496,24 @@ function extractGMATHeroQuantContent() {
         var annotation = mathml.querySelector("annotation");
         if (annotation) {
           var texContent = annotation.textContent;
-          var isDisplay = texContent.includes("\\dfrac") || texContent.includes("\\frac") ||
+
+          // Check if this katex element is inside a katex-display wrapper
+          var isDisplayMode = katexElem.closest('.katex-display') !== null;
+
+          var isDisplay = isDisplayMode || texContent.includes("\\dfrac") || texContent.includes("\\frac") ||
             texContent.includes("\\int") || texContent.includes("\\sum");
-          var mathPlaceholder = document.createTextNode(isDisplay ? "$$" + texContent + "$$" : "$" + texContent + "$");
+
+          var mathText;
+          if (isDisplayMode) {
+            // Display mode: add newlines before and after for proper separation
+            mathText = '\n\n$$' + texContent + '$$\n\n';
+          } else if (isDisplay) {
+            mathText = '$$' + texContent + '$$';
+          } else {
+            mathText = '$' + texContent + '$';
+          }
+
+          var mathPlaceholder = document.createTextNode(mathText);
           katexElem.replaceWith(mathPlaceholder);
         }
       }
@@ -464,7 +588,7 @@ function extractGMATHeroQuantContent() {
     // Create JSON structure for Quant question
     var jsonData = {
       "questionLink": getPracticeUrl(),
-      "source": "",
+      "source": "GMAT HERO",
       "questionType": "quant",
       "difficulty": metadata.difficulty || "",
       "section": "Quant",
@@ -475,7 +599,8 @@ function extractGMATHeroQuantContent() {
       "content": {
         "questionText": normalizeCurrency(decodeHtmlEntities(questionText)),
         "answerChoices": answerChoices,
-        "image": questionImage
+        "image": questionImage,
+        "table": tableData
       }
     };
 
@@ -861,18 +986,29 @@ function extractGMATHeroRCContent() {
  * Main export: Extract question from GMAT Hero page
  */
 export function extractGMATHeroQuestion() {
-  const section = detectGMATHeroSection();
-  console.log("Detected GMAT Hero section:", section);
+  const questionType = detectQuestionType();
+  console.log("Detected GMAT Hero question type:", questionType);
 
-  switch (section) {
-    case "Quant":
+  switch (questionType) {
+    case 'quant':
       return extractGMATHeroQuantContent();
-    case "Critical Reasoning":
+    case 'ds':
+      // DS questions are skipped for now (or could add specific extractor)
+      console.log("DS question detected - skipping");
+      return null;
+    case 'cr':
       return extractGMATHeroCRContent();
-    case "Reading Comprehension":
+    case 'rc':
       return extractGMATHeroRCContent();
+    case 'di-gi':
+    case 'di-msr':
+    case 'di-ta':
+    case 'di-tpa':
+      // DI questions - could add specific extractors
+      console.log("DI question type detected:", questionType);
+      return null;
     default:
-      console.warn("Unsupported GMAT Hero question type:", section);
+      console.warn("Unsupported GMAT Hero question type:", questionType);
       return null;
   }
 }

@@ -8,6 +8,7 @@ import {
     escapeCurrencyInElement,
     normalizeCurrency,
     processKaTeX,
+    extractTable,
     getPracticeUrl,
     extractGMATHeroMetadata
 } from '../utils.js';
@@ -58,6 +59,9 @@ export async function extractQuestionData() {
         html = html.replace(/<br\s*\/?>\s*\(2\)/gi, '|||STMT2|||(2)');
 
         tempDiv.innerHTML = html;
+
+        // Extract table data BEFORE other processing (also removes table from DOM)
+        const tableData = extractTable(tempDiv);
 
         // IMPORTANT: Escape currency symbols BEFORE processing KaTeX
         escapeCurrencyInElement(tempDiv);
@@ -122,7 +126,7 @@ export async function extractQuestionData() {
             difficulty: metadata.difficulty || '',
             section: 'di',
             questionType: 'di',
-            category: 'ds',
+            category: 'DS',
             correctAnswer: metadata.correctAnswer || '',
             content: {
                 questionText: normalizeCurrency(decodeHtmlEntities(questionText)),
@@ -130,7 +134,8 @@ export async function extractQuestionData() {
                     normalizeCurrency(decodeHtmlEntities(statement1)),
                     normalizeCurrency(decodeHtmlEntities(statement2))
                 ],
-                image: questionImage
+                image: questionImage,
+                table: tableData
             }
         };
 

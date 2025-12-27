@@ -274,7 +274,7 @@ export async function loadExtractor(type) {
 
     const extractorMap = {
         'quant': 'quant.js',
-        'ds': 'ds.js',
+        'ds': 'di-ds.js',
         'cr': 'cr.js',
         'rc': 'rc.js',
         'di-gi': 'di-gi.js',

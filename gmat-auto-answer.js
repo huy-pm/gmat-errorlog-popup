@@ -113,18 +113,126 @@
         console.log('Auto-answer script stopped.');
     }
 
+    // Detect and answer the current question type
+    function answerQuestion() {
+        let answered = false;
+        let questionType = 'unknown';
+
+        // 1. DI - DS: Select first radio option (id starts with "ds-option")
+        const dsOption = document.getElementById('ds-option1');
+        if (dsOption) {
+            dsOption.click();
+            answered = true;
+            questionType = 'DI-DS';
+            console.log('DI-DS: Selected first option');
+        }
+
+        // 2. DI - TPA: Select both columns in first row (name starts with "tpa-column")
+        if (!answered) {
+            const tpaColumn1 = document.querySelector('input[name="tpa-column1"]');
+            const tpaColumn2 = document.querySelector('input[name="tpa-column2"]');
+            if (tpaColumn1 || tpaColumn2) {
+                if (tpaColumn1) tpaColumn1.click();
+                if (tpaColumn2) tpaColumn2.click();
+                answered = true;
+                questionType = 'DI-TPA';
+                console.log('DI-TPA: Selected both columns');
+            }
+        }
+
+        // 3. DI - TA: Select first column for top 3 rows (name starts with "ta-statement-")
+        if (!answered) {
+            const taInputs = document.querySelectorAll('input[name^="ta-statement-"]');
+            if (taInputs.length > 0) {
+                // Group by statement number and select first column (first input) for each
+                const statements = new Set();
+                taInputs.forEach(input => {
+                    const name = input.name;
+                    if (!statements.has(name)) {
+                        statements.add(name);
+                        // Get all inputs for this statement and click the first one
+                        const firstInput = document.querySelector(`input[name="${name}"]`);
+                        if (firstInput) firstInput.click();
+                    }
+                });
+                answered = true;
+                questionType = 'DI-TA';
+                console.log('DI-TA: Selected first column for all rows');
+            }
+        }
+
+        // 4. MSR - Binary: Select first column for all rows (name starts with "msr-binary-")
+        if (!answered) {
+            const msrBinaryInputs = document.querySelectorAll('input[name^="msr-binary-"]');
+            if (msrBinaryInputs.length > 0) {
+                // Group by row and select first column for each
+                const rows = new Set();
+                msrBinaryInputs.forEach(input => {
+                    const name = input.name;
+                    if (!rows.has(name)) {
+                        rows.add(name);
+                        const firstInput = document.querySelector(`input[name="${name}"]`);
+                        if (firstInput) firstInput.click();
+                    }
+                });
+                answered = true;
+                questionType = 'MSR-Binary';
+                console.log('MSR-Binary: Selected first column for all rows');
+            }
+        }
+
+        // 5. MSR - Multiple Choice: Select first item (div with rounded-full and cursor-pointer)
+        if (!answered) {
+            const msrChoices = document.querySelectorAll('.space-y-3 > div.cursor-pointer, .space-y-3 > div[class*="cursor-pointer"]');
+            if (msrChoices.length > 0) {
+                msrChoices[0].click();
+                answered = true;
+                questionType = 'MSR-MultipleChoice';
+                console.log('MSR-MultipleChoice: Selected first option');
+            }
+        }
+
+        // 6. DI - GI: Select second option in all dropdowns
+        if (!answered) {
+            const dropdowns = document.querySelectorAll('select');
+            if (dropdowns.length > 0) {
+                dropdowns.forEach(select => {
+                    if (select.options.length > 1) {
+                        select.selectedIndex = 1; // Select second option (index 1)
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                answered = true;
+                questionType = 'DI-GI';
+                console.log('DI-GI: Selected second option in dropdowns');
+            }
+        }
+
+        // 7. Fallback: Regular multiple choice (id="option1")
+        if (!answered) {
+            const option1 = document.getElementById('option1');
+            if (option1) {
+                option1.click();
+                answered = true;
+                questionType = 'MultipleChoice';
+                console.log('MultipleChoice: Selected Option 1');
+            }
+        }
+
+        return { answered, questionType };
+    }
+
     function processStep() {
         if (!isRunning || isPaused) return;
 
         console.log('--- Starting new iteration ---');
 
-        // 1. Select Option 1
-        const option1 = document.getElementById('option1');
-        if (option1) {
-            option1.click();
-            console.log('Selected Option 1');
+        // 1. Answer the current question
+        const { answered, questionType } = answerQuestion();
+        if (answered) {
+            updateStatus(`Answered: ${questionType}`, '#28a745');
         } else {
-            console.warn('Option 1 (#option1) not found.');
+            console.warn('Could not find any answerable element.');
         }
 
         // Small delay to allow UI state to update

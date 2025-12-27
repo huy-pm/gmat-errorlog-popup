@@ -6,6 +6,7 @@
 import {
     decodeHtmlEntities,
     convertStyledSpansToMarkdown,
+    convertBoldItalicToMarkdown,
     isCompletionStyleQuestion,
     getPracticeUrl,
     extractGMATHeroMetadata
@@ -92,12 +93,23 @@ export async function extractQuestionData() {
             return null;
         }
 
+        // Extract metadata first to check question type (like the working autoscraping script)
+        const metadata = extractGMATHeroMetadata();
+        const isBoldfaceQuestion = metadata.category && metadata.category.toLowerCase().includes('boldface');
+        const isCompleteArgumentQuestion = metadata.category && metadata.category.toLowerCase().includes('complete');
+
         // Clone and process
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = questionStem.innerHTML;
 
-        // Convert styled spans to markdown
-        let processedHtml = convertStyledSpansToMarkdown(tempDiv.innerHTML);
+        let processedHtml = tempDiv.innerHTML;
+
+        // Only convert bold/italic to markdown for boldface and complete argument questions
+        // This matches the behavior of the working gmat-hero-cr-autoscraping.js
+        if (isBoldfaceQuestion || isCompleteArgumentQuestion) {
+            // Use convertBoldItalicToMarkdown which handles <b>, <i>, <strong>, <em>, and styled <span> tags
+            processedHtml = convertBoldItalicToMarkdown(processedHtml);
+        }
 
         // Replace <br> tags with newlines
         processedHtml = processedHtml.replace(/<br\s*\/?>/gi, '\n\n');
@@ -139,9 +151,7 @@ export async function extractQuestionData() {
             });
         }
 
-        // Extract metadata
-        const metadata = extractGMATHeroMetadata();
-
+        // Note: metadata was already extracted earlier to check for Boldface questions
         // Determine if this is a completion style question
         const needsCompletion = isCompletionStyleQuestion(question) ||
             (!question.endsWith('?') && question.length > 0);

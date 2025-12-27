@@ -243,6 +243,40 @@ export function convertStyledSpansToMarkdown(htmlContent) {
 }
 
 /**
+ * Convert HTML bold/italic tags to markdown format for boldface questions
+ * Handles: <b>, <strong>, <i>, <em>, and styled <span> tags
+ * @param {string} htmlContent - HTML content
+ * @returns {string} Markdown formatted content
+ */
+export function convertBoldItalicToMarkdown(htmlContent) {
+    if (!htmlContent) return '';
+
+    let result = htmlContent;
+
+    // Convert <b> and <strong> tags to **text**
+    result = result.replace(/<b>([^<]*)<\/b>/gi, '**$1**');
+    result = result.replace(/<strong>([^<]*)<\/strong>/gi, '**$1**');
+
+    // Convert <i> and <em> tags to *text*
+    result = result.replace(/<i>([^<]*)<\/i>/gi, '*$1*');
+    result = result.replace(/<em>([^<]*)<\/em>/gi, '*$1*');
+
+    // Also handle styled spans (for completeness)
+    result = result.replace(/<span[^>]*style="([^"]*)"[^>]*>([\s\S]*?)<\/span>/gi, function (match, style, content) {
+        if (style.includes('font-style: italic') || style.includes('font-style:italic')) {
+            return '*' + content + '*';
+        }
+        if (style.includes('font-weight: bold') || style.includes('font-weight:bold') ||
+            style.includes('font-weight: 700') || style.includes('font-weight:700')) {
+            return '**' + content + '**';
+        }
+        return content;
+    });
+
+    return result;
+}
+
+/**
  * Convert highlighted text to markdown format for RC questions
  * - Yellow background spans -> ==text==
  * @param {string} htmlContent - HTML content

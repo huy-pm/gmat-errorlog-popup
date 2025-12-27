@@ -19,6 +19,8 @@ const QUESTION_PATTERNS = [
     /Which of the following/i,
     /Which one of the following/i,
     /What is the/i,
+    /Why does the/i,
+    /How does the/i,
     /The argument is most vulnerable/i,
     /The reasoning in the argument/i,
     /The claim that/i,
@@ -31,7 +33,20 @@ const QUESTION_PATTERNS = [
     /The information above/i,
     /The facts above/i,
     /Based on the passage/i,
-    /According to the passage/i
+    /According to the passage/i,
+    /EXCEPT/i,
+    /flaw in the reasoning/i,
+    /strengthen the argument/i,
+    /weaken the argument/i
+];
+
+/**
+ * Keywords that indicate a sentence with ? is likely a question (not just a quote)
+ */
+const QUESTION_KEYWORDS = [
+    'which', 'what', 'how', 'why', 'except',
+    'vulnerable', 'flaw', 'assumption', 'conclusion',
+    'inference', 'strengthen', 'weaken'
 ];
 
 /**
@@ -39,6 +54,43 @@ const QUESTION_PATTERNS = [
  * @param {string} text - Full text content
  * @returns {{ passage: string, question: string }}
  */
+/**
+ * Check if text likely contains a question based on keywords
+ */
+function hasQuestionKeywords(text) {
+    const lowerText = text.toLowerCase();
+    return QUESTION_KEYWORDS.some(keyword => lowerText.includes(keyword));
+}
+
+/**
+ * Split passage and question for Complete-the-Argument questions
+ * Structure: Question (with ?) comes FIRST, then passage (ending with _____)
+ */
+function splitCompleteArgumentQuestion(text) {
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    let questionPart = '';
+    let passagePart = '';
+
+    for (const sentence of sentences) {
+        if (sentence.includes('?') && !questionPart) {
+            questionPart = sentence.trim();
+        } else if (sentence.includes('_____') || sentence.includes('________')) {
+            // This and remaining content is the passage with blanks
+            const idx = sentences.indexOf(sentence);
+            passagePart = sentences.slice(idx).join(' ').trim();
+            break;
+        }
+    }
+
+    // If we found the question but not passage with blanks, combine remaining as passage
+    if (questionPart && !passagePart) {
+        const questionIdx = text.indexOf(questionPart);
+        passagePart = text.substring(questionIdx + questionPart.length).trim();
+    }
+
+    return { passage: passagePart, question: questionPart };
+}
+
 function splitPassageAndQuestion(text) {
     if (!text) return { passage: '', question: text };
 
@@ -56,11 +108,22 @@ function splitPassageAndQuestion(text) {
         }
     }
 
+    // Fallback: find last sentence with ? that has question keywords
+    const sentences = text.split(/(?<=[.!?])\s+/);
+    for (let i = sentences.length - 1; i >= 0; i--) {
+        const sentence = sentences[i];
+        if (sentence.includes('?') && hasQuestionKeywords(sentence)) {
+            return {
+                passage: sentences.slice(0, i).join(' ').trim(),
+                question: sentence.trim()
+            };
+        }
+    }
+
     // Check for sentence completion style (ends with specific patterns)
     if (isCompletionStyleQuestion(text)) {
         // For completion style, the entire text is the "question"
         // Try to find the last sentence before the completion pattern
-        const sentences = text.split(/(?<=[.!?])\s+/);
         if (sentences.length > 1) {
             const lastSentence = sentences[sentences.length - 1];
             const passage = sentences.slice(0, -1).join(' ');
@@ -127,8 +190,17 @@ export async function extractQuestionData() {
         stemContent = stemContent.split('\n').map(line => line.trim()).join('\n');
         stemContent = stemContent.replace(/\n{3,}/g, '\n\n').trim();
 
-        // Split passage and question
-        const { passage, question } = splitPassageAndQuestion(stemContent);
+        // Handle Complete-the-Argument questions separately
+        let passage, question;
+        if (isCompleteArgumentQuestion) {
+            const result = splitCompleteArgumentQuestion(stemContent);
+            passage = result.passage;
+            question = result.question;
+        } else {
+            const result = splitPassageAndQuestion(stemContent);
+            passage = result.passage;
+            question = result.question;
+        }
 
         // Extract answer choices
         const answerChoices = [];
@@ -158,10 +230,6 @@ export async function extractQuestionData() {
             });
         }
 
-        // Note: metadata was already extracted earlier to check for Boldface questions
-        // Determine if this is a completion style question
-        const needsCompletion = isCompletionStyleQuestion(question) ||
-            (!question.endsWith('?') && question.length > 0);
 
         // Create JSON structure
         const jsonData = {
@@ -175,8 +243,7 @@ export async function extractQuestionData() {
             content: {
                 passage: decodeHtmlEntities(passage),
                 questionText: decodeHtmlEntities(question),
-                answerChoices: answerChoices.map(choice => decodeHtmlEntities(choice)),
-                isCompletionStyle: needsCompletion
+                answerChoices: answerChoices.map(choice => decodeHtmlEntities(choice))
             }
         };
 

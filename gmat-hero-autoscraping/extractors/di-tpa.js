@@ -46,10 +46,10 @@ export async function extractQuestionData() {
         }
 
         // 3. Extract Column Headers
-        const columnHeaders = [];
+        const choiceLabels = [];
         const headerElements = tpaQuestion.querySelectorAll('.grid-item.center > b');
         headerElements.forEach(header => {
-            columnHeaders.push(header.textContent.trim());
+            choiceLabels.push(header.textContent.trim());
         });
 
         // 4. Extract Rows
@@ -109,7 +109,7 @@ export async function extractQuestionData() {
             category: 'TPA',
             content: {
                 questionText: decodeHtmlEntities(questionText),
-                columnHeaders: columnHeaders,
+                choiceLabels: choiceLabels,
                 rows: rows,
                 correctAnswers: correctAnswers
             }

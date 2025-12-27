@@ -5,6 +5,9 @@
 
 import {
     decodeHtmlEntities,
+    escapeCurrencyInElement,
+    normalizeCurrency,
+    processKaTeX,
     getPracticeUrl,
     extractGMATHeroMetadata
 } from '../utils.js';
@@ -22,9 +25,15 @@ export async function extractQuestionData() {
             return null;
         }
 
-        // 2. Extract Intro Text
+        // 2. Extract Intro Text (with KaTeX processing)
         const introTextDiv = irTa.querySelector('div.ng-star-inserted');
-        const introText = introTextDiv ? introTextDiv.textContent.trim() : '';
+        let introText = '';
+        if (introTextDiv) {
+            const introClone = introTextDiv.cloneNode(true);
+            escapeCurrencyInElement(introClone);
+            processKaTeX(introClone);
+            introText = normalizeCurrency(introClone.textContent.trim());
+        }
 
         // 3. Extract Table Headers
         const thead = irTa.querySelector('thead');
@@ -43,8 +52,11 @@ export async function extractQuestionData() {
             const groupHeaders = subHeaderRow.querySelectorAll('th');
             groupHeaders.forEach(th => {
                 const colspan = th.getAttribute('colspan') || '1';
+                const thClone = th.cloneNode(true);
+                escapeCurrencyInElement(thClone);
+                processKaTeX(thClone);
                 headerGroups.push({
-                    label: th.textContent.trim(),
+                    label: normalizeCurrency(thClone.textContent.trim()),
                     colspan: parseInt(colspan, 10)
                 });
             });
@@ -55,7 +67,10 @@ export async function extractQuestionData() {
         const lastHeaderRow = headerRows[headerRows.length - 1];
         const headerCells = lastHeaderRow.querySelectorAll('th > div');
         headerCells.forEach(cell => {
-            headers.push(cell.textContent.trim());
+            const cellClone = cell.cloneNode(true);
+            escapeCurrencyInElement(cellClone);
+            processKaTeX(cellClone);
+            headers.push(normalizeCurrency(cellClone.textContent.trim()));
         });
 
         // 4. Extract Table Rows
@@ -71,30 +86,39 @@ export async function extractQuestionData() {
             const rowData = [];
             const cells = tr.querySelectorAll('td > span');
             cells.forEach(span => {
-                rowData.push(span.textContent.trim());
+                const spanClone = span.cloneNode(true);
+                escapeCurrencyInElement(spanClone);
+                processKaTeX(spanClone);
+                rowData.push(normalizeCurrency(spanClone.textContent.trim()));
             });
             if (rowData.length > 0) {
                 rows.push(rowData);
             }
         });
 
-        // 5. Extract Table Legend/Footnotes (if present)
+        // 5. Extract Table Legend/Footnotes (if present, with KaTeX processing)
         let tableLegend = null;
         const legendDiv = irTa.querySelector('.sortable-table + div.ng-star-inserted');
         if (legendDiv) {
-            const legendText = legendDiv.textContent.trim();
+            const legendClone = legendDiv.cloneNode(true);
+            escapeCurrencyInElement(legendClone);
+            processKaTeX(legendClone);
+            const legendText = normalizeCurrency(legendClone.textContent.trim());
             if (legendText) {
                 tableLegend = decodeHtmlEntities(legendText);
             }
         }
 
-        // 6. Extract Question Instruction
+        // 6. Extract Question Instruction (with KaTeX processing)
         const questionStem = document.querySelector('#right-panel .question-stem');
         if (!questionStem) {
             console.warn('No question stem found');
             return null;
         }
-        const questionInstruction = questionStem.textContent.trim();
+        const stemClone = questionStem.cloneNode(true);
+        escapeCurrencyInElement(stemClone);
+        processKaTeX(stemClone);
+        const questionInstruction = normalizeCurrency(stemClone.textContent.trim());
 
         // 7. Extract Binary Choice Statements (Yes/No, True/False, etc.)
         const yesNoQuestion = document.querySelector('.yes-no-question');
@@ -120,7 +144,11 @@ export async function extractQuestionData() {
 
             if (!statementTextDiv) break;
 
-            const statementText = statementTextDiv.textContent.trim();
+            // Process KaTeX in statement text
+            const statementClone = statementTextDiv.cloneNode(true);
+            escapeCurrencyInElement(statementClone);
+            processKaTeX(statementClone);
+            const statementText = normalizeCurrency(statementClone.textContent.trim());
 
             // Find correct answer by checking which radio button has 'correct-answer' class
             let correctAnswer = null;

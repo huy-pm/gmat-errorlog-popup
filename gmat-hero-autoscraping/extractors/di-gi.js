@@ -6,6 +6,8 @@
 import {
     decodeHtmlEntities,
     delay,
+    escapeCurrencyInElement,
+    normalizeCurrency,
     getPracticeUrl,
     extractGMATHeroMetadata,
     processKaTeX
@@ -25,12 +27,13 @@ function extractTextWithKaTeX(node) {
         return clone.textContent;
     }
 
-    // Process KaTeX elements in the clone
+    // Process currency and KaTeX elements in the clone
     if (clone.querySelectorAll) {
+        escapeCurrencyInElement(clone);
         processKaTeX(clone);
     }
 
-    return clone.textContent;
+    return normalizeCurrency(clone.textContent);
 }
 
 /**
@@ -68,7 +71,11 @@ export async function extractQuestionData() {
         htmlWithLineBreaks = htmlWithLineBreaks.replace(/<br\s*\/?>/gi, '\n');
         stemClone.innerHTML = htmlWithLineBreaks;
 
-        let questionText = stemClone.textContent.trim();
+        // Process KaTeX math expressions
+        escapeCurrencyInElement(stemClone);
+        processKaTeX(stemClone);
+
+        let questionText = normalizeCurrency(stemClone.textContent.trim());
         questionText = questionText.split('\n').map(l => l.trim()).join('\n');
         questionText = questionText.replace(/\n{3,}/g, '\n\n').trim();
 

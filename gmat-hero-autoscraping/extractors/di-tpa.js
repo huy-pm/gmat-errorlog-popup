@@ -5,6 +5,9 @@
 
 import {
     decodeHtmlEntities,
+    escapeCurrencyInElement,
+    normalizeCurrency,
+    processKaTeX,
     getPracticeUrl,
     extractGMATHeroMetadata
 } from '../utils.js';
@@ -27,14 +30,18 @@ export async function extractQuestionData() {
             return null;
         }
 
-        // 1. Extract Question Text
+        // 1. Extract Question Text (with KaTeX processing)
         let htmlWithLineBreaks = questionStem.innerHTML;
         htmlWithLineBreaks = htmlWithLineBreaks.replace(/<br\s*\/?>/gi, '\n');
 
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = htmlWithLineBreaks;
 
-        let questionText = tempDiv.textContent.trim();
+        // Process KaTeX math expressions
+        escapeCurrencyInElement(tempDiv);
+        processKaTeX(tempDiv);
+
+        let questionText = normalizeCurrency(tempDiv.textContent.trim());
         questionText = questionText.split('\n').map(l => l.trim()).join('\n');
         questionText = questionText.replace(/\n{3,}/g, '\n\n').trim();
 
@@ -45,11 +52,14 @@ export async function extractQuestionData() {
             return null;
         }
 
-        // 3. Extract Column Headers
+        // 3. Extract Column Headers (with KaTeX processing)
         const choiceLabels = [];
         const headerElements = tpaQuestion.querySelectorAll('.grid-item.center > b');
         headerElements.forEach(header => {
-            choiceLabels.push(header.textContent.trim());
+            const headerClone = header.cloneNode(true);
+            escapeCurrencyInElement(headerClone);
+            processKaTeX(headerClone);
+            choiceLabels.push(normalizeCurrency(headerClone.textContent.trim()));
         });
 
         // 4. Extract Rows
@@ -70,7 +80,11 @@ export async function extractQuestionData() {
             const radioInput = radioPart1.querySelector('input[type="radio"]');
             const optionValue = radioInput ? radioInput.value : '';
 
-            const rowText = textElement.textContent.trim();
+            // Process KaTeX in row text
+            const textClone = textElement.cloneNode(true);
+            escapeCurrencyInElement(textClone);
+            processKaTeX(textClone);
+            const rowText = normalizeCurrency(textClone.textContent.trim());
 
             rows.push({
                 text: rowText,

@@ -393,7 +393,7 @@ export async function extractQuestionData() {
 
             questionSet = {
                 questionSetLink: getPracticeUrl(),
-                source: 'GMAT HERO',
+                source: 'gmat-hero',
                 section: 'di',
                 questionType: 'di',
                 category: 'MSR',

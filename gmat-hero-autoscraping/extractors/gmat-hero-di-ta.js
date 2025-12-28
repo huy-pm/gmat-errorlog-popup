@@ -183,7 +183,7 @@ export async function extractQuestionData() {
         // Construct Final JSON
         const jsonData = {
             questionLink: getPracticeUrl(),
-            source: 'GMAT HERO',
+            source: 'gmat-hero',
             difficulty: metadata.difficulty || '',
             section: 'di',
             questionType: 'di',

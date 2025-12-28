@@ -17,7 +17,7 @@
             // Remove query params and get the path without the filename
             const pathWithoutQuery = scriptUrl.origin + scriptUrl.pathname;
             // Remove loader.js from the end to get base path
-            return pathWithoutQuery.replace(/loader\.js$/, '');
+            return pathWithoutQuery.replace(/gmat-hero-loader\.js$/, '');
         }
         return './';
     };
@@ -28,8 +28,8 @@
         console.log('🚀 GMAT Hero Autoscraping - Loading...');
 
         // Dynamically import modules
-        const utils = await import(`${basePath}utils.js${cacheBuster}`);
-        const core = await import(`${basePath}core.js${cacheBuster}`);
+        const utils = await import(`${basePath}gmat-hero-utils.js${cacheBuster}`);
+        const core = await import(`${basePath}gmat-hero-core.js${cacheBuster}`);
 
         // Detect initial question type
         const initialType = utils.detectQuestionType();

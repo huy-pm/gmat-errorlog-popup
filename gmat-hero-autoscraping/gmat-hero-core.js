@@ -3,7 +3,7 @@
  * Popup UI, processing loop, state management, and navigation
  */
 
-import { delay, detectQuestionType, getSectionFromType } from './utils.js';
+import { delay, detectQuestionType, getSectionFromType } from './gmat-hero-utils.js';
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -273,14 +273,14 @@ export async function loadExtractor(type) {
     const cacheBuster = `?v=${Date.now()}`;
 
     const extractorMap = {
-        'quant': 'quant.js',
-        'ds': 'di-ds.js',
-        'cr': 'cr.js',
-        'rc': 'rc.js',
-        'di-gi': 'di-gi.js',
-        'di-msr': 'di-msr.js',
-        'di-ta': 'di-ta.js',
-        'di-tpa': 'di-tpa.js'
+        'quant': 'gmat-hero-quant.js',
+        'ds': 'gmat-hero-di-ds.js',
+        'cr': 'gmat-hero-cr.js',
+        'rc': 'gmat-hero-rc.js',
+        'di-gi': 'gmat-hero-di-gi.js',
+        'di-msr': 'gmat-hero-di-msr.js',
+        'di-ta': 'gmat-hero-di-ta.js',
+        'di-tpa': 'gmat-hero-di-tpa.js'
     };
 
     const extractorFile = extractorMap[type];
@@ -310,7 +310,7 @@ function getBasePath() {
         // Remove query params and get the path without the filename
         const pathWithoutQuery = scriptUrl.origin + scriptUrl.pathname;
         // Remove loader.js from the end to get base path
-        return pathWithoutQuery.replace(/loader\.js$/, '');
+        return pathWithoutQuery.replace(/gmat-hero-loader\.js$/, '');
     }
     // Fallback for when loaded as a module
     return './';

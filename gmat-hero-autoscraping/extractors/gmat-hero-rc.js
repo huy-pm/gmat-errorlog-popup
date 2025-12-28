@@ -101,7 +101,7 @@ export async function extractQuestionData() {
         // Create JSON structure
         const jsonData = {
             questionLink: getPracticeUrl(),
-            source: 'GMAT HERO',
+            source: 'gmat-hero',
             difficulty: metadata.difficulty || '',
             section: 'verbal',
             questionType: 'rc',

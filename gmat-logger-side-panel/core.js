@@ -13,6 +13,7 @@ import {
   allDifficultyMappings,
   sourceMappings,
   detectSourceFromLink,
+  getSourceDisplayLabel,
   createBadge,
   showStatus,
   enrichquestionData,
@@ -453,7 +454,8 @@ function updateParsedPreview(questionLink, notes, root) {
   badgesDiv.innerHTML = '';
 
   if (parsed.source) {
-    const sourceBadge = createBadge(`Source: ${parsed.source}`, 'green');
+    const sourceDisplay = getSourceDisplayLabel(parsed.source);
+    const sourceBadge = createBadge(`Source: ${sourceDisplay}`, 'green');
     if (questionLink.trim()) sourceBadge.innerHTML += ' <span style="margin-left:4px">📎</span>';
     badgesDiv.appendChild(sourceBadge);
   }

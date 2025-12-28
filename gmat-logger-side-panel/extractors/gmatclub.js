@@ -770,7 +770,7 @@ function extractGMATClubRCContent() {
     // Create JSON structure for RC question
     var jsonData = {
       "questionLink": getPracticeUrl(window.location.href),
-      "source": "", // Will be filled by enrich or caller if needed, but usually empty here
+      "source": "gmat-club", // Will be filled by enrich or caller if needed, but usually empty here
       "questionType": "rc",
       "difficulty": metadata.difficulty || "",
       "section": "verbal",

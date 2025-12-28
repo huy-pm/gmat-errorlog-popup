@@ -351,7 +351,7 @@ function extractOGRCContent() {
         // Create JSON structure for RC question
         const jsonData = {
             "questionLink": getCurrentUrl(),
-            "source": "GMAT Official",
+            "source": "gmat-og",
             "questionType": "rc",
             "difficulty": "",
             "section": "verbal",
@@ -525,7 +525,7 @@ function extractOGCRContent() {
         // Create JSON structure for CR question
         const jsonData = {
             "questionLink": getCurrentUrl(),
-            "source": "GMAT Official",
+            "source": "gmat-og",
             "questionType": "cr",
             "difficulty": "",
             "section": "verbal",

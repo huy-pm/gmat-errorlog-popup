@@ -86,22 +86,45 @@ export const allDifficultyMappings = {
 };
 
 export const sourceMappings = {
-  'og': 'OG',
-  'official': 'OG',
-  'guide': 'OG',
-  'gmat': 'GMATClub',
-  'club': 'GMATClub',
-  'gmatclub': 'GMATClub',
-  'ttp': 'TTP',
-  'target test prep': 'TTP'
+  'og': 'gmat-og',
+  'official': 'gmat-og',
+  'official guide': 'gmat-og',
+  'gmatclub': 'gmat-club',
+  'gmat club': 'gmat-club',
+  'ttp': 'gmat-ttp',
+  'target test prep': 'gmat-ttp',
+  'hero': 'gmat-hero',
+  'gmat hero': 'gmat-hero',
+  'gmathero': 'gmat-hero',
+  'youtube': 'youtube'
 };
 
 export const urlSourceMappings = [
-  { pattern: /gmat-hero-v2\.web\.app/i, source: 'OG' },
-  { pattern: /gmatclub\.com\/forum/i, source: 'GMATClub' },
-  { pattern: /targettestprep\.com/i, source: 'TTP' },
-  { pattern: /gmatofficialpractice\.mba\.com/i, source: 'GMAT Official' }
+  { pattern: /gmat-hero-v2\.web\.app/i, source: 'gmat-hero' },
+  { pattern: /gmatclub\.com\/forum/i, source: 'gmat-club' },
+  { pattern: /targettestprep\.com/i, source: 'gmat-ttp' },
+  { pattern: /gmatofficialpractice\.mba\.com/i, source: 'gmat-og' },
+  { pattern: /youtube\.com/i, source: 'youtube' }
 ];
+
+// Display labels for source values
+export const sourceDisplayLabels = {
+  'gmat-club': 'GMAT Club',
+  'gmat-og': 'Official Guide',
+  'gmat-hero': 'GMAT Hero',
+  'gmat-ttp': 'TTP',
+  'youtube': 'Youtube'
+};
+
+/**
+ * Get display label for a source value
+ * @param {string} source - The source value (e.g., 'gmat-club')
+ * @returns {string} - The display label (e.g., 'GMAT Club') or the original source if not found
+ */
+export function getSourceDisplayLabel(source) {
+  if (!source) return '';
+  return sourceDisplayLabels[source] || source;
+}
 
 /**
  * Decode HTML entities

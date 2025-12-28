@@ -606,7 +606,7 @@ function extractGMATHeroQuantContent() {
     // Create JSON structure for Quant question
     var jsonData = {
       "questionLink": getPracticeUrl(),
-      "source": "GMAT HERO",
+      "source": "gmat-hero",
       "questionType": "quant",
       "difficulty": metadata.difficulty || "",
       "section": "Quant",

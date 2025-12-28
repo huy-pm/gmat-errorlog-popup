@@ -765,7 +765,7 @@ javascript: (function () {
       // Create JSON structure matching gmatclub.js format
       let jsonData = {
         "questionLink": window.location.href,
-        "source": "",
+        "source": "gmat-club",
         "difficulty": "",
         "section": "verbal",
         "questionType": "rc",

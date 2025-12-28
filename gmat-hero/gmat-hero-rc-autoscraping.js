@@ -264,7 +264,7 @@ javascript: (function () {
             // Create JSON structure for RC question
             var jsonData = {
                 "questionLink": getPracticeUrl(),
-                "source": "GMAT HERO",
+                "source": "gmat-hero",
                 "difficulty": metadata.difficulty || "",
                 "section": "verbal",
                 "questionType": "rc",
@@ -275,7 +275,7 @@ javascript: (function () {
                     "passage": passage,
                     "questionText": question,
                     "answerChoices": answerChoices,
-                    "highlight_ranges": highlightRanges
+                    "highlightRanges": highlightRanges
                 }
             };
 

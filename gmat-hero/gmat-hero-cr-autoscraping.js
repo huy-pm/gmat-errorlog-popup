@@ -468,7 +468,7 @@ javascript: (function () {
             // Create JSON structure for CR question
             var jsonData = {
                 "questionLink": getPracticeUrl(),
-                "source": "GMAT HERO",
+                "source": "gmat-hero",
                 "difficulty": metadata.difficulty || "",
                 "section": "verbal",
                 "questionType": "cr",

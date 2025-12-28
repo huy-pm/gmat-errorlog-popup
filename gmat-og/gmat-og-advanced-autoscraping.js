@@ -513,7 +513,7 @@ javascript: (function () {
             // Create JSON structure for CR question
             var jsonData = {
                 "questionLink": getCurrentUrl(),
-                "source": "GMAT Official",
+                "source": "gmat-og",
                 "difficulty": currentDifficulty, // Use difficulty from list page
                 "section": "verbal",
                 "questionType": "cr",

@@ -136,7 +136,7 @@ export function extractQuestionData(difficulty = '') {
         // Construct Final JSON (matching GMAT Hero format)
         var jsonData = {
             questionLink: getCurrentUrl(),
-            source: 'GMAT Official',
+            source: 'gmat-og',
             difficulty: difficulty,
             section: 'di',
             questionType: 'di',

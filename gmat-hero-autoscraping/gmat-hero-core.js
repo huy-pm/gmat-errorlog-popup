@@ -15,7 +15,8 @@ export const state = {
     popup: null,
     currentExtractor: null,
     startTime: null,
-    extractorCache: {}
+    extractorCache: {},
+    incorrectOnly: false
 };
 
 // ============================================================================
@@ -131,6 +132,12 @@ export function createPopup(title = 'GMAT Hero Extractor') {
                         <li>The script will automatically navigate through questions</li>
                         <li>Click "Stop" to stop and save all questions</li>
                     </ol>
+                </div>
+                <div class="options" style="margin-bottom: 15px; padding: 10px; background: #f0f0f0; border-radius: 6px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                        <input type="checkbox" id="incorrect-only-checkbox" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>Extract incorrect questions only</span>
+                    </label>
                 </div>
                 <div class="controls">
                     <button id="start-btn" onclick="window.opener.gmatheroStartExtraction()">Start</button>
@@ -304,13 +311,17 @@ export async function loadExtractor(type) {
  * @returns {string} Base path URL
  */
 function getBasePath() {
-    const currentScript = document.currentScript || document.querySelector('script[src*="loader.js"]');
+    const currentScript = document.currentScript || document.querySelector('script[src*="gmat-hero-loader.js"]');
     if (currentScript && currentScript.src) {
         const scriptUrl = new URL(currentScript.src);
         // Remove query params and get the path without the filename
         const pathWithoutQuery = scriptUrl.origin + scriptUrl.pathname;
-        // Remove loader.js from the end to get base path
-        return pathWithoutQuery.replace(/gmat-hero-loader\.js$/, '');
+        // Remove the filename by finding the last slash
+        const lastSlashIndex = pathWithoutQuery.lastIndexOf('/');
+        if (lastSlashIndex !== -1) {
+            return pathWithoutQuery.substring(0, lastSlashIndex + 1);
+        }
+        return pathWithoutQuery;
     }
     // Fallback for when loaded as a module
     return './';
@@ -362,6 +373,39 @@ export async function processLoop() {
         // 3. Show correct answer (review mode)
         if (showCorrectAnswer()) {
             await delay(1000);
+        }
+
+        // 3.5. Check if we should skip this question (incorrect only mode)
+        if (state.incorrectOnly) {
+            // Check if the question was answered incorrectly by looking at the standard-choices class
+            const standardChoices = document.querySelector('.standard-choices');
+            const isIncorrect = standardChoices && standardChoices.classList.contains('has-answered-incorrectly');
+            const isCorrect = standardChoices && standardChoices.classList.contains('has-answered-correctly');
+
+            console.log('[GMAT Hero] Answer check:', { isIncorrect, isCorrect });
+
+            if (isCorrect) {
+                console.log('[GMAT Hero] Skipping correct question');
+                updateStatus('Skipping correct...', 'gray');
+
+                // Navigate to next question
+                if (isLastQuestion()) {
+                    stopExtraction();
+                    return;
+                }
+                if (!clickNextButton()) {
+                    stopExtraction();
+                    return;
+                }
+                await delay(3000);
+                continue;
+            } else if (isIncorrect) {
+                console.log('[GMAT Hero] Extracting incorrect question');
+                updateStatus('Extracting incorrect...', 'orange');
+            } else {
+                // No answer found (maybe DI question type or unanswered) - still extract
+                console.log('[GMAT Hero] No answer status found, extracting anyway');
+            }
         }
 
         // 4. Extract question data
@@ -429,15 +473,26 @@ export function startExtraction() {
     state.startTime = new Date();
     state.extractedQuestions = [];
 
+    // Read checkbox state
+    if (state.popup && !state.popup.closed) {
+        const checkbox = state.popup.document.getElementById('incorrect-only-checkbox');
+        state.incorrectOnly = checkbox ? checkbox.checked : false;
+    }
+
     // Update UI
     if (state.popup && !state.popup.closed) {
         const startBtn = state.popup.document.getElementById('start-btn');
         const stopBtn = state.popup.document.getElementById('stop-btn');
+        const checkbox = state.popup.document.getElementById('incorrect-only-checkbox');
         if (startBtn) startBtn.disabled = true;
         if (stopBtn) stopBtn.disabled = false;
+        if (checkbox) checkbox.disabled = true; // Disable checkbox while running
     }
 
     updateStatus('Running...', 'green');
+    if (state.incorrectOnly) {
+        console.log('[GMAT Hero] Filtering mode: Incorrect questions only');
+    }
 
     // Start the loop
     processLoop();
@@ -453,8 +508,10 @@ export function stopExtraction() {
     if (state.popup && !state.popup.closed) {
         const startBtn = state.popup.document.getElementById('start-btn');
         const stopBtn = state.popup.document.getElementById('stop-btn');
+        const checkbox = state.popup.document.getElementById('incorrect-only-checkbox');
         if (startBtn) startBtn.disabled = false;
         if (stopBtn) stopBtn.disabled = true;
+        if (checkbox) checkbox.disabled = false; // Re-enable checkbox
     }
 
     updateStatus('Stopped', 'red');

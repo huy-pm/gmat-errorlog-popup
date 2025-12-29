@@ -347,7 +347,7 @@ javascript: (function () {
                     "passage": passage,
                     "questionText": question,
                     "answerChoices": answerChoices,
-                    "highlight_ranges": highlightRanges
+                    "highlightRanges": highlightRanges
                 }
             };
 

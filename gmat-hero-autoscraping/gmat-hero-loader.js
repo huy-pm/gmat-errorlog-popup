@@ -11,13 +11,17 @@
 
     // Get the base path for module imports
     const getBasePath = () => {
-        const currentScript = document.currentScript || document.querySelector('script[src*="loader.js"]');
+        const currentScript = document.currentScript || document.querySelector('script[src*="gmat-hero-loader.js"]');
         if (currentScript && currentScript.src) {
             const scriptUrl = new URL(currentScript.src);
             // Remove query params and get the path without the filename
             const pathWithoutQuery = scriptUrl.origin + scriptUrl.pathname;
-            // Remove loader.js from the end to get base path
-            return pathWithoutQuery.replace(/gmat-hero-loader\.js$/, '');
+            // Remove the filename by finding the last slash
+            const lastSlashIndex = pathWithoutQuery.lastIndexOf('/');
+            if (lastSlashIndex !== -1) {
+                return pathWithoutQuery.substring(0, lastSlashIndex + 1);
+            }
+            return pathWithoutQuery;
         }
         return './';
     };

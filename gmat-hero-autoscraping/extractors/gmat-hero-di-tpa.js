@@ -10,7 +10,7 @@ import {
     processKaTeX,
     getPracticeUrl,
     extractGMATHeroMetadata
-} from '../utils.js';
+} from '../gmat-hero-utils.js';
 
 /**
  * Extract Two-Part Analysis question data

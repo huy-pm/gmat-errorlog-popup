@@ -11,7 +11,7 @@ import {
     extractTable,
     getPracticeUrl,
     extractGMATHeroMetadata
-} from '../utils.js';
+} from '../gmat-hero-utils.js';
 
 /**
  * Check if this is a Data Sufficiency question (to skip)

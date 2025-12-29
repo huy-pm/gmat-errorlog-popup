@@ -9,7 +9,7 @@ import {
     extractHighlightRanges,
     getPracticeUrl,
     extractGMATHeroMetadata
-} from '../utils.js';
+} from '../gmat-hero-utils.js';
 
 /**
  * Extract Reading Comprehension question data

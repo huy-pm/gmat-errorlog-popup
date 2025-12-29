@@ -11,7 +11,7 @@ import {
     escapeCurrencyInElement,
     normalizeCurrency,
     processKaTeX
-} from '../utils.js';
+} from '../gmat-hero-utils.js';
 
 // MSR state - questions share data sources
 let questionSet = null;

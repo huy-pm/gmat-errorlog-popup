@@ -10,7 +10,7 @@ import {
     isCompletionStyleQuestion,
     getPracticeUrl,
     extractGMATHeroMetadata
-} from '../utils.js';
+} from '../gmat-hero-utils.js';
 
 /**
  * Keywords that indicate a sentence with ? is likely a question (not just a quote)

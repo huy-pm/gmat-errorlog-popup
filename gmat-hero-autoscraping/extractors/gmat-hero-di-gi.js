@@ -11,7 +11,7 @@ import {
     getPracticeUrl,
     extractGMATHeroMetadata,
     processKaTeX
-} from '../utils.js';
+} from '../gmat-hero-utils.js';
 
 /**
  * Extract text from a node, handling KaTeX math elements properly

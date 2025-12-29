@@ -353,7 +353,7 @@ javascript: (function () {
                     "passage": passageText,
                     "questionText": questionText,
                     "answerChoices": answerChoices,
-                    "highlight_ranges": highlightRanges
+                    "highlightRanges": highlightRanges
                 }
             };
 

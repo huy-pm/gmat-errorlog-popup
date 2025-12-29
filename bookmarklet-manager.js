@@ -58,7 +58,7 @@
         {
             name: "GMAT Hero Question Auto",
             description: "Auto-scrape GMAT Hero questions",
-            script: '/gmat-hero-autoscraping/loader.js'
+            script: '/gmat-hero-autoscraping/gmat-hero-loader.js'
         },
         {
             name: "GMAT OG - DI Auto",

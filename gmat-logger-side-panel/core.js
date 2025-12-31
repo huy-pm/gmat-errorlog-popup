@@ -1050,6 +1050,9 @@ function setupLogTabEvents(root) {
     updateSuggestions();
   });
   notesTextarea.addEventListener('keydown', (e) => {
+    // Prevent keyboard events from bubbling to the main page
+    // This stops arrow keys from triggering page navigation while typing
+    e.stopPropagation();
     cursorPosition = e.target.selectionStart;
     if (currentSuggestions.length > 0) {
       switch (e.key) {
@@ -1066,6 +1069,10 @@ function setupLogTabEvents(root) {
   });
   notesTextarea.addEventListener('blur', () => {
     setTimeout(() => suggestionsDiv.style.display = 'none', 150);
+  });
+  questionLinkInput.addEventListener('keydown', (e) => {
+    // Prevent keyboard events from bubbling to the main page
+    e.stopPropagation();
   });
   questionLinkInput.addEventListener('input', () => {
     updateParsedPreview(questionLinkInput.value, notesTextarea.value, root);

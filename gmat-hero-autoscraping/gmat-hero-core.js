@@ -373,7 +373,7 @@ export async function processLoop() {
                 stopExtraction();
                 return;
             }
-            await delay(3000);
+            await delay(1000);
             continue;
         }
 
@@ -386,7 +386,7 @@ export async function processLoop() {
                 stopExtraction();
                 return;
             }
-            await delay(3000);
+            await delay(1000);
             continue;
         }
 
@@ -417,7 +417,7 @@ export async function processLoop() {
                     stopExtraction();
                     return;
                 }
-                await delay(3000);
+                await delay(1000);
                 continue;
             } else if (isIncorrect) {
                 console.log('[GMAT Hero] Extracting incorrect question');
@@ -475,7 +475,7 @@ export async function processLoop() {
         }
 
         // 7. Wait for page to load
-        await delay(3000);
+        await delay(1000);
     }
 }
 

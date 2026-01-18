@@ -131,7 +131,9 @@ export function extractTable(container) {
 
     rows.forEach((row, index) => {
         const cells = row.querySelectorAll('td, th');
-        const rowData = Array.from(cells).map(cell => {
+        const rowData = [];
+
+        cells.forEach(cell => {
             // Process any KaTeX in cell and get text
             const cellClone = cell.cloneNode(true);
             const katexElems = cellClone.querySelectorAll('.katex');
@@ -159,7 +161,12 @@ export function extractTable(container) {
             if (text.includes('^{') || text.includes('_{')) {
                 text = '$' + text + '$';
             }
-            return text;
+
+            // Handle colspan
+            const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+            for (let k = 0; k < colspan; k++) {
+                rowData.push(text);
+            }
         });
 
         if (index === 0) {
@@ -539,6 +546,9 @@ export function detectQuestionType() {
     const hasPassage = document.querySelector('#left-panel .passage');
     const hasKaTeX = document.querySelector('.katex');
 
+    // Check for table in question stem - this is a strong indicator of Quant if not already a DI type
+    const hasTable = document.querySelector('#right-panel .question-stem table');
+
     // Also check question stem for (1) and (2) pattern as backup
     if (hasQuestionStem) {
         const stemText = hasQuestionStem.textContent || '';
@@ -551,11 +561,11 @@ export function detectQuestionType() {
         }
     }
 
-    // CR: has question stem but no passage and no KaTeX math
-    if (hasQuestionStem && !hasPassage && !hasKaTeX) return 'cr';
+    // CR: has question stem but no passage, no KaTeX math, AND no table
+    if (hasQuestionStem && !hasPassage && !hasKaTeX && !hasTable) return 'cr';
 
-    // Quant (has KaTeX math and not DI selectors)
-    if (hasKaTeX) return 'quant';
+    // Quant (has KaTeX math OR has table, and not DI selectors)
+    if (hasKaTeX || hasTable) return 'quant';
 
     return null;
 }

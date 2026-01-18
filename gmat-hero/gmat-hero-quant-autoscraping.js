@@ -102,7 +102,9 @@ javascript: (function () {
 
         rows.forEach(function (row, index) {
             var cells = row.querySelectorAll('td, th');
-            var rowData = Array.from(cells).map(function (cell) {
+            var rowData = [];
+
+            cells.forEach(function (cell) {
                 // Process any KaTeX in cell and get text
                 var cellClone = cell.cloneNode(true);
                 var katexElems = cellClone.querySelectorAll('.katex');
@@ -130,7 +132,12 @@ javascript: (function () {
                 if (text.indexOf('^{') !== -1 || text.indexOf('_{') !== -1) {
                     text = '$' + text + '$';
                 }
-                return text;
+
+                // Handle colspan
+                var colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+                for (var k = 0; k < colspan; k++) {
+                    rowData.push(text);
+                }
             });
 
             if (index === 0) {

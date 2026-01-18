@@ -235,13 +235,33 @@ export function clickNextButton() {
  * @returns {boolean} True if answer button was clicked
  */
 export function showCorrectAnswer() {
-    const reviewButtons = document.querySelectorAll('.pointer.hover-green.sub.only-review');
-    for (const btn of reviewButtons) {
+    // 1. Try specific selector first (safest)
+    const specificBtns = document.querySelectorAll('.pointer.hover-green.sub.only-review');
+    for (const btn of specificBtns) {
         if (btn.textContent.toLowerCase().includes('answer')) {
+            console.log('[GMAT Hero] Clicking specific Answer button');
             btn.click();
             return true;
         }
     }
+
+    // 2. Fallback: Try broader search for "Answer" button (useful if classes change)
+    // Looking for elements with 'pointer' class or 'only-review' class that imply interactivity
+    const candidates = document.querySelectorAll('.pointer, .only-review, button, .btn');
+    for (const btn of candidates) {
+        const text = btn.textContent ? btn.textContent.toLowerCase().trim() : '';
+
+        // Check for "answer" text
+        if (text === 'answer' || text === 'show answer' || (text.includes('answer') && text.length < 20)) {
+            // Ensure element is visible
+            if (btn.offsetParent === null) continue;
+
+            console.log('[GMAT Hero] Clicking fallback Answer button:', text);
+            btn.click();
+            return true;
+        }
+    }
+
     return false;
 }
 

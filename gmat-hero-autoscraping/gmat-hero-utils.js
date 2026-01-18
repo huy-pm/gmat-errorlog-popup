@@ -482,12 +482,21 @@ export function extractGMATHeroMetadata() {
 
     // 6. Extract correct answer if not found yet
     if (!metadata.correctAnswer) {
-        const correctAnswerLabel = document.querySelector('.correct-answer');
-        if (correctAnswerLabel) {
-            const forAttr = correctAnswerLabel.getAttribute('for');
-            if (forAttr) {
+        const correctAnswerLabels = document.querySelectorAll('.correct-answer');
+
+        for (const label of correctAnswerLabels) {
+            const forAttr = label.getAttribute('for');
+            if (forAttr && forAttr.includes('-')) {
                 const parts = forAttr.split('-');
-                metadata.correctAnswer = parts[parts.length - 1];
+                const match = parts[parts.length - 1];
+
+                // Validate that it looks like a standard answer (A-E)
+                // This helps avoid picking up non-answer elements that happen to have the class
+                // or if the loop found a hidden element without a proper ID
+                if (/^[A-Ea-e]$/.test(match)) {
+                    metadata.correctAnswer = match;
+                    break;
+                }
             }
         }
     }

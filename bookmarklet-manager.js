@@ -74,7 +74,14 @@
             name: "GMAT OG - Advanced",
             description: "Auto-scrape GMAT Official Practice questions",
             script: '/gmat-og/gmat-og-advanced-autoscraping.js'
+        },
+        {
+            name: "GMAT Hero Quant",
+            description: "Auto-scrape GMAT Official Practice questions",
+            script: '/gmat-hero/gmat-hero-quant-autoscraping.js'
         }
+
+
     ];
 
     // Helper function to load a script

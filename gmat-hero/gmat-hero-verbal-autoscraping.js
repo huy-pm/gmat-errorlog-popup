@@ -159,12 +159,21 @@ javascript: (function () {
 
         // 6. Extract correct answer (only if we haven't found it yet)
         if (!metadata.correctAnswer) {
-            var correctAnswerLabel = document.querySelector('.correct-answer');
-            if (correctAnswerLabel) {
-                var forAttr = correctAnswerLabel.getAttribute('for');
-                if (forAttr) {
+            var correctAnswerLabels = document.querySelectorAll('.correct-answer');
+
+            // Loop through all elements to find the valid one
+            for (var i = 0; i < correctAnswerLabels.length; i++) {
+                var label = correctAnswerLabels[i];
+                var forAttr = label.getAttribute('for');
+                if (forAttr && forAttr.indexOf('-') !== -1) {
                     var parts = forAttr.split('-');
-                    metadata.correctAnswer = parts[parts.length - 1];
+                    var match = parts[parts.length - 1];
+
+                    // Validate match format (A-E)
+                    if (/^[A-Ea-e]$/.test(match)) {
+                        metadata.correctAnswer = match;
+                        break;
+                    }
                 }
             }
         }
@@ -632,20 +641,35 @@ javascript: (function () {
 
     // Function to show correct answer by clicking the "Answer" button
     function showCorrectAnswer() {
-        var answerButton = null;
-        var reviewButtons = document.querySelectorAll('.pointer.hover-green.sub.only-review');
-
-        reviewButtons.forEach(function (button) {
-            var text = button.textContent.toLowerCase();
-            if (text.includes('answer')) {
-                answerButton = button;
+        // 1. Try specific selector first (safest)
+        var specificBtns = document.querySelectorAll('.pointer.hover-green.sub.only-review');
+        for (var i = 0; i < specificBtns.length; i++) {
+            var btn = specificBtns[i];
+            if (btn.textContent.toLowerCase().includes('answer')) {
+                console.log('[GMAT Hero] Clicking specific Answer button');
+                btn.click();
+                return true;
             }
-        });
-
-        if (answerButton) {
-            answerButton.click();
-            return true;
         }
+
+        // 2. Fallback: Try broader search for "Answer" button (useful if classes change)
+        // Looking for elements with 'pointer' class or 'only-review' class that imply interactivity
+        var candidates = document.querySelectorAll('.pointer, .only-review, button, .btn');
+        for (var i = 0; i < candidates.length; i++) {
+            var btn = candidates[i];
+            var text = btn.textContent ? btn.textContent.toLowerCase().trim() : '';
+
+            // Check for "answer" text
+            if (text === 'answer' || text === 'show answer' || (text.includes('answer') && text.length < 20)) {
+                // Ensure element is visible
+                if (btn.offsetParent === null) continue;
+
+                console.log('[GMAT Hero] Clicking fallback Answer button:', text);
+                btn.click();
+                return true;
+            }
+        }
+
         return false;
     }
 

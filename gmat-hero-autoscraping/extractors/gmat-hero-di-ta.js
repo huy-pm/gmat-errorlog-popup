@@ -52,13 +52,23 @@ export async function extractQuestionData() {
             const groupHeaders = subHeaderRow.querySelectorAll('th');
             groupHeaders.forEach(th => {
                 const colspan = th.getAttribute('colspan') || '1';
+                const rowspan = th.getAttribute('rowspan') || '1';
                 const thClone = th.cloneNode(true);
                 escapeCurrencyInElement(thClone);
                 processKaTeX(thClone);
+                const label = normalizeCurrency(thClone.textContent.trim());
+
                 headerGroups.push({
-                    label: normalizeCurrency(thClone.textContent.trim()),
-                    colspan: parseInt(colspan, 10)
+                    label: label,
+                    colspan: parseInt(colspan, 10),
+                    rowspan: parseInt(rowspan, 10)
                 });
+
+                // If this header spans multiple rows (rowspan > 1), it acts as a primary header for that column
+                // and won't appear in the lastHeaderRow. So we add it to headers here.
+                if (parseInt(rowspan, 10) > 1) {
+                    headers.push(label);
+                }
             });
         }
 
@@ -82,15 +92,49 @@ export async function extractQuestionData() {
 
         const rows = [];
         const tableRows = tbody.querySelectorAll('tr');
+
+        // Track active rowspans for the first column
+        let col1RowspanRemaining = 0;
+
         tableRows.forEach(tr => {
             const rowData = [];
-            const cells = tr.querySelectorAll('td > span');
-            cells.forEach(span => {
-                const spanClone = span.cloneNode(true);
-                escapeCurrencyInElement(spanClone);
-                processKaTeX(spanClone);
-                rowData.push(normalizeCurrency(spanClone.textContent.trim()));
+
+            // If we are inside a rowspan for column 1, inject placeholder
+            if (col1RowspanRemaining > 0) {
+                rowData.push(""); // Placeholder
+                col1RowspanRemaining--;
+            }
+
+            const cells = tr.querySelectorAll('td');
+            cells.forEach(td => {
+                // Check if this cell initiates a rowspan
+                if (td.hasAttribute('rowspan')) {
+                    const rs = parseInt(td.getAttribute('rowspan'), 10);
+                    if (rs > 1) {
+                        // Assuming this is column 1 because it's the pattern we observe
+                        col1RowspanRemaining = rs - 1;
+                    }
+                }
+
+                // Normal extraction: check for span first, then fallback to td text
+                const span = td.querySelector('span');
+                let cellContent = '';
+
+                if (span) {
+                    const spanClone = span.cloneNode(true);
+                    escapeCurrencyInElement(spanClone);
+                    processKaTeX(spanClone);
+                    cellContent = spanClone.textContent.trim();
+                } else {
+                    const tdClone = td.cloneNode(true);
+                    escapeCurrencyInElement(tdClone);
+                    processKaTeX(tdClone);
+                    cellContent = tdClone.textContent.trim();
+                }
+
+                rowData.push(normalizeCurrency(cellContent));
             });
+
             if (rowData.length > 0) {
                 rows.push(rowData);
             }

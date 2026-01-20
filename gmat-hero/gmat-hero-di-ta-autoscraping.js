@@ -98,10 +98,20 @@ javascript: (function () {
                 var groupHeaders = subHeaderRow.querySelectorAll('th');
                 groupHeaders.forEach(function (th) {
                     var colspan = th.getAttribute('colspan') || '1';
+                    var rowspan = th.getAttribute('rowspan') || '1';
+                    var label = th.textContent.trim();
+
                     headerGroups.push({
-                        label: th.textContent.trim(),
-                        colspan: parseInt(colspan, 10)
+                        label: label,
+                        colspan: parseInt(colspan, 10),
+                        rowspan: parseInt(rowspan, 10)
                     });
+
+                    // If this header spans multiple rows (rowspan > 1), it acts as a primary header for that column
+                    // and won't appear in the lastHeaderRow. So we add it to headers here.
+                    if (parseInt(rowspan, 10) > 1) {
+                        headers.push(label);
+                    }
                 });
             }
 
@@ -122,16 +132,46 @@ javascript: (function () {
 
             var rows = [];
             var tableRows = tbody.querySelectorAll('tr');
+
+            // Track active rowspans for the first column
+            var col1RowspanRemaining = 0;
+
             tableRows.forEach(function (tr) {
                 var rowData = [];
-                var cells = tr.querySelectorAll('td > span');
-                cells.forEach(function (span) {
-                    rowData.push(span.textContent.trim());
+
+                // If we are inside a rowspan for column 1, inject placeholder
+                if (col1RowspanRemaining > 0) {
+                    rowData.push(""); // Placeholder
+                    col1RowspanRemaining--;
+                }
+
+                var cells = tr.querySelectorAll('td');
+                cells.forEach(function (td) {
+                    // Check if this cell initiates a rowspan
+                    if (td.hasAttribute('rowspan')) {
+                        var rs = parseInt(td.getAttribute('rowspan'), 10);
+                        if (rs > 1) {
+                            // Assuming this is column 1 because it's the pattern we observe
+                            col1RowspanRemaining = rs - 1;
+                        }
+                    }
+
+                    // Normal extraction
+                    var span = td.querySelector('span');
+                    var cellContent = "";
+                    if (span) {
+                        cellContent = span.textContent.trim();
+                    } else {
+                        cellContent = td.textContent.trim();
+                    }
+                    rowData.push(cellContent);
                 });
+
                 if (rowData.length > 0) {
                     rows.push(rowData);
                 }
             });
+
 
             // 3.5. Extract Table Legend/Footnotes (if present)
             var tableLegend = null;

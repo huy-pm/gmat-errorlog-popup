@@ -5,7 +5,7 @@
 
 import {
   CONFIG,
-  baseUrl,
+  baseUrl, // Imported to use in link generation
   ICONS,
   sectionMappings,
   allSectionMappings,
@@ -17,8 +17,18 @@ import {
   createBadge,
   showStatus,
   enrichquestionData,
-  getPracticeUrl
+  getPracticeUrl,
+  isCompletionStyleQuestion,
+  sourceDisplayLabels
 } from './utils.js';
+
+import {
+  hasValidToken,
+  authenticate, // Renamed to avoid confusion if needed, but 'authenticate' is clear
+  clearToken,
+  authenticatedFetch,
+  getToken
+} from './auth.js';
 
 // ============================================================================
 // STATE
@@ -336,7 +346,8 @@ async function fetchCategories() {
     }
 
     console.log('Fetching categories from API');
-    const response = await fetch(`${baseUrl}/api/categories`);
+    console.log('Fetching categories from API');
+    const response = await authenticatedFetch(`${baseUrl}/api/categories`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     state.categories = Array.isArray(data) ? data : data.categories || [];
@@ -393,7 +404,8 @@ async function fetchAllTags() {
     }
 
     console.log('Fetching tags from API');
-    const response = await fetch(`${baseUrl}/api/tags`);
+    console.log('Fetching tags from API');
+    const response = await authenticatedFetch(`${baseUrl}/api/tags`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     const tags = Array.isArray(data) ? data : data.tags || [];
@@ -848,25 +860,58 @@ async function submitQuestionData(root) {
     }
 
     console.log('[Debug] Sending payload to API:', payload);
-    console.log('[Debug] API URL:', `${baseUrl}/api/questions`);
+    const endpoint = `${baseUrl}/api/questions`;
+    console.log('Submitting to:', endpoint);
 
-    const response = await fetch(`${baseUrl}/api/questions`, {
+    // Use authenticatedFetch instead of regular fetch
+    const response = await authenticatedFetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(payload)
     });
 
-    console.log('[Debug] API Response status:', response.status);
-
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Network error' }));
-      console.error('[Debug] API Error:', errorData);
-      throw new Error(errorData.message || `HTTP ${response.status}`);
+      throw new Error(`Server returned ${response.status}: ${response.statusText}`);
     }
 
-    console.log('[Debug] Question added successfully!');
-    showStatus('✅ Question added successfully!', 'success', root);
+    const result = await response.json();
+    console.log('Submission result:', result);
 
+    showStatus('Question logged successfully!', 'success', root);
+
+    // Clear form after success
+    // clearFormValues(root);
+    // Keep sidebar open so user can see success message or log another
+
+  } catch (error) {
+    console.error('Submission error:', error);
+
+    // Handle auth specific errors
+    if (error.code === 'AUTH_REQUIRED' || error.code === 'AUTH_EXPIRED') {
+      showStatus('Please sign in to save data', 'warning', root);
+
+      // Optionally auto-trigger login if user agrees?
+      // For now, let's just show a specific button or guide them
+      const confirmLogin = confirm('You need to be signed in to save logs. Sign in now?');
+      if (confirmLogin) {
+        const success = await authenticate();
+        if (success) {
+          // Update UI to show signed in state
+          updateHeaderAuthIcon(root);
+
+          // Retry submission automatically
+          showStatus('Signed in! Retrying submission...', 'loading', root);
+          state.isSubmitting = false; // Reset flag to allow recursive call
+          await submitQuestionData(root);
+          return; // Exit current execution as recursive call handles it
+        }
+      }
+    } else {
+      showStatus('Error: ' + error.message, 'error', root);
+    }
+  } finally {
     // Clear form values after successful submission
     setTimeout(() => {
       // Clear state values
@@ -886,10 +931,6 @@ async function submitQuestionData(root) {
         updateSidebarLayout();
       }, 500);
     }, 1000);
-  } catch (error) {
-    console.error('Submission error:', error);
-    showStatus(`❌ Error: ${error.message}`, 'error', root);
-  } finally {
     state.isSubmitting = false;
     submitBtn.disabled = false;
     submitBtn.textContent = 'Quick Add';
@@ -1030,7 +1071,7 @@ function setupLogTabEvents(root) {
       const result = applySuggestion(notesTextarea.value, suggestion, cursorPosition);
       notesTextarea.value = result.newInput;
       cursorPosition = result.newCursorPosition;
-      notesTextarea.setSelectionRange(cursorPosition, cursorPosition);
+      notesTextarea.setSelectionRange(cursorPos, cursorPos);
       notesTextarea.focus();
       setTimeout(() => updateSuggestions(), 0);
     }
@@ -1090,17 +1131,113 @@ function setupLogTabEvents(root) {
 }
 
 function renderSettings(parent) {
-  const div = document.createElement('div');
-  div.className = "space-y-4";
-  div.innerHTML = `
-    <div class="space-y-2">
-      <label class="block text-sm font-medium text-gray-700">Gemini API Key</label>
-      <input type="password" id="input-api-key" value="${state.apiKey}" class="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your API Key">
-      <p class="text-xs text-gray-500">Key is stored locally in your browser.</p>
+  const container = document.createElement('div');
+  container.className = 'section';
+  container.innerHTML = `
+    <div class="section-header">
+      <div class="section-title">Settings</div>
     </div>
-    <button id="btn-save-key" class="w-full bg-blue-600 text-white py-2 rounded-md text-sm font-medium hover:bg-blue-700">Save Key</button>
+    <div class="form-group">
+      <label class="form-label">Gemini API Key</label>
+      <div class="input-with-icon">
+        <input type="password" id="gemini-api-key" class="form-input" placeholder="Enter your API key">
+        <button id="toggle-api-key" class="icon-button" title="Toggle Visibility">
+          ${ICONS.eye}
+        </button>
+      </div>
+      <div class="help-text">
+        Required for AI analysis features. Key is stored locally in your browser.
+        <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener">Get API Key</a>
+      </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Authentication</label>
+        <div id="auth-status-container">
+            <!-- Will be populated by updateAuthUI -->
+        </div>
+    </div>
+
+    <div class="button-row">
+      <button id="save-settings" class="button primary full-width">Save Settings</button>
+    </div>
   `;
-  parent.appendChild(div);
+
+  // Load saved key
+  const savedKey = localStorage.getItem('gemini_api_key');
+  if (savedKey) {
+    container.querySelector('#gemini-api-key').value = savedKey;
+  }
+
+  // Toggle visibility
+  const toggleBtn = container.querySelector('#toggle-api-key');
+  const input = container.querySelector('#gemini-api-key');
+  toggleBtn.onclick = () => {
+    if (input.type === 'password') {
+      input.type = 'text';
+      toggleBtn.innerHTML = ICONS.eyeOff; // You might need to add eyeOff icon or reuse eye
+    } else {
+      input.type = 'password';
+      toggleBtn.innerHTML = ICONS.eye;
+    }
+  };
+
+  // Save settings
+  container.querySelector('#save-settings').onclick = () => {
+    const key = input.value.trim();
+    if (key) {
+      localStorage.setItem('gemini_api_key', key);
+      showStatus('Settings saved', 'success', container.getRootNode());
+    }
+  };
+
+  parent.appendChild(container);
+
+  // Update auth UI initially
+  updateAuthUI(container);
+}
+
+// Function to update the auth UI section
+function updateAuthUI(container) {
+  const authContainer = container.querySelector('#auth-status-container');
+  if (!authContainer) return;
+
+  if (hasValidToken()) {
+    authContainer.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <span class="badge success">● Signed In</span>
+                <button id="btn-logout" class="button secondary small">Sign Out</button>
+            </div>
+            <div class="help-text">Session active. You can save logs to your account.</div>
+        `;
+
+    container.querySelector('#btn-logout').onclick = () => {
+      clearToken();
+      showStatus('Signed out successfully', 'info', container.getRootNode());
+      updateAuthUI(container);
+      updateHeaderAuthIcon(container.getRootNode());
+    };
+  } else {
+    authContainer.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <span class="badge warning">○ Not Signed In</span>
+                <button id="btn-login" class="button primary small">Sign In</button>
+            </div>
+            <div class="help-text">Sign in to save logs to your account.</div>
+        `;
+
+    container.querySelector('#btn-login').onclick = async () => {
+      showStatus('Opening login popup...', 'loading', container.getRootNode());
+      const success = await authenticate();
+      if (success) {
+        showStatus('Signed in successfully!', 'success', container.getRootNode());
+        updateAuthUI(container);
+        updateHeaderAuthIcon(container.getRootNode());
+      } else {
+        showStatus('Sign in failed or cancelled', 'error', container.getRootNode());
+      }
+    };
+  }
 }
 
 function renderAiTab(parent) {
@@ -1167,22 +1304,34 @@ function updateSidebarLayout() {
   }
 }
 
+function updateHeaderAuthIcon(root) {
+  const authStatusDiv = root.getElementById('header-auth-status');
+  if (authStatusDiv) {
+    if (hasValidToken()) {
+      authStatusDiv.innerHTML = `<span class="text-green-500" title="Signed In">${ICONS.checkCircle}</span>`;
+    } else {
+      authStatusDiv.innerHTML = `<span class="text-gray-400" title="Not Signed In">${ICONS.user}</span>`;
+    }
+  }
+}
+
 function render() {
   container.innerHTML = '';
 
   const header = document.createElement('div');
   header.className = "p-4 border-b border-gray-200 flex justify-between items-center bg-white";
   header.innerHTML = `
-    <div class="flex items-center space-x-2 text-gray-800">
-      <div class="bg-yellow-100 p-1.5 rounded-md">${ICONS.zap}</div>
-      <h2 class="font-bold text-lg">Smart Log</h2>
+    <div class="header-left flex items-center">
+        <div class="drag-handle-icon mr-2 text-gray-400 cursor-grab" title="Drag to resize">${ICONS.menu}</div>
+        <div class="title font-bold text-lg">GMAT Logger</div>
+        <div id="header-auth-status" style="margin-left: 8px;"></div>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="header-controls flex items-center gap-1">
       <button id="btn-settings" class="text-gray-400 hover:text-gray-600 transition p-1" title="Settings">
-         ${ICONS.settings}
+        ${ICONS.settings}
       </button>
-      <button id="btn-minimize" class="text-gray-400 hover:text-gray-600 transition p-1" title="Minimize Sidebar">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      <button id="btn-minimize" class="text-gray-400 hover:text-gray-600 transition p-1" title="Minimize">
+        ${ICONS.zap}
       </button>
       <button id="btn-close" class="text-gray-400 hover:text-red-600 transition p-1" title="Close Sidebar">
         ${ICONS.x}
@@ -1492,6 +1641,7 @@ export async function createSidebar() {
   document.body.style.transition = 'margin-right 0.3s ease-in-out';
 
   updateSidebarLayout();
+  updateSidebarLayout();
 
   // Modal detection
   function detectAndHandleModals() {
@@ -1602,6 +1752,7 @@ export async function createSidebar() {
 
   // Initial render
   render();
+  updateHeaderAuthIcon(shadow);
 
   // Auto-populate notes with extracted difficulty and category
   // Only run on initial sidebar creation, not on re-renders (e.g., after submission)

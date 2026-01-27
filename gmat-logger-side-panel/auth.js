@@ -1,46 +1,89 @@
 /**
  * GMAT Logger Side Panel - Authentication Module
- * Handles token management, login flow, and authenticated API requests.
+ * Handles token management via Iframe Bridge, login flow, and authenticated API requests.
  */
 
 import { baseUrl } from './utils.js';
+import { AuthBridge } from './bridge-client.js';
 
 // Constants
-const TOKEN_KEY = 'gmat_auth_token';
-const EXPIRY_KEY = 'gmat_auth_expires';
-const USER_KEY = 'gmat_user_id';
+const USER_KEY = 'gmat_user_id'; // We can still persist User ID if useful, or remove it.
+
+// State (Memory Only)
+let accessToken = null;
+let tokenExpiresAt = null;
+const authBridge = new AuthBridge();
+const listeners = [];
 
 /**
- * Check if the user has a valid authentication token
- * @returns {boolean} True if token exists and is not expired
+ * Initialize Authentication
+ * Attempts to silently get a token from the bridge.
+ */
+export async function initAuth() {
+    try {
+        console.log('[Auth] Initializing bridge authentication...');
+        const token = await authBridge.getToken();
+        setToken(token);
+        console.log('[Auth] Bridge auth successful');
+        return true;
+    } catch (error) {
+        console.log('[Auth] Bridge auth failed (likely not logged in):', error.message);
+        setToken(null);
+        return false;
+    }
+}
+
+/**
+ * Subscribe to authentication state changes
+ * @param {Function} callback - Function called with (isAuthenticated) when state changes
+ */
+export function subscribeAuthChange(callback) {
+    listeners.push(callback);
+}
+
+/**
+ * Notify all listeners of auth state change
+ */
+function notifyListeners() {
+    const isAuthenticated = hasValidToken();
+    listeners.forEach(callback => callback(isAuthenticated));
+}
+
+/**
+ * Check if we have a valid token in memory
+ * @returns {boolean} True if token exists
  */
 export function hasValidToken() {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const expiresAt = localStorage.getItem(EXPIRY_KEY);
-
-    if (!token || !expiresAt) return false;
-
-    // Check expiration with a 5-minute buffer
-    const expiryTime = new Date(expiresAt).getTime();
-
-    // If expiry is invalid, assume token might be valid and let server decide
-    if (isNaN(expiryTime)) {
-        return true;
-    }
-
-    const now = Date.now();
-    const buffer = 10 * 1000; // 10 seconds buffer
-
-    return now < (expiryTime - buffer);
+    return !!accessToken;
 }
 
 /**
  * Get the current authentication token
- * @returns {string|null} The token or null if invalid
+ * If cached token is missing or expired (logic pending), tries to fetch from bridge.
+ * @returns {Promise<string|null>} The token or null if invalid
  */
-export function getToken() {
-    if (!hasValidToken()) return null;
-    return localStorage.getItem(TOKEN_KEY);
+export async function getToken() {
+    if (accessToken) {
+        return accessToken;
+    }
+    try {
+        const token = await authBridge.getToken();
+        setToken(token);
+        return token;
+    } catch (error) {
+        return null;
+    }
+}
+
+/**
+ * Set the token in memory and notify listeners
+ */
+function setToken(token) {
+    const changed = accessToken !== token;
+    accessToken = token;
+    if (changed) {
+        notifyListeners();
+    }
 }
 
 /**
@@ -49,33 +92,21 @@ export function getToken() {
  */
 export function getUserId() {
     return localStorage.getItem(USER_KEY);
-}
-
-/**
- * Save authentication data to local storage
- * @param {Object} authData
- */
-export function saveToken(authData) {
-    if (!authData.token || !authData.expiresAt) {
-        console.error('Invalid auth data received:', authData);
-        return;
-    }
-
-    localStorage.setItem(TOKEN_KEY, authData.token);
-    localStorage.setItem(EXPIRY_KEY, authData.expiresAt);
-
-    if (authData.userId) {
-        localStorage.setItem(USER_KEY, authData.userId);
-    }
+    // TODO: If needed, we can ask bridge for user info too.
 }
 
 /**
  * Clear authentication data (Logout)
+ * Note: specific to what "Logout" means here. 
+ * If we just clear memory, the bridge might still have a session.
+ * Real logout should call bridge to logout? 
+ * Or just clear local state.
  */
 export function clearToken() {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(EXPIRY_KEY);
+    setToken(null);
     localStorage.removeItem(USER_KEY);
+    // Ideally we might want to tell the bridge to logout too?
+    // But usually clearing local state is enough for the client.
 }
 
 /**
@@ -106,25 +137,34 @@ export function authenticate() {
             return;
         }
 
-        // Handler for receiving the token
-        const messageHandler = (event) => {
+        // We listen for message from popup primarily to know when it's done.
+        // OR we can just poll the bridge?
+
+        // Let's keep the listener as a signal that "Login Complete" happened.
+        const messageHandler = async (event) => {
             // CRITICAL: Validate origin for security
-            // We only accept messages from our own API domain
             if (event.origin !== baseUrl) {
-                // Ignoring messages from other origins
                 return;
             }
 
             if (event.data && event.data.type === 'AUTH_TOKEN') {
-                // Save the received token
-                saveToken(event.data);
+                // The popup sent us a token directly.
+                // We can use it, AND we should verify bridge works.
+                console.log('[Auth] Received token from popup');
+
+                // Save user ID if present
+                if (event.data.userId) {
+                    localStorage.setItem(USER_KEY, event.data.userId);
+                }
+
+                // We trust the token from popup for immediate use
+                setToken(event.data.token);
 
                 // Close the popup
                 if (authWindow && !authWindow.closed) {
                     authWindow.close();
                 }
 
-                // cleanup
                 window.removeEventListener('message', messageHandler);
                 resolve(true);
             }
@@ -135,24 +175,21 @@ export function authenticate() {
         // Safety timeout - stop waiting after 5 minutes
         setTimeout(() => {
             window.removeEventListener('message', messageHandler);
-            if (authWindow && !authWindow.closed) {
-                // We don't close it automatically on timeout as user might be slow typing password
-                // but we stop listening
-            }
-            // If we haven't resolved yet, we can assume it didn't complete immediately
-            // But we don't necessarily resolve(false) here because the user might still be interacting.
-            // The promise might hang if user abandons it, which is acceptable for this flow.
         }, 300000);
 
-        // Optional: Poll to see if window was closed manually without sending token
-        const pollTimer = setInterval(() => {
+        // Poll to see if window was closed
+        const pollTimer = setInterval(async () => {
             if (authWindow.closed) {
                 clearInterval(pollTimer);
-                // If window is closed and we have a token, it was handled by messageHandler.
-                // If no token, then user closed it without logging in.
+                window.removeEventListener('message', messageHandler);
+
+                // If window closed but we didn't get a message, check bridge
                 if (!hasValidToken()) {
-                    window.removeEventListener('message', messageHandler);
-                    resolve(false);
+                    console.log('[Auth] Popup closed, checking bridge...');
+                    const success = await initAuth();
+                    resolve(success);
+                } else {
+                    resolve(true); // Already got token via message
                 }
             }
         }, 1000);
@@ -166,7 +203,7 @@ export function authenticate() {
  * @returns {Promise<Response>}
  */
 export async function authenticatedFetch(url, options = {}) {
-    const token = getToken();
+    const token = await getToken();
 
     if (!token) {
         // Throw specific error that UI can catch to trigger login
@@ -187,9 +224,20 @@ export async function authenticatedFetch(url, options = {}) {
 
     // Handle 401 Unauthorized (Token expired/revoked)
     if (response.status === 401) {
-        // Note: We don't auto-clear token here because some endpoints (like GET /tags) 
-        // are incorrectly returning 401 even with valid tokens.
-        // We let the UI handle the error message instead.
+        // Token might be expired. 
+        // We could try ONE retry with a fresh token from bridge?
+        // simple retry logic:
+        if (!options._retry) {
+            console.log('[Auth] 401, retrying with fresh token...');
+            // Force refresh from bridge? 
+            // getToken() checks memory first. We should invalidate memory.
+            setToken(null);
+            const newToken = await getToken();
+            if (newToken) {
+                return authenticatedFetch(url, { ...options, _retry: true });
+            }
+        }
+
         const error = new Error('Session expired');
         error.code = 'AUTH_EXPIRED';
         throw error;

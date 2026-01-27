@@ -27,7 +27,9 @@ import {
   authenticate, // Renamed to avoid confusion if needed, but 'authenticate' is clear
   clearToken,
   authenticatedFetch,
-  getToken
+  getToken,
+  initAuth,
+  subscribeAuthChange
 } from './auth.js';
 
 // ============================================================================
@@ -1712,7 +1714,7 @@ export async function createSidebar() {
   });
 
   // Shadow DOM & Styles
-  shadow = contentArea.attachShadow({ mode: 'open' });
+  shadow = contentArea.attachShadow({ mode: 'closed' });
 
   const styleLink = document.createElement('link');
   styleLink.rel = 'stylesheet';
@@ -1752,6 +1754,31 @@ export async function createSidebar() {
 
   // Initial render
   render();
+  // Subscribe to auth changes to update UI automatically
+  subscribeAuthChange((isAuthenticated) => {
+    console.log('[SmartLog] Auth state changed:', isAuthenticated);
+    // We don't want to re-render everything, just the UI parts that depend on auth
+    // But updateAuthUI is called inside render()? No, updateAuthUI is separate.
+    // Actually render() calls updateAuthUI(container) ? 
+    // render() function clears container and rebuilds.
+    // Let's just update the specific parts if possible.
+    // Since context 'container' is available in module scope? 
+    // No, 'container' is shadowed in render(). 'container' is global in this module line 1736.
+    if (typeof container !== 'undefined') {
+      updateAuthUI(container);
+      updateHeaderAuthIcon(shadow);
+    }
+  });
+
+  // Start Auth Initialization
+  initAuth().then(success => {
+    console.log('[SmartLog] Auth initialized:', success);
+    updateHeaderAuthIcon(shadow);
+    if (typeof container !== 'undefined') {
+      updateAuthUI(container);
+    }
+  });
+
   updateHeaderAuthIcon(shadow);
 
   // Auto-populate notes with extracted difficulty and category

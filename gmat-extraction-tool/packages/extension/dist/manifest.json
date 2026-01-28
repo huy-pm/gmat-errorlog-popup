@@ -1,0 +1,61 @@
+{
+    "manifest_version": 3,
+    "name": "GMAT Extraction Tool",
+    "version": "3.0.0",
+    "description": "Extract GMAT questions and log them to your Error Log.",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage",
+        "identity",
+        "alarms",
+        "notifications"
+    ],
+    "host_permissions": [
+        "https://gmat-errorlog.vercel.app/*",
+        "http://localhost:3000/*",
+        "http://localhost:5001/*",
+        "*://gmat-hero-v2.web.app/*",
+        "*://gmatclub.com/*",
+        "*://gmatofficialpractice.mba.com/*"
+    ],
+    "background": {
+        "service_worker": "src/background/index.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://gmat-hero-v2.web.app/*",
+                "*://gmatclub.com/*",
+                "*://gmatofficialpractice.mba.com/*"
+            ],
+            "js": [
+                "src/content/index.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "tailwind.min.css"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}

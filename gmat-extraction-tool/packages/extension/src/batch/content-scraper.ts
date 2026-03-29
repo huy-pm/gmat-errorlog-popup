@@ -90,6 +90,47 @@ function showCorrectAnswer(): boolean {
 }
 
 /**
+ * Extract the GMAT Club link via background script using chrome.scripting.executeScript
+ * with world: 'MAIN', which runs in the page's JS context (not the isolated content script
+ * context). This is required because Angular's click handler calls window.open() in the
+ * page context — overriding window.open in the content script has no effect.
+ *
+ * Flow: content script → background (EXTRACT_GMAT_CLUB_LINK) →
+ *       chrome.scripting.executeScript(world:'MAIN') → capture URL → return to content script
+ */
+async function extractGmatClubLink(): Promise<string | null> {
+    try {
+        // Quick DOM check first — skip the round-trip if button isn't visible
+        const footerDivs = document.querySelectorAll('.gmat-sub-footer .pointer.disable-select.sub');
+        let hasGmatClubBtn = false;
+        for (const div of footerDivs) {
+            if (div.textContent?.trim().includes('GMAT Club')) {
+                hasGmatClubBtn = true;
+                break;
+            }
+        }
+        if (!hasGmatClubBtn) return null;
+
+        return new Promise<string | null>((resolve) => {
+            chrome.runtime.sendMessage(
+                { action: 'EXTRACT_GMAT_CLUB_LINK' },
+                (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.warn('[Batch] EXTRACT_GMAT_CLUB_LINK failed:', chrome.runtime.lastError.message);
+                        resolve(null);
+                    } else {
+                        resolve(response?.url || null);
+                    }
+                }
+            );
+        });
+    } catch (err) {
+        console.warn('[Batch] Failed to extract GMAT Club link:', err);
+        return null;
+    }
+}
+
+/**
  * Check if we're on the last question
  */
 function isLastQuestion(): boolean {
@@ -193,10 +234,18 @@ export async function scrapeCurrentPage(categoryId: string, incorrectOnly: boole
                 }
             }
 
-            // 4. Extract question data
+            // 4. Extract GMAT Club link (while in review mode)
+            const gmatClubLink = await extractGmatClubLink();
+
+            // 5. Extract question data
             try {
                 const data = await extractor();
                 if (data) {
+                    // Attach GMAT Club link if found
+                    if (gmatClubLink) {
+                        (data as any).gmatClubLink = gmatClubLink;
+                    }
+
                     if (questionType === 'di-msr') {
                         // MSR: update existing entry with same tab signature
                         const existingIndex = extractedQuestions.findIndex(
@@ -223,13 +272,13 @@ export async function scrapeCurrentPage(categoryId: string, incorrectOnly: boole
                 });
             }
 
-            // 5. Check if last question
+            // 6. Check if last question
             if (isLastQuestion()) break;
 
-            // 6. Navigate to next
+            // 7. Navigate to next
             if (!clickNextButton()) break;
 
-            // 7. Wait for page load
+            // 8. Wait for page load
             await delay(1000);
             questionIndex++;
 

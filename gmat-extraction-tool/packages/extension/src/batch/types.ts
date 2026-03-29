@@ -53,6 +53,7 @@ export interface BatchError {
 
 export interface ExtractedQuestion {
     questionLink: string;
+    gmatClubLink?: string | null;
     source: string;
     difficulty: string;
     section: string;

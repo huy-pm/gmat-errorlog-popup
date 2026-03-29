@@ -112,6 +112,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'BATCH_SCRAPE_PROGRESS') {
         const senderTabId = sender.tab?.id || 0;
         onScrapeProgress(senderTabId, message.categoryId, message.questionsCount, message.currentIndex);
-        return false; // No async response needed
+        return false;
+    }
+
+    if (message.action === 'EXTRACT_GMAT_CLUB_LINK') {
+        const tabId = sender.tab?.id;
+        if (!tabId) { sendResponse({ url: null }); return false; }
+
+        // Run in the page's JS context (world: 'MAIN') so window.open override
+        // actually affects Angular's handler, not the isolated content script window.
+        chrome.scripting.executeScript({
+            target: { tabId },
+            world: 'MAIN',
+            func: () => {
+                const divs = document.querySelectorAll('.gmat-sub-footer .pointer.disable-select.sub');
+                let btn: HTMLElement | null = null;
+                for (const div of divs) {
+                    if ((div as HTMLElement).textContent?.trim().includes('GMAT Club')) {
+                        btn = div as HTMLElement;
+                        break;
+                    }
+                }
+                if (!btn) return null;
+
+                let captured: string | null = null;
+                const orig = window.open.bind(window);
+                window.open = function (url?: string | URL | undefined) {
+                    if (url) captured = url.toString();
+                    return null;
+                } as typeof window.open;
+
+                btn.click();
+                window.open = orig;
+                return captured;
+            }
+        }).then((results) => {
+            const url = results?.[0]?.result ?? null;
+            sendResponse({ url });
+        }).catch((err) => {
+            console.warn('[Background] EXTRACT_GMAT_CLUB_LINK failed:', err.message);
+            sendResponse({ url: null });
+        });
+        return true; // async response
     }
 });

@@ -487,7 +487,21 @@ export function extractGMATHeroMetadata() {
         metadata.timeSpent = clockIcon.nextElementSibling.textContent.trim();
     }
 
-    // 6. Extract correct answer if not found yet
+    // 6. Extract GMAT Club discussion link
+    // The link is in an <a> containing <span class="hide-small">GMAT Club</span>
+    metadata.gmatClubLink = null;
+    const hideSmallSpans = document.querySelectorAll('span.hide-small');
+    for (const span of hideSmallSpans) {
+        if (span.textContent.trim() === 'GMAT Club') {
+            const anchor = span.closest('a');
+            if (anchor && anchor.href) {
+                metadata.gmatClubLink = anchor.href;
+                break;
+            }
+        }
+    }
+
+    // 7. Extract correct answer if not found yet
     if (!metadata.correctAnswer) {
         const correctAnswerLabels = document.querySelectorAll('.correct-answer');
 

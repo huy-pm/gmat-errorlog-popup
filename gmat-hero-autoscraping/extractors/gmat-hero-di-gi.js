@@ -189,6 +189,7 @@ export async function extractQuestionData() {
         // Construct Final JSON
         const jsonData = {
             questionLink: getPracticeUrl(),
+            gmatClubLink: metadata.gmatClubLink || '',
             source: 'gmat-hero',
             difficulty: metadata.difficulty || '',
             section: 'di',

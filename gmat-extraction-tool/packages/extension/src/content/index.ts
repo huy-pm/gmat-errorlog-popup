@@ -9,6 +9,9 @@ import {
     baseUrl
 } from '@gmat-extraction/core';
 
+import { scrapeCurrentPage } from '../batch/content-scraper';
+import { discoverCategories } from '../batch/category-discovery';
+
 // Bridge to Background Service Worker for Auth
 const ExtensionAuth = {
     async getToken() {
@@ -132,40 +135,82 @@ setAuthProvider(ExtensionAuth);
         console.log('Extractor configured for:', source);
     }
 
-    // Listen for messages from background script
+    // Listen for messages from background script / side panel
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        // Toggle sidebar (existing functionality)
         if (message.action === 'TOGGLE_SIDEBAR') {
             if (!window.__SMARTLOG_INJECTED__) {
-                // Sidebar doesn't exist, create it
                 createSidebar();
             } else {
-                // Sidebar exists, toggle its visibility using transform
                 const sidebar = document.getElementById('smartlog-split-container');
                 if (sidebar) {
                     const currentTransform = sidebar.style.transform;
-                    
+
                     if (currentTransform === 'translateX(100%)' || currentTransform === '') {
-                        // Sidebar is hidden or initial state, show it
                         sidebar.style.transform = 'translateX(0)';
                         document.body.style.marginRight = sidebar.style.width || '400px';
                         const expandBtn = document.getElementById('smartlog-expand-button');
                         if (expandBtn) expandBtn.style.display = 'none';
                     } else {
-                        // Sidebar is visible, hide it
                         sidebar.style.transform = 'translateX(100%)';
                         document.body.style.marginRight = '0px';
                         const expandBtn = document.getElementById('smartlog-expand-button');
                         if (expandBtn) expandBtn.style.display = 'block';
                     }
                 } else {
-                    // Sidebar element not found, recreate it
                     window.__SMARTLOG_INJECTED__ = false;
                     createSidebar();
                 }
             }
             sendResponse({ success: true });
+            return;
         }
+
+        // Category discovery (called from side panel via background)
+        if (message.action === 'DISCOVER_CATEGORIES') {
+            const categories = discoverCategories();
+            sendResponse({ categories });
+            return;
+        }
+
+        // Batch scrape command (from orchestrator — parallel mode)
+        if (message.action === 'BATCH_SCRAPE_PAGE') {
+            console.log(`[Batch] Received scrape command for: ${message.categoryId}`);
+            scrapeCurrentPage(message.categoryId, message.incorrectOnly || false)
+                .catch((err: Error) => {
+                    console.error('[Batch] Scrape failed:', err);
+                    chrome.runtime.sendMessage({
+                        action: 'BATCH_CATEGORY_ERROR',
+                        categoryId: message.categoryId,
+                        error: err.message
+                    });
+                });
+            sendResponse({ success: true });
+            return;
+        }
+
         return true; // Keep channel open for async response
     });
+
+    // ============================================
+    // BATCH MODE FALLBACK: Auto-start if storage flags are set
+    // (for recovery after tab reload during batch)
+    // ============================================
+    if (window.location.hostname.includes('gmat-hero')) {
+        chrome.storage.local.get(['batchMode', 'batchCurrentCategoryId', 'batchIncorrectOnly'], (result) => {
+            if (result.batchMode && result.batchCurrentCategoryId) {
+                console.log(`[Batch] Fallback: Auto-starting scrape for: ${result.batchCurrentCategoryId}`);
+                scrapeCurrentPage(result.batchCurrentCategoryId, result.batchIncorrectOnly || false)
+                    .catch((err: Error) => {
+                        console.error('[Batch] Scrape failed:', err);
+                        chrome.runtime.sendMessage({
+                            action: 'BATCH_CATEGORY_ERROR',
+                            categoryId: result.batchCurrentCategoryId,
+                            error: err.message
+                        });
+                    });
+            }
+        });
+    }
 
 })();

@@ -2,6 +2,7 @@
     "name": "@gmat-extraction/extension",
     "version": "1.0.0",
     "scripts": {
+        "prebuild": "node scripts/bump-version.js",
         "build": "vite build"
     },
     "dependencies": {

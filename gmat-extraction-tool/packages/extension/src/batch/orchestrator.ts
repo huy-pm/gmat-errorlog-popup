@@ -26,6 +26,7 @@ function createInitialState(): BatchState {
         concurrency: 3,
         totalCategories: 0,
         results: {},
+        categoryNames: {},
         errors: [],
         startedAt: null,
         stats: { totalCategories: 0, completedCategories: 0, totalQuestions: 0, totalErrors: 0, skippedQuestions: 0 },
@@ -96,6 +97,7 @@ export async function startBatch(
                 currentQuestionIndex: 0
             };
             batchState.workers.push(worker);
+            batchState.categoryNames[category.id] = category.name;
 
             // When tab finishes loading, send scrape command
             tabLoadCallbacks.set(tab.id!, () => {
@@ -208,6 +210,7 @@ async function assignNextCategory(tabId: number): Promise<void> {
         worker.questionsExtracted = 0;
         worker.currentQuestionIndex = 0;
     }
+    batchState.categoryNames[category.id] = category.name;
 
     await persistState();
     broadcastProgress();
@@ -266,6 +269,24 @@ export async function onCategoryComplete(
     console.log(`[Orchestrator] "${categoryName}" complete: ${questions.length} questions, ${report.errors.length} errors`);
 
     broadcastProgress();
+
+    // Download immediately — don't wait for all categories to finish
+    if (questions.length > 0) {
+        const section = questions[0]?.section || 'mixed';
+        const questionType = questions[0]?.category || 'unknown';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = buildFilename(categoryId, categoryName, section, timestamp);
+        await downloadFile(JSON.stringify({
+            exportedAt: new Date().toISOString(),
+            totalRecords: questions.length,
+            source: 'gmat-hero',
+            section,
+            category: questionType,
+            categoryId,
+            categoryName,
+            questions
+        }, null, 2), filename);
+    }
 
     // Assign next category to this worker
     await assignNextCategory(senderTabId);
@@ -337,45 +358,6 @@ async function finalizeBatch(): Promise<void> {
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
-    // Collect files to download
-    const filesToDownload: { content: string; filename: string }[] = [];
-
-    for (const [categoryId, questions] of Object.entries(batchState.results)) {
-        if (questions.length === 0) continue;
-
-        const section = questions[0]?.section || 'mixed';
-        const questionType = questions[0]?.category || 'unknown';
-        // Use categoryId (e.g. "OG-CR-09", "ADVANCE-CR") for unique filenames
-        // instead of questionType (e.g. "CR") which is the same for all CR categories
-        const safeCategoryId = categoryId.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
-        const filename = `GMAT-HERO/${section}/${safeCategoryId}-${timestamp}.json`;
-
-        filesToDownload.push({
-            content: JSON.stringify({
-                exportedAt: new Date().toISOString(),
-                totalRecords: questions.length,
-                source: 'gmat-hero',
-                section,
-                category: questionType,
-                categoryId,
-                questions
-            }, null, 2),
-            filename
-        });
-    }
-
-    if (batchState.errors.length > 0) {
-        filesToDownload.push({
-            content: JSON.stringify({
-                generatedAt: new Date().toISOString(),
-                stats: batchState.stats,
-                errors: batchState.errors.filter(e => e.severity === 'error'),
-                warnings: batchState.errors.filter(e => e.severity === 'warning')
-            }, null, 2),
-            filename: `GMAT-HERO/error-report-${timestamp}.json`
-        });
-    }
-
     // Close worker tabs
     for (const worker of batchState.workers) {
         try {
@@ -383,9 +365,14 @@ async function finalizeBatch(): Promise<void> {
         } catch { /* tab may already be closed */ }
     }
 
-    // Download files silently via chrome.downloads API (no Save dialog)
-    for (const file of filesToDownload) {
-        await downloadFile(file.content, file.filename);
+    // Download error report if there were any errors
+    if (batchState.errors.length > 0) {
+        await downloadFile(JSON.stringify({
+            generatedAt: new Date().toISOString(),
+            stats: batchState.stats,
+            errors: batchState.errors.filter(e => e.severity === 'error'),
+            warnings: batchState.errors.filter(e => e.severity === 'warning')
+        }, null, 2), `GMAT-HERO/error-report-${timestamp}.json`);
     }
 
     // Broadcast completion to side panel
@@ -426,6 +413,33 @@ export async function getBatchStatus(): Promise<BatchState> {
 // ============================================
 // Helpers
 // ============================================
+
+/**
+ * Build a filename from categoryId slug + display name.
+ * e.g. "OG-CR-01" + "Inference" → "GMAT-HERO/verbal/og-cr-inference-01-{ts}.json"
+ *      "ADVANCE-CR" + "Advance CR" → "GMAT-HERO/verbal/advance-cr-advance_cr-{ts}.json"
+ */
+function buildFilename(categoryId: string, categoryName: string, section: string, timestamp: string): string {
+    const safeDisplayName = categoryName
+        .replace(/[^a-zA-Z0-9_-]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '')
+        .toLowerCase();
+
+    // Split trailing number from slug: "OG-CR-01" → prefix="OG-CR", num="01"
+    const match = categoryId.match(/^(.*)-(\d+)$/);
+    let base: string;
+    if (match) {
+        const prefix = match[1].toLowerCase();
+        const num = match[2];
+        base = `${prefix}-${safeDisplayName}-${num}`;
+    } else {
+        base = `${categoryId.toLowerCase()}-${safeDisplayName}`;
+    }
+
+    return `GMAT-HERO/${section}/${base}-${timestamp}.json`;
+}
+
 function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

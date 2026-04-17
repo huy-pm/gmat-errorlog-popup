@@ -26,6 +26,7 @@ export interface BatchState {
     concurrency: number;
     totalCategories: number;
     results: Record<string, ExtractedQuestion[]>;
+    categoryNames: Record<string, string>;
     errors: BatchError[];
     startedAt: string | null;
     stats: BatchStats;
@@ -59,6 +60,7 @@ export interface ExtractedQuestion {
     section: string;
     questionType: string;
     category: string;
+    topic?: string;
     correctAnswer?: string | null;
     content: Record<string, unknown>;
     // MSR-specific

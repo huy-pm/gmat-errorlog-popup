@@ -41,6 +41,13 @@ const selConcurrency = $('#sel-concurrency') as HTMLSelectElement;
 
 let discoveredCategories: CategoryDefinition[] = [];
 
+// Show version from manifest
+const versionLabel = document.getElementById('version-label');
+if (versionLabel) {
+    const manifest = chrome.runtime.getManifest();
+    versionLabel.textContent = `v${manifest.version}`;
+}
+
 // Chrome settings link - can't navigate directly to chrome:// from extension page
 const linkChromeSettings = document.getElementById('link-chrome-settings');
 if (linkChromeSettings) {

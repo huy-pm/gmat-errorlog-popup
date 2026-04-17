@@ -403,6 +403,7 @@ export function extractGMATHeroMetadata() {
     const metadata = {
         isReviewMode: false,
         category: null,
+        topic: null,
         selectedAnswer: null,
         difficulty: null,
         timeSpent: null,
@@ -430,6 +431,14 @@ export function extractGMATHeroMetadata() {
         }
     } else if (url.includes('rc') || url.includes('rrc')) {
         metadata.category = 'rc';
+        // Extract topic from page header (e.g. "RC - Business Topic 1" → "Business Topic 1")
+        if (categoryEl) {
+            const fullText = categoryEl.textContent.trim();
+            const parts = fullText.split('-');
+            if (parts.length > 1) {
+                metadata.topic = parts[parts.length - 1].trim();
+            }
+        }
     } else {
         metadata.category = '';
     }

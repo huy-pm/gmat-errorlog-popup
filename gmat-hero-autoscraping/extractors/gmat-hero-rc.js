@@ -107,6 +107,7 @@ export async function extractQuestionData() {
             section: 'verbal',
             questionType: 'rc',
             category: 'RC',
+            topic: metadata.topic || '',
             correctAnswer: metadata.correctAnswer || '',
             content: {
                 passage: decodeHtmlEntities(cleanPassage || passageText),

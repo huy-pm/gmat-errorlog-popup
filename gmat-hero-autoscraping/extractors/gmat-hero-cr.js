@@ -220,7 +220,7 @@ export async function extractQuestionData() {
             difficulty: metadata.difficulty || '',
             section: 'verbal',
             questionType: 'cr',
-            category: 'CR',
+            category: metadata.category || 'CR',
             correctAnswer: metadata.correctAnswer || '',
             content: {
                 passage: decodeHtmlEntities(passage),

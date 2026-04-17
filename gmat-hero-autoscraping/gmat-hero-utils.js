@@ -403,6 +403,7 @@ export function extractGMATHeroMetadata() {
     const metadata = {
         isReviewMode: false,
         category: null,
+        topic: null,
         selectedAnswer: null,
         difficulty: null,
         timeSpent: null,
@@ -430,6 +431,14 @@ export function extractGMATHeroMetadata() {
         }
     } else if (url.includes('rc') || url.includes('rrc')) {
         metadata.category = 'rc';
+        // Extract topic from page header (e.g. "RC - Business Topic 1" → "Business Topic 1")
+        if (categoryEl) {
+            const fullText = categoryEl.textContent.trim();
+            const parts = fullText.split('-');
+            if (parts.length > 1) {
+                metadata.topic = parts[parts.length - 1].trim();
+            }
+        }
     } else {
         metadata.category = '';
     }
@@ -487,7 +496,21 @@ export function extractGMATHeroMetadata() {
         metadata.timeSpent = clockIcon.nextElementSibling.textContent.trim();
     }
 
-    // 6. Extract correct answer if not found yet
+    // 6. Extract GMAT Club discussion link
+    // The link is in an <a> containing <span class="hide-small">GMAT Club</span>
+    metadata.gmatClubLink = null;
+    const hideSmallSpans = document.querySelectorAll('span.hide-small');
+    for (const span of hideSmallSpans) {
+        if (span.textContent.trim() === 'GMAT Club') {
+            const anchor = span.closest('a');
+            if (anchor && anchor.href) {
+                metadata.gmatClubLink = anchor.href;
+                break;
+            }
+        }
+    }
+
+    // 7. Extract correct answer if not found yet
     if (!metadata.correctAnswer) {
         const correctAnswerLabels = document.querySelectorAll('.correct-answer');
 

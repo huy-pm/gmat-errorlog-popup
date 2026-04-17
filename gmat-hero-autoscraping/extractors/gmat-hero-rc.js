@@ -101,11 +101,13 @@ export async function extractQuestionData() {
         // Create JSON structure
         const jsonData = {
             questionLink: getPracticeUrl(),
+            gmatClubLink: metadata.gmatClubLink || '',
             source: 'gmat-hero',
             difficulty: metadata.difficulty || '',
             section: 'verbal',
             questionType: 'rc',
             category: 'RC',
+            topic: metadata.topic || '',
             correctAnswer: metadata.correctAnswer || '',
             content: {
                 passage: decodeHtmlEntities(cleanPassage || passageText),

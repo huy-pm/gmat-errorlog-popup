@@ -1,0 +1,10 @@
+{
+    "name": "gmat-extraction-tool",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "npm run build --workspaces"
+    }
+}

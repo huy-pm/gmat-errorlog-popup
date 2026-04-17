@@ -245,7 +245,7 @@ javascript: (function () {
                 if (radioButton && label) {
                     var letter = radioButton.value;
                     var text = decodeHtmlEntities(label.textContent.trim());
-                    var isCorrect = option.querySelector('p-radiobutton').classList.contains('correct-answer');
+                    var isCorrect = !!option.querySelector('.correct-answer');
 
                     question.options.push({
                         letter: letter,
@@ -327,6 +327,10 @@ javascript: (function () {
     }
 
     function showCorrectAnswerToggle() {
+        // If correct-answer is already visible, do NOT click the toggle — it would hide it
+        if (document.querySelector('.correct-answer')) {
+            return false;
+        }
         var reviewButtons = document.querySelectorAll('.pointer.hover-green.sub.only-review');
         for (var btn of reviewButtons) {
             if (btn.textContent.toLowerCase().includes('answer')) {

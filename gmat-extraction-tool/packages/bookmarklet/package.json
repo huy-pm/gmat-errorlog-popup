@@ -1,0 +1,14 @@
+{
+    "name": "@gmat-extraction/bookmarklet",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "vite build"
+    },
+    "dependencies": {
+        "@gmat-extraction/core": "*"
+    },
+    "devDependencies": {
+        "vite": "^5.0.0",
+        "typescript": "^5.0.0"
+    }
+}

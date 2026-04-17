@@ -1,0 +1,16 @@
+{
+    "name": "@gmat-extraction/extension",
+    "version": "1.0.0",
+    "scripts": {
+        "prebuild": "node scripts/bump-version.js",
+        "build": "vite build"
+    },
+    "dependencies": {
+        "@gmat-extraction/core": "*"
+    },
+    "devDependencies": {
+        "@types/chrome": "^0.0.260",
+        "vite": "^5.0.0",
+        "typescript": "^5.0.0"
+    }
+}

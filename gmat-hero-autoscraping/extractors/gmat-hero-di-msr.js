@@ -393,6 +393,7 @@ export async function extractQuestionData() {
 
             questionSet = {
                 questionSetLink: getPracticeUrl(),
+                gmatClubLink: metadata.gmatClubLink || '',
                 source: 'gmat-hero',
                 section: 'di',
                 questionType: 'di',
@@ -410,9 +411,10 @@ export async function extractQuestionData() {
             return null;
         }
 
-        // Add question ID, difficulty, and link
+        // Add question ID, difficulty, link, and GMAT Club link
         question.questionId = questionSet.questions.length + 1;
         question.questionLink = getPracticeUrl();
+        question.gmatClubLink = metadata.gmatClubLink || '';
         question.difficulty = metadata.difficulty || '';
 
         // Add question to set

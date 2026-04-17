@@ -1,3 +1,6 @@
+# Claude Code worktrees (temporary, should never be committed)
+.claude/worktrees/
+
 # Test files
 test.html
 test-page.html

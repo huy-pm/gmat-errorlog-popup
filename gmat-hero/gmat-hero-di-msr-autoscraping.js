@@ -237,6 +237,12 @@ javascript: (function () {
             question.options = [];
             question.correctAnswer = null;
 
+            // Debug: log label classes to console so we can see what GMAT Hero is giving us
+            var debugLabels = Array.from(standardChoices.querySelectorAll('.option label')).map(function(l) {
+                return l.className || '(no class)';
+            });
+            console.log('[MSR] multipleChoice label classes:', debugLabels.join(' | '));
+
             var options = standardChoices.querySelectorAll('.option');
             options.forEach(function (option) {
                 var radioButton = option.querySelector('p-radiobutton input');
@@ -245,7 +251,23 @@ javascript: (function () {
                 if (radioButton && label) {
                     var letter = radioButton.value;
                     var text = decodeHtmlEntities(label.textContent.trim());
+
+                    // Primary: GMAT Hero adds .correct-answer to the label when answer is revealed
                     var isCorrect = !!option.querySelector('.correct-answer');
+
+                    // Fallback: when user answered CORRECTLY, the selected answer IS the correct
+                    // answer and GMAT Hero may only mark it with aria-checked / p-radiobutton-checked
+                    // rather than adding .correct-answer.
+                    // Only use this when NO option has .correct-answer at all (otherwise we'd
+                    // accidentally pick the wrong answer in the answered-incorrectly case).
+                    if (!isCorrect && !standardChoices.querySelector('.correct-answer')) {
+                        var input = option.querySelector('input[type="radio"]');
+                        var rbBox = option.querySelector('.p-radiobutton-box');
+                        isCorrect = !!(
+                            (input && input.getAttribute('aria-checked') === 'true') ||
+                            (rbBox && rbBox.classList.contains('p-highlight'))
+                        );
+                    }
 
                     question.options.push({
                         letter: letter,
@@ -326,19 +348,38 @@ javascript: (function () {
         return false;
     }
 
-    function showCorrectAnswerToggle() {
-        // If correct-answer is already visible, do NOT click the toggle — it would hide it
-        if (document.querySelector('.correct-answer')) {
-            return false;
-        }
-        var reviewButtons = document.querySelectorAll('.pointer.hover-green.sub.only-review');
-        for (var btn of reviewButtons) {
-            if (btn.textContent.toLowerCase().includes('answer')) {
-                btn.click();
-                return true;
+    /**
+     * Ensure the correct answer is visible for the current sub-question.
+     * - If .correct-answer is already in the right panel: nothing to do.
+     * - Otherwise: click the "Show Answer" button (if any) then poll up to
+     *   2 s for the class to appear.
+     */
+    async function ensureAnswerShown() {
+        var rightPanel = document.querySelector('#right-panel');
+        if (!rightPanel) return;
+
+        // Already showing?
+        if (rightPanel.querySelector('.correct-answer')) return;
+
+        // Try to click any "show answer" trigger.
+        // Cast a wide net: any .only-review element whose text includes "answer".
+        var clicked = false;
+        var candidates = document.querySelectorAll('.only-review');
+        for (var el of candidates) {
+            if (el.textContent.trim().toLowerCase().includes('answer')) {
+                el.click();
+                clicked = true;
+                break;
             }
         }
-        return false;
+
+        if (clicked) {
+            // Poll up to 2 s (4 × 500 ms) waiting for .correct-answer to appear
+            for (var i = 0; i < 4; i++) {
+                await delay(500);
+                if (rightPanel.querySelector('.correct-answer')) return; // found
+            }
+        }
     }
 
     async function processLoop() {
@@ -350,9 +391,7 @@ javascript: (function () {
 
         while (isRunning) {
             // 1. Ensure Answer is Shown
-            if (showCorrectAnswerToggle()) {
-                await delay(1000);
-            }
+            await ensureAnswerShown();
 
             // 2. Extract Data
             var data = await extractQuestionData();

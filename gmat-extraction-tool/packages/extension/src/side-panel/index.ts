@@ -64,52 +64,85 @@ btnDiscover.addEventListener('click', async () => {
     btnDiscover.textContent = '🔄 Discovering...';
     btnDiscover.disabled = true;
 
-    try {
-        // Find the active GMAT Hero tab
-        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-        const gmTab = tabs.find(t => t.url?.includes('gmat-hero'));
-
-        if (!gmTab?.id) {
-            // Try any GMAT Hero tab
-            const allTabs = await chrome.tabs.query({ url: '*://gmat-hero-v2.web.app/*' });
-            if (allTabs.length === 0) {
-                btnDiscover.textContent = '❌ No GMAT Hero tab found';
-                setTimeout(() => {
-                    btnDiscover.textContent = '🔍 Discover Categories from Active Tab';
-                    btnDiscover.disabled = false;
-                }, 3000);
-                return;
-            }
-            // Use the first GMAT Hero tab
-            const tabId = allTabs[0].id!;
-            const response = await chrome.tabs.sendMessage(tabId, { action: 'DISCOVER_CATEGORIES' });
-            handleDiscoveryResponse(response);
-        } else {
-            const response = await chrome.tabs.sendMessage(gmTab.id, { action: 'DISCOVER_CATEGORIES' });
-            handleDiscoveryResponse(response);
-        }
-    } catch (err) {
-        console.error('Discovery failed:', err);
-        btnDiscover.textContent = '❌ Discovery failed - is a GMAT Hero page open?';
+    const resetButton = (msg: string, ms = 4000) => {
+        btnDiscover.textContent = msg;
         setTimeout(() => {
             btnDiscover.textContent = '🔍 Discover Categories from Active Tab';
             btnDiscover.disabled = false;
-        }, 3000);
+        }, ms);
+    };
+
+    try {
+        // Prefer the active tab in the current window; fall back to any GMAT Hero tab
+        const activeTabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        let targetTab = activeTabs.find(t => t.url?.includes('gmat-hero-v2.web.app'));
+
+        if (!targetTab) {
+            const allTabs = await chrome.tabs.query({ url: '*://gmat-hero-v2.web.app/*' });
+            if (allTabs.length === 0) {
+                resetButton('❌ Open a GMAT Hero tab first');
+                return;
+            }
+            targetTab = allTabs[0];
+            console.log('[Discover] Active tab is not GMAT Hero; falling back to tab:', targetTab.url);
+        }
+
+        const url = targetTab.url || '';
+        console.log('[Discover] Target tab URL:', url);
+
+        // Hint: discovery only works on the listing page (/pages/study/<source>)
+        if (!/\/pages\/study\/[^/]+\/?($|\?)/.test(url)) {
+            resetButton('❌ Navigate to a /pages/study/<source> listing page', 6000);
+            console.warn('[Discover] URL does not look like a study listing page:', url);
+            return;
+        }
+
+        const sendDiscover = () =>
+            chrome.tabs.sendMessage(targetTab!.id!, { action: 'DISCOVER_CATEGORIES' }) as Promise<
+                { categories?: CategoryDefinition[] } | undefined
+            >;
+
+        let response: { categories?: CategoryDefinition[] } | undefined;
+        try {
+            response = await sendDiscover();
+        } catch (msgErr) {
+            // Content script not loaded on this tab (extension was reloaded after the page loaded).
+            // Inject it programmatically and retry.
+            console.warn('[Discover] sendMessage failed, injecting content script and retrying:', msgErr);
+            try {
+                await chrome.scripting.executeScript({
+                    target: { tabId: targetTab.id! },
+                    files: ['src/content/index.js']
+                });
+                // Give the script a moment to register its message listener
+                await new Promise(r => setTimeout(r, 150));
+                response = await sendDiscover();
+            } catch (injectErr) {
+                console.error('[Discover] Injection/retry failed:', injectErr);
+                resetButton('❌ Reload the GMAT Hero tab and retry', 5000);
+                return;
+            }
+        }
+
+        console.log('[Discover] Response:', response);
+        handleDiscoveryResponse(response, resetButton);
+    } catch (err) {
+        console.error('[Discover] Unexpected error:', err);
+        resetButton('❌ Discovery failed - see console');
     }
 });
 
-function handleDiscoveryResponse(response: { categories?: CategoryDefinition[] }) {
+function handleDiscoveryResponse(
+    response: { categories?: CategoryDefinition[] } | undefined,
+    resetButton: (msg: string, ms?: number) => void
+) {
     if (response?.categories && response.categories.length > 0) {
         discoveredCategories = response.categories;
         renderCategoryList(discoveredCategories);
-        btnDiscover.textContent = `✅ Found ${discoveredCategories.length} categories`;
+        resetButton(`✅ Found ${discoveredCategories.length} categories`);
     } else {
-        btnDiscover.textContent = '❌ No categories found on this page';
+        resetButton('❌ No categories found on this page');
     }
-    setTimeout(() => {
-        btnDiscover.textContent = '🔍 Discover Categories from Active Tab';
-        btnDiscover.disabled = false;
-    }, 3000);
 }
 
 // ============================================

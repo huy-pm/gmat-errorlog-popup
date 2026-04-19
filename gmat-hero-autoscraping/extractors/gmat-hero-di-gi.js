@@ -130,6 +130,25 @@ export async function extractQuestionData() {
                         // Add placeholder for dropdown
                         statementText += '{dropdown}';
 
+                        // Determine correct answer PER DROPDOWN:
+                        //  - If a `.gi-answer` span is present in this dropdown, the user
+                        //    got it wrong and that span holds the correct answer.
+                        //  - Else if the `nb-select` carries `status-success`, the user
+                        //    got it right and the currently-selected text IS the answer.
+                        let correctAnswer = null;
+                        const giAnswerEl = node.querySelector('.gi-answer');
+                        if (giAnswerEl) {
+                            correctAnswer = giAnswerEl.textContent.trim();
+                        } else {
+                            const nbSel = node.querySelector('nb-select');
+                            if (nbSel && nbSel.classList.contains('status-success')) {
+                                const selectedBtn = node.querySelector('button');
+                                if (selectedBtn) {
+                                    correctAnswer = selectedBtn.textContent.trim();
+                                }
+                            }
+                        }
+
                         // Extract Dropdown Options
                         const btn = node.querySelector('button');
                         if (btn) {
@@ -141,13 +160,17 @@ export async function extractQuestionData() {
                             const options = Array.from(document.querySelectorAll('nb-option'))
                                 .map(o => o.textContent.trim());
 
-                            dropdowns.push({ options: options });
+                            const dd = { options: options };
+                            if (correctAnswer) dd.correctAnswer = correctAnswer;
+                            dropdowns.push(dd);
 
                             // Close the dropdown
                             btn.click();
                             await delay(300);
                         } else {
-                            dropdowns.push({ options: [] });
+                            const dd = { options: [] };
+                            if (correctAnswer) dd.correctAnswer = correctAnswer;
+                            dropdowns.push(dd);
                         }
                     } else {
                         // Regular text (handle KaTeX if present)
@@ -166,22 +189,9 @@ export async function extractQuestionData() {
             }
         }
 
-        // 4. Extract correct answers from .gi-answer elements
-        const correctAnswerSpans = document.querySelectorAll('.gi-answer');
-        if (correctAnswerSpans.length > 0) {
-            let answerIndex = 0;
-
-            for (const statement of contentData.statements) {
-                if (statement.dropdowns) {
-                    for (const dropdown of statement.dropdowns) {
-                        if (correctAnswerSpans[answerIndex]) {
-                            dropdown.correctAnswer = correctAnswerSpans[answerIndex].textContent.trim();
-                            answerIndex++;
-                        }
-                    }
-                }
-            }
-        }
+        // 4. Correct answers were captured per-dropdown in section 3 above
+        //    (both from `.gi-answer` spans when the user answered wrong, and
+        //    from `nb-select.status-success` when the user answered right).
 
         // 5. Metadata
         const metadata = extractGMATHeroMetadata();

@@ -267,6 +267,48 @@ async function extractDataSources() {
 }
 
 /**
+ * Ensure the "Answer" reveal button has been clicked so `.correct-answer` markers
+ * are present in the right panel. On GMAT Hero:
+ *  - Binary sub-questions already have .correct-answer on <p-radiobutton> in review mode.
+ *  - Multiple-choice sub-questions only show .correct-answer on an inner <label> after
+ *    the "Answer" button is clicked, and that button toggles on each click.
+ * This function is idempotent: if the markers are already visible it returns without
+ * clicking (so it never toggles off a reveal the caller already performed).
+ */
+async function ensureAnswerRevealed() {
+    const rightPanel = document.querySelector('#right-panel') || document;
+    const hasCorrect = () => !!rightPanel.querySelector(
+        '.standard-choices .correct-answer, .yes-no-question .correct-answer'
+    );
+
+    if (hasCorrect()) return;
+
+    // Wait up to 2s for the Answer button to render (Angular hydration race)
+    let btn = null;
+    for (let w = 0; w < 10; w++) {
+        btn = document.querySelector('.pointer.hover-green.sub.only-review');
+        if (btn && btn.offsetParent !== null) break;
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    if (!btn || btn.offsetParent === null) {
+        console.warn('[MSR] "Answer" button unavailable — correctAnswer may be missing. URL:', location.href);
+        return;
+    }
+
+    // The button toggles on each click. Click up to 3 times, verifying after each.
+    for (let i = 0; i < 3; i++) {
+        if (hasCorrect()) return;
+        btn.click();
+        await new Promise(r => setTimeout(r, 700));
+    }
+
+    if (!hasCorrect()) {
+        console.warn('[MSR] Reveal failed after 3 clicks — URL:', location.href);
+    }
+}
+
+/**
  * Extract current question
  * @returns {Object|null} Question data
  */
@@ -351,7 +393,10 @@ function extractQuestion() {
                 escapeCurrencyInElement(labelClone);
                 processKaTeX(labelClone);
                 const text = normalizeCurrency(decodeHtmlEntities(labelClone.textContent.trim()));
-                const isCorrect = option.querySelector('p-radiobutton')?.classList.contains('correct-answer') ||
+                // PrimeNG puts the .correct-answer class on an inner <label> element,
+                // not on the <p-radiobutton> host. A broad descendant query reliably
+                // catches the marker no matter where it lands in the rendered DOM.
+                const isCorrect = !!option.querySelector('.correct-answer') ||
                     option.classList.contains('correct-answer');
 
                 question.options.push({ letter, text, isCorrect });
@@ -372,6 +417,12 @@ function extractQuestion() {
  */
 export async function extractQuestionData() {
     try {
+        // Reveal correct-answer markers before doing anything else. Idempotent — will
+        // NOT toggle off a reveal the caller (e.g. the batch scraper's showCorrectAnswer)
+        // already performed. Critical for multiple-choice sub-questions, which require
+        // the "Answer" button to have been clicked for `.correct-answer` to appear.
+        await ensureAnswerRevealed();
+
         // Extract metadata
         const metadata = extractGMATHeroMetadata();
 
@@ -405,10 +456,19 @@ export async function extractQuestionData() {
         }
 
         // Extract current question
-        const question = extractQuestion();
+        let question = extractQuestion();
         if (!question) {
             console.error('Failed to extract question');
             return null;
+        }
+
+        // Self-heal: if MC came back without a correctAnswer, the reveal may have
+        // raced against Angular paint. Re-run the reveal guarantee and re-extract once.
+        if (question.questionType === 'multipleChoice' && !question.correctAnswer) {
+            await new Promise(r => setTimeout(r, 500));
+            await ensureAnswerRevealed();
+            const retry = extractQuestion();
+            if (retry && retry.correctAnswer) question = retry;
         }
 
         // Add question ID, difficulty, link, and GMAT Club link

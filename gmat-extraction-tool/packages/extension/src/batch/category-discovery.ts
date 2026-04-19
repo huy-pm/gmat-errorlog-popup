@@ -26,6 +26,7 @@ const TABLE_CLASS_TO_TYPE: Record<string, string> = {
     'ta': 'TA',
     'tpa': 'TPA',
     'di': 'DI',
+    'ir': 'IR',
 };
 
 /** Map of table CSS class → section */
@@ -41,6 +42,7 @@ const TABLE_CLASS_TO_SECTION: Record<string, string> = {
     'ta': 'di',
     'tpa': 'di',
     'di': 'di',
+    'ir': 'di',
 };
 
 /**

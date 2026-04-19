@@ -13,3 +13,6 @@ test-page.html
 # OS generated files
 .DS_Store
 Thumbs.db
+
+.svg files
+/svg files

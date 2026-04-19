@@ -1,2 +1,3 @@
 import { extractGMATClubQuestion } from './extractors/gmatclub';
-export declare const getExtractor: (url: string) => typeof extractGMATClubQuestion | null;
+import { extractGMATHeroQuestion } from './extractors/gmathero';
+export declare const getExtractor: (url: string) => typeof extractGMATClubQuestion | typeof extractGMATHeroQuestion | null;

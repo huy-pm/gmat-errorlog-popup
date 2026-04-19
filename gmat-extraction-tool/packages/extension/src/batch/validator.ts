@@ -16,13 +16,29 @@ interface ValidationRule {
     appliesTo?: string[];
 }
 
+/**
+ * MSR question sets follow the autoscraping format: top-level has `questionSetLink`
+ * (not `questionLink`) and per-sub-question `questionLink` + `difficulty` live inside
+ * the `questions[]` array. Universal rules must treat these sets differently.
+ */
+function isMsrSet(q: ExtractedQuestion): boolean {
+    return (q.category || '').toUpperCase() === 'MSR' || Array.isArray(q.questions);
+}
+
 // Rules that apply to ALL question types
 const UNIVERSAL_RULES: ValidationRule[] = [
     {
         field: 'questionLink',
-        check: (q) => !!q.questionLink && q.questionLink.startsWith('http'),
+        check: (q) => {
+            // MSR sets use `questionSetLink` at the top (matches autoscraping format)
+            if (isMsrSet(q)) {
+                const setLink = (q as Record<string, unknown>).questionSetLink as string | undefined;
+                return !!setLink && setLink.startsWith('http');
+            }
+            return !!q.questionLink && q.questionLink.startsWith('http');
+        },
         severity: 'error',
-        message: 'Missing or invalid questionLink'
+        message: 'Missing or invalid questionLink/questionSetLink'
     },
     {
         field: 'source',
@@ -44,7 +60,16 @@ const UNIVERSAL_RULES: ValidationRule[] = [
     },
     {
         field: 'difficulty',
-        check: (q) => ['easy', 'medium', 'hard'].includes(q.difficulty),
+        check: (q) => {
+            // MSR sets carry difficulty on each sub-question, not at the top level
+            if (isMsrSet(q)) {
+                const subs = (q.questions || []) as Array<Record<string, unknown>>;
+                return subs.length > 0 && subs.every(s =>
+                    ['easy', 'medium', 'hard'].includes(((s.difficulty as string) || '').toLowerCase())
+                );
+            }
+            return ['easy', 'medium', 'hard'].includes(q.difficulty);
+        },
         severity: 'warning',
         message: 'Missing or invalid difficulty'
     },
@@ -192,14 +217,35 @@ const MSR_RULES: ValidationRule[] = [
         },
         severity: 'error',
         message: 'MSR questions must have dataSources with tabs',
-        appliesTo: ['di-msr']
+        appliesTo: ['di-msr', 'msr']
     },
     {
         field: 'questions',
         check: (q) => Array.isArray(q.questions) && q.questions.length > 0,
         severity: 'error',
         message: 'MSR questions must have a non-empty questions array',
-        appliesTo: ['di-msr']
+        appliesTo: ['di-msr', 'msr']
+    },
+    {
+        field: 'questions[].correctAnswer',
+        check: (q) => {
+            const subs = (q.questions || []) as Array<Record<string, unknown>>;
+            return subs.every(sub => {
+                const qt = sub.questionType;
+                if (qt === 'multipleChoice') {
+                    const ca = sub.correctAnswer as string | null | undefined;
+                    return !!ca && /^[A-Ea-e]$/.test(ca);
+                }
+                if (qt === 'binary') {
+                    const stmts = (sub.statements || []) as Array<Record<string, unknown>>;
+                    return stmts.length > 0 && stmts.every(s => !!s.correctAnswer);
+                }
+                return true;
+            });
+        },
+        severity: 'warning',
+        message: 'MSR sub-question(s) missing correctAnswer',
+        appliesTo: ['di-msr', 'msr']
     }
 ];
 
@@ -238,11 +284,12 @@ export function validateQuestion(
         }
 
         if (!rule.check(question)) {
+            const setLink = (question as Record<string, unknown>).questionSetLink as string | undefined;
             issues.push({
                 categoryId,
                 categoryName,
                 questionIndex,
-                questionLink: question.questionLink || '',
+                questionLink: question.questionLink || setLink || '',
                 error: rule.message,
                 severity: rule.severity,
                 field: rule.field

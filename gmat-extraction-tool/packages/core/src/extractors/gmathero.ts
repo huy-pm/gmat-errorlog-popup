@@ -1001,10 +1001,1027 @@ function extractGMATHeroRCContent() {
   }
 }
 
+// ============================================================================
+// DI SHARED UTILITIES
+// ============================================================================
+
+/**
+ * Promise-based delay (used by async DI extractors that must click UI elements)
+ */
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Process KaTeX elements in a container and convert to TeX notation.
+ * (Mirrors processKaTeX from gmat-hero-utils.js)
+ */
+function processKaTeX(container) {
+  var katexElements = container.querySelectorAll('.katex');
+  katexElements.forEach(function (katexElem) {
+    var mathml = katexElem.querySelector('.katex-mathml');
+    if (mathml) {
+      var annotation = mathml.querySelector('annotation');
+      if (annotation) {
+        var texContent = annotation.textContent;
+        var isDisplayMode = katexElem.closest('.katex-display') !== null;
+        var isDisplay = isDisplayMode ||
+          texContent.includes('\\dfrac') || texContent.includes('\\frac') ||
+          texContent.includes('\\int') || texContent.includes('\\sum');
+        var mathText;
+        if (isDisplayMode) {
+          mathText = '\n\n$$' + texContent + '$$\n\n';
+        } else if (isDisplay) {
+          mathText = '$$' + texContent + '$$';
+        } else {
+          mathText = '$' + texContent + '$';
+        }
+        katexElem.replaceWith(document.createTextNode(mathText));
+      }
+    }
+  });
+}
+
+// ============================================================================
+// EXTRACTION ERROR REPORTING
+// ============================================================================
+
+/**
+ * Module-level extraction log — reset on each top-level extractGMATHeroQuestion() call.
+ * Surfaces structured reasons why fields may be missing or extraction failed.
+ */
+var _extractionLog = { errors: [], warnings: [] };
+
+function _logError(msg) {
+  _extractionLog.errors.push(msg);
+  console.error('[GMAT Extractor]', msg);
+}
+
+function _logWarning(msg) {
+  _extractionLog.warnings.push(msg);
+  console.warn('[GMAT Extractor]', msg);
+}
+
+/**
+ * Returns the extraction log from the most recent extractGMATHeroQuestion() call.
+ * Call this after extraction to see why fields may be missing.
+ *
+ * Example:
+ *   const data = extractGMATHeroQuestion();
+ *   const { errors, warnings } = getExtractionReport();
+ */
+export function getExtractionReport() {
+  return {
+    errors: _extractionLog.errors.slice(),
+    warnings: _extractionLog.warnings.slice()
+  };
+}
+
+// ============================================================================
+// DI: DATA SUFFICIENCY (DS)
+// ============================================================================
+
+/**
+ * Extract Data Sufficiency question from GMAT Hero
+ */
+function extractGMATHeroDIDS() {
+  try {
+    var rightPanel = document.getElementById('right-panel');
+    if (!rightPanel) {
+      _logError('DS: No #right-panel found');
+      return null;
+    }
+
+    var questionStem = rightPanel.querySelector('.question-stem');
+    if (!questionStem) {
+      _logError('DS: No .question-stem in #right-panel');
+      return null;
+    }
+
+    // Extract image before any DOM manipulation
+    var questionImage = null;
+    var imgElement = questionStem.querySelector('img');
+    if (imgElement) questionImage = imgElement.src;
+
+    // Clone and mark statement boundaries BEFORE KaTeX processing
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = questionStem.innerHTML;
+    tempDiv.querySelectorAll('img').forEach(function (img) { img.remove(); });
+
+    var html = tempDiv.innerHTML;
+    html = html.replace(/<br\s*\/?>\s*<br\s*\/?>\s*\(1\)/gi, '|||STMT1|||(1)');
+    html = html.replace(/<br\s*\/?>\s*\(1\)/gi, '|||STMT1|||(1)');
+    html = html.replace(/<br\s*\/?>\s*<br\s*\/?>\s*\(2\)/gi, '|||STMT2|||(2)');
+    html = html.replace(/<br\s*\/?>\s*\(2\)/gi, '|||STMT2|||(2)');
+    tempDiv.innerHTML = html;
+
+    var tableData = extractTable(tempDiv);
+    escapeCurrencyInElement(tempDiv);
+    processKaTeX(tempDiv);
+
+    var processedHtml = tempDiv.innerHTML.replace(/<br\s*\/?>/gi, ' ');
+    tempDiv.innerHTML = processedHtml;
+
+    var fullText = (tempDiv.textContent || '').replace(/\s+/g, ' ').trim();
+
+    var questionText = '', statement1 = '', statement2 = '';
+
+    if (fullText.includes('|||STMT1|||') && fullText.includes('|||STMT2|||')) {
+      var parts = fullText.split('|||STMT1|||');
+      questionText = parts[0].trim();
+      var remainingParts = parts[1].split('|||STMT2|||');
+      statement1 = remainingParts[0].trim();
+      statement2 = remainingParts[1].trim();
+    } else {
+      // Fallback: locate (1) and (2) in plain text
+      var stmt1Index = fullText.indexOf('(1)');
+      var stmt2Index = fullText.indexOf('(2)');
+      if (stmt1Index > 0 && stmt2Index > stmt1Index) {
+        questionText = fullText.substring(0, stmt1Index).trim();
+        statement1 = fullText.substring(stmt1Index, stmt2Index).trim();
+        statement2 = fullText.substring(stmt2Index).trim();
+        _logWarning('DS: Used fallback (1)/(2) text search for statement parsing');
+      }
+    }
+
+    if (!questionText || !statement1 || !statement2) {
+      _logError('DS: Could not parse question/statement structure. Preview: ' + fullText.substring(0, 200));
+      return null;
+    }
+
+    var metadata = extractGMATHeroMetadata();
+
+    return {
+      questionLink: getPracticeUrl(),
+      source: 'gmat-hero',
+      difficulty: metadata.difficulty || '',
+      section: 'di',
+      questionType: 'di',
+      category: 'DS',
+      correctAnswer: metadata.correctAnswer || '',
+      content: {
+        questionText: normalizeCurrency(decodeHtmlEntities(questionText)),
+        statements: [
+          normalizeCurrency(decodeHtmlEntities(statement1)),
+          normalizeCurrency(decodeHtmlEntities(statement2))
+        ],
+        image: questionImage,
+        table: tableData
+      }
+    };
+
+  } catch (error) {
+    _logError('DS: Exception — ' + error.message);
+    return null;
+  }
+}
+
+// ============================================================================
+// DI: TABLE ANALYSIS (TA)
+// ============================================================================
+
+/**
+ * Extract Table Analysis question from GMAT Hero
+ */
+function extractGMATHeroDITA() {
+  try {
+    var irTa = document.querySelector('.ir-ta');
+    if (!irTa) {
+      _logError('TA: No .ir-ta container found');
+      return null;
+    }
+
+    // Intro text
+    var introText = '';
+    var introTextDiv = irTa.querySelector('div.ng-star-inserted');
+    if (introTextDiv) {
+      var introClone = introTextDiv.cloneNode(true);
+      escapeCurrencyInElement(introClone);
+      processKaTeX(introClone);
+      introText = normalizeCurrency(introClone.textContent.trim());
+    } else {
+      _logWarning('TA: No intro text div found (.ng-star-inserted)');
+    }
+
+    // Table headers
+    var thead = irTa.querySelector('thead');
+    if (!thead) {
+      _logError('TA: No <thead> in .ir-ta');
+      return null;
+    }
+
+    var headerGroups = null;
+    var headers = [];
+
+    var subHeaderRow = thead.querySelector('tr.sub-header');
+    if (subHeaderRow) {
+      headerGroups = [];
+      subHeaderRow.querySelectorAll('th').forEach(function (th) {
+        var colspan = parseInt(th.getAttribute('colspan') || '1', 10);
+        var rowspan = parseInt(th.getAttribute('rowspan') || '1', 10);
+        var thClone = th.cloneNode(true);
+        escapeCurrencyInElement(thClone);
+        processKaTeX(thClone);
+        var label = normalizeCurrency(thClone.textContent.trim());
+        headerGroups.push({ label: label, colspan: colspan, rowspan: rowspan });
+        if (rowspan > 1) headers.push(label);
+      });
+    }
+
+    var headerRows = thead.querySelectorAll('tr');
+    var lastHeaderRow = headerRows[headerRows.length - 1];
+    lastHeaderRow.querySelectorAll('th > div').forEach(function (cell) {
+      var cellClone = cell.cloneNode(true);
+      escapeCurrencyInElement(cellClone);
+      processKaTeX(cellClone);
+      headers.push(normalizeCurrency(cellClone.textContent.trim()));
+    });
+
+    if (headers.length === 0) _logWarning('TA: No table headers extracted');
+
+    // Table rows
+    var tbody = irTa.querySelector('tbody');
+    if (!tbody) {
+      _logError('TA: No <tbody> in .ir-ta');
+      return null;
+    }
+
+    var rows = [];
+    var col1RowspanRemaining = 0;
+
+    tbody.querySelectorAll('tr').forEach(function (tr) {
+      var rowData = [];
+      if (col1RowspanRemaining > 0) {
+        rowData.push('');
+        col1RowspanRemaining--;
+      }
+      tr.querySelectorAll('td').forEach(function (td) {
+        if (td.hasAttribute('rowspan')) {
+          var rs = parseInt(td.getAttribute('rowspan'), 10);
+          if (rs > 1) col1RowspanRemaining = rs - 1;
+        }
+        var span = td.querySelector('span');
+        var cellContent = '';
+        if (span) {
+          var spanClone = span.cloneNode(true);
+          escapeCurrencyInElement(spanClone);
+          processKaTeX(spanClone);
+          cellContent = spanClone.textContent.trim();
+        } else {
+          var tdClone = td.cloneNode(true);
+          escapeCurrencyInElement(tdClone);
+          processKaTeX(tdClone);
+          cellContent = tdClone.textContent.trim();
+        }
+        rowData.push(normalizeCurrency(cellContent));
+      });
+      if (rowData.length > 0) rows.push(rowData);
+    });
+
+    // Table legend/footnotes
+    var tableLegend = null;
+    var legendDiv = irTa.querySelector('.sortable-table + div.ng-star-inserted');
+    if (legendDiv) {
+      var legendClone = legendDiv.cloneNode(true);
+      escapeCurrencyInElement(legendClone);
+      processKaTeX(legendClone);
+      var legendText = normalizeCurrency(legendClone.textContent.trim());
+      if (legendText) tableLegend = decodeHtmlEntities(legendText);
+    }
+
+    // Question instruction
+    var questionStem = document.querySelector('#right-panel .question-stem');
+    if (!questionStem) {
+      _logError('TA: No #right-panel .question-stem found');
+      return null;
+    }
+    var stemClone = questionStem.cloneNode(true);
+    escapeCurrencyInElement(stemClone);
+    processKaTeX(stemClone);
+    var questionInstruction = normalizeCurrency(stemClone.textContent.trim());
+
+    // Binary choice statements
+    var yesNoQuestion = document.querySelector('.yes-no-question');
+    if (!yesNoQuestion) {
+      _logError('TA: No .yes-no-question container found');
+      return null;
+    }
+
+    var gridItems = Array.from(yesNoQuestion.querySelectorAll('.grid-item'));
+    var taChoice1Label = (gridItems[0] && gridItems[0].querySelector('b') ? gridItems[0].querySelector('b').textContent.trim() : null) || 'Y';
+    var taChoice2Label = (gridItems[1] && gridItems[1].querySelector('b') ? gridItems[1].querySelector('b').textContent.trim() : null) || 'N';
+
+    var statements = [];
+    for (var i = 3; i < gridItems.length; i += 3) {
+      var radioChoice1Div = gridItems[i];
+      var radioChoice2Div = gridItems[i + 1];
+      var statementTextDiv = gridItems[i + 2];
+      if (!statementTextDiv) break;
+
+      var statementClone = statementTextDiv.cloneNode(true);
+      escapeCurrencyInElement(statementClone);
+      processKaTeX(statementClone);
+      var statementText = normalizeCurrency(statementClone.textContent.trim());
+
+      var taCorrectAnswer = null;
+      var radioChoice1 = radioChoice1Div.querySelector('p-radiobutton');
+      var radioChoice2 = radioChoice2Div.querySelector('p-radiobutton');
+      if (radioChoice1 && radioChoice1.classList.contains('correct-answer')) {
+        taCorrectAnswer = taChoice1Label;
+      } else if (radioChoice2 && radioChoice2.classList.contains('correct-answer')) {
+        taCorrectAnswer = taChoice2Label;
+      } else {
+        _logWarning('TA: No correct-answer class on statement ' + (statements.length + 1) + ': "' + statementText.substring(0, 50) + '"');
+      }
+
+      statements.push({ text: statementText, correctAnswer: taCorrectAnswer });
+    }
+
+    if (statements.length === 0) _logWarning('TA: No statements extracted from .yes-no-question');
+
+    var metadata = extractGMATHeroMetadata();
+    var tableData = { headers: headers, rows: rows };
+    if (headerGroups) tableData.headerGroups = headerGroups;
+    if (tableLegend) tableData.legend = tableLegend;
+
+    return {
+      questionLink: getPracticeUrl(),
+      source: 'gmat-hero',
+      difficulty: metadata.difficulty || '',
+      section: 'di',
+      questionType: 'di',
+      category: 'TA',
+      content: {
+        introText: decodeHtmlEntities(introText),
+        table: tableData,
+        questionInstruction: decodeHtmlEntities(questionInstruction),
+        choiceLabels: [taChoice1Label, taChoice2Label],
+        statements: statements
+      }
+    };
+
+  } catch (error) {
+    _logError('TA: Exception — ' + error.message);
+    return null;
+  }
+}
+
+// ============================================================================
+// DI: GRAPHICS INTERPRETATION (GI)
+// ============================================================================
+
+/**
+ * Extract text from a DOM node, handling KaTeX math
+ */
+function extractTextWithKaTeX(node) {
+  var clone = node.cloneNode(true);
+  if (clone.nodeType === Node.TEXT_NODE) return clone.textContent;
+  if (clone.querySelectorAll) {
+    escapeCurrencyInElement(clone);
+    processKaTeX(clone);
+  }
+  return normalizeCurrency(clone.textContent);
+}
+
+/**
+ * Extract Graphics Interpretation question from GMAT Hero.
+ * Async because it clicks dropdowns open to read their options.
+ */
+async function extractGMATHeroDIGI() {
+  try {
+    var rightPanel = document.getElementById('right-panel');
+    if (!rightPanel) {
+      _logError('GI: No #right-panel found');
+      return null;
+    }
+
+    var questionStem = rightPanel.querySelector('.question-stem');
+    if (!questionStem) {
+      _logError('GI: No .question-stem in #right-panel');
+      return null;
+    }
+
+    // Image
+    var image = null;
+    var imgEl = questionStem.querySelector('img');
+    if (imgEl) {
+      image = imgEl.src;
+    } else {
+      _logWarning('GI: No image found in question stem');
+    }
+
+    // Question text (strip image)
+    var stemClone = questionStem.cloneNode(true);
+    var stemImg = stemClone.querySelector('img');
+    if (stemImg) stemImg.remove();
+    var stemHtml = stemClone.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+    stemClone.innerHTML = stemHtml;
+    escapeCurrencyInElement(stemClone);
+    processKaTeX(stemClone);
+    var questionText = normalizeCurrency(stemClone.textContent.trim());
+    questionText = questionText.split('\n').map(function (l) { return l.trim(); }).join('\n');
+    questionText = questionText.replace(/\n{3,}/g, '\n\n').trim();
+
+    var contentData = {
+      image: image,
+      questionText: decodeHtmlEntities(questionText),
+      statements: []
+    };
+
+    // Process dropdown statements
+    var dropdownSelection = document.querySelector('.dropdown-selection');
+    if (!dropdownSelection) {
+      _logWarning('GI: No .dropdown-selection found — statements will be empty');
+    } else {
+      var childNodes = Array.from(dropdownSelection.childNodes);
+      var chunks = [];
+      var currentNodes = [];
+
+      childNodes.forEach(function (node) {
+        var isBr = node.nodeName === 'BR' ||
+          (node.nodeName === 'SPAN' && node.querySelector && node.querySelector('br'));
+        if (isBr) {
+          if (currentNodes.length > 0) { chunks.push(currentNodes); currentNodes = []; }
+        } else {
+          currentNodes.push(node);
+        }
+      });
+      if (currentNodes.length > 0) chunks.push(currentNodes);
+
+      for (var ci = 0; ci < chunks.length; ci++) {
+        var chunkNodes = chunks[ci];
+        var statementText = '';
+        var dropdowns = [];
+
+        for (var ni = 0; ni < chunkNodes.length; ni++) {
+          var node = chunkNodes[ni];
+          var isDropdown = node.classList &&
+            (node.classList.contains('dropdown') || (node.querySelector && node.querySelector('nb-select')));
+
+          if (isDropdown) {
+            statementText += '{dropdown}';
+            var btn = node.querySelector('button');
+            if (btn) {
+              btn.click();
+              await delay(500);
+              var options = Array.from(document.querySelectorAll('nb-option'))
+                .map(function (o) { return o.textContent.trim(); });
+              dropdowns.push({ options: options });
+              btn.click();
+              await delay(300);
+            } else {
+              _logWarning('GI: Dropdown in chunk ' + ci + ' has no <button>');
+              dropdowns.push({ options: [] });
+            }
+          } else {
+            statementText += extractTextWithKaTeX(node);
+          }
+        }
+
+        var cleanedText = statementText.trim().replace(/\s+/g, ' ');
+        if (cleanedText) contentData.statements.push({ text: cleanedText, dropdowns: dropdowns });
+      }
+    }
+
+    // Correct answers from .gi-answer elements
+    var correctAnswerSpans = document.querySelectorAll('.gi-answer');
+    if (correctAnswerSpans.length === 0) {
+      _logWarning('GI: No .gi-answer elements found — correctAnswer will be null for all dropdowns');
+    } else {
+      var answerIndex = 0;
+      for (var si = 0; si < contentData.statements.length; si++) {
+        var statement = contentData.statements[si];
+        for (var di = 0; di < statement.dropdowns.length; di++) {
+          if (correctAnswerSpans[answerIndex]) {
+            statement.dropdowns[di].correctAnswer = correctAnswerSpans[answerIndex].textContent.trim();
+            answerIndex++;
+          } else {
+            _logWarning('GI: Missing .gi-answer for dropdown ' + di + ' in statement ' + si);
+          }
+        }
+      }
+    }
+
+    var metadata = extractGMATHeroMetadata();
+
+    return {
+      questionLink: getPracticeUrl(),
+      source: 'gmat-hero',
+      difficulty: metadata.difficulty || '',
+      section: 'di',
+      questionType: 'di',
+      category: 'GI',
+      content: contentData
+    };
+
+  } catch (error) {
+    _logError('GI: Exception — ' + error.message);
+    return null;
+  }
+}
+
+// ============================================================================
+// DI: TWO-PART ANALYSIS (TPA)
+// ============================================================================
+
+/**
+ * Extract Two-Part Analysis question from GMAT Hero
+ */
+function extractGMATHeroDITPA() {
+  try {
+    var rightPanel = document.getElementById('right-panel');
+    if (!rightPanel) {
+      _logError('TPA: No #right-panel found');
+      return null;
+    }
+
+    var questionStem = rightPanel.querySelector('.question-stem');
+    if (!questionStem) {
+      _logError('TPA: No .question-stem in #right-panel');
+      return null;
+    }
+
+    // Question text
+    var tpaHtml = questionStem.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+    var tpaTempDiv = document.createElement('div');
+    tpaTempDiv.innerHTML = tpaHtml;
+    escapeCurrencyInElement(tpaTempDiv);
+    processKaTeX(tpaTempDiv);
+    var tpaQuestionText = normalizeCurrency(tpaTempDiv.textContent.trim());
+    tpaQuestionText = tpaQuestionText.split('\n').map(function (l) { return l.trim(); }).join('\n');
+    tpaQuestionText = tpaQuestionText.replace(/\n{3,}/g, '\n\n').trim();
+
+    // TPA container
+    var tpaQuestion = document.querySelector('.tpa-question');
+    if (!tpaQuestion) {
+      _logError('TPA: No .tpa-question container found');
+      return null;
+    }
+
+    // Column headers
+    var choiceLabels = [];
+    tpaQuestion.querySelectorAll('.grid-item.center > b').forEach(function (header) {
+      var headerClone = header.cloneNode(true);
+      escapeCurrencyInElement(headerClone);
+      processKaTeX(headerClone);
+      choiceLabels.push(normalizeCurrency(headerClone.textContent.trim()));
+    });
+    if (choiceLabels.length === 0) _logWarning('TPA: No column headers found');
+
+    // Rows (structure: header, header, empty, radio1, radio2, text, ...)
+    var allGridItems = Array.from(tpaQuestion.querySelectorAll('.grid-item'));
+    var tpaRows = [];
+
+    for (var i = 3; i < allGridItems.length; i += 3) {
+      var radioPart1 = allGridItems[i];
+      var textElement = allGridItems[i + 2];
+      if (!textElement) break;
+
+      var radioInput = radioPart1.querySelector('input[type="radio"]');
+      var optionValue = radioInput ? radioInput.value : '';
+
+      var textClone = textElement.cloneNode(true);
+      escapeCurrencyInElement(textClone);
+      processKaTeX(textClone);
+      tpaRows.push({ text: normalizeCurrency(textClone.textContent.trim()), optionValue: optionValue });
+    }
+
+    if (tpaRows.length === 0) _logWarning('TPA: No rows extracted from grid');
+
+    // Correct answers per column
+    var tpaCorrectAnswers = { column1: null, column2: null };
+    var correctPart1 = tpaQuestion.querySelector('p-radiobutton.correct-answer[name="part-1"] input');
+    if (correctPart1) {
+      tpaCorrectAnswers.column1 = correctPart1.value;
+    } else {
+      _logWarning('TPA: No .correct-answer found for column 1 (part-1)');
+    }
+
+    var correctPart2 = tpaQuestion.querySelector('p-radiobutton.correct-answer[name="part-2"] input');
+    if (correctPart2) {
+      tpaCorrectAnswers.column2 = correctPart2.value;
+    } else {
+      _logWarning('TPA: No .correct-answer found for column 2 (part-2)');
+    }
+
+    var metadata = extractGMATHeroMetadata();
+
+    return {
+      questionLink: getPracticeUrl(),
+      source: 'gmat-hero',
+      difficulty: metadata.difficulty || '',
+      section: 'di',
+      questionType: 'di',
+      category: 'TPA',
+      content: {
+        questionText: decodeHtmlEntities(tpaQuestionText),
+        choiceLabels: choiceLabels,
+        rows: tpaRows,
+        correctAnswers: tpaCorrectAnswers
+      }
+    };
+
+  } catch (error) {
+    _logError('TPA: Exception — ' + error.message);
+    return null;
+  }
+}
+
+// ============================================================================
+// DI: MULTI-SOURCE REASONING (MSR)
+// ============================================================================
+
+// Module-level MSR state — sub-questions within the same tab set are accumulated
+var _msrQuestionSet = null;
+var _msrLastTabSignature = null;
+
+/**
+ * Compute a string fingerprint of the current MSR tab headers.
+ * Used to detect when the user has moved to a new question set.
+ */
+function getMsrTabSignature() {
+  var irMsr = document.querySelector('.ir-msr');
+  if (!irMsr) return '';
+  var names = [];
+  irMsr.querySelectorAll('.p-tabview-nav li a span').forEach(function (th) {
+    names.push(th.textContent.trim());
+  });
+  return names.join('|');
+}
+
+/**
+ * Extract complex table from an MSR tab panel (handles multi-row headers, section rows)
+ */
+function extractMsrComplexTable(table) {
+  var result = { title: '', headers: [], headerGroups: [], rows: [] };
+
+  var prevSibling = table.previousElementSibling;
+  if (prevSibling && prevSibling.querySelector('strong')) {
+    result.title = prevSibling.textContent.trim();
+  }
+
+  var thead = table.querySelector('thead');
+  if (thead) {
+    thead.querySelectorAll('tr').forEach(function (tr, rowIndex) {
+      tr.querySelectorAll('th').forEach(function (th) {
+        var text = th.textContent.trim();
+        var colspan = parseInt(th.getAttribute('colspan')) || 1;
+        var rowspan = parseInt(th.getAttribute('rowspan')) || 1;
+        if (rowIndex === 0 && colspan > 1) {
+          result.headerGroups.push({ text: text, colspan: colspan });
+        } else if (text && rowIndex > 0) {
+          result.headers.push(text);
+        } else if (text && rowIndex === 0 && colspan === 1 && rowspan === 1) {
+          result.headers.push(text);
+        }
+      });
+    });
+  }
+
+  var tbody = table.querySelector('tbody');
+  if (tbody) {
+    tbody.querySelectorAll('tr').forEach(function (tr) {
+      var cells = tr.querySelectorAll('td');
+      if (cells.length === 0) return;
+      var firstCell = cells[0];
+      var colspan = parseInt(firstCell.getAttribute('colspan')) || 1;
+      if (cells.length === 1 && colspan >= 2) {
+        result.rows.push({ type: 'section', text: firstCell.textContent.trim() });
+      } else {
+        var rowData = [];
+        cells.forEach(function (td) { rowData.push(td.textContent.trim()); });
+        if (rowData.length > 0) result.rows.push({ type: 'data', cells: rowData });
+      }
+    });
+  }
+
+  if (result.headers.length === 0 && result.rows.length === 0) return null;
+  return result;
+}
+
+/**
+ * Click through each MSR tab and extract its content. Async due to tab clicks.
+ */
+async function extractMsrDataSources() {
+  var irMsr = document.querySelector('.ir-msr');
+  if (!irMsr) {
+    _logError('MSR: No .ir-msr container found');
+    return null;
+  }
+
+  var tabHeaders = irMsr.querySelectorAll('.p-tabview-nav li a span');
+  var tabPanels = irMsr.querySelectorAll('.p-tabview-panel');
+
+  if (tabHeaders.length === 0) {
+    _logError('MSR: No tabs found in .ir-msr');
+    return null;
+  }
+  if (tabHeaders.length !== tabPanels.length) {
+    _logError('MSR: Tab header/panel count mismatch (' + tabHeaders.length + ' vs ' + tabPanels.length + ')');
+    return null;
+  }
+
+  var tabs = [];
+  var BASE_URL = 'https://gmat-hero-v2.web.app';
+
+  for (var i = 0; i < tabHeaders.length; i++) {
+    var tabName = tabHeaders[i].textContent.trim();
+
+    var tabLink = tabHeaders[i].closest('a');
+    if (tabLink) {
+      tabLink.click();
+      await delay(500);
+    }
+
+    var panel = tabPanels[i];
+    var content = { text: '', table: null, images: [] };
+
+    var textDiv = panel.querySelector('div[_ngcontent-ng-c2296498254]') || panel.querySelector('div');
+    if (textDiv) {
+      var clonedDiv = textDiv.cloneNode(true);
+      escapeCurrencyInElement(clonedDiv);
+      processKaTeX(clonedDiv);
+
+      // Remove table (and its title) from the clone before extracting plain text
+      var tableInClone = clonedDiv.querySelector('table.embed-table') || clonedDiv.querySelector('table');
+      if (tableInClone) {
+        var prevSib = tableInClone.previousElementSibling;
+        if (prevSib && (prevSib.querySelector('strong') || prevSib.tagName === 'STRONG')) prevSib.remove();
+        tableInClone.remove();
+      }
+      clonedDiv.querySelectorAll('img').forEach(function (img) { img.remove(); });
+      content.text = normalizeCurrency(decodeHtmlEntities(clonedDiv.textContent.trim()));
+
+      // Extract table from original (not clone)
+      var origTable = textDiv.querySelector('table.embed-table') || textDiv.querySelector('table');
+      if (origTable) {
+        var tableData = extractMsrComplexTable(origTable);
+        if (tableData) content.table = tableData;
+      }
+
+      // Extract images (normalize relative URLs)
+      textDiv.querySelectorAll('img').forEach(function (img) {
+        var src = img.getAttribute('src');
+        if (src) {
+          if (!src.startsWith('http')) {
+            if (src.startsWith('../') || src.startsWith('./')) {
+              src = new URL(src, BASE_URL + '/assets/img/question/').href;
+            } else if (src.startsWith('/')) {
+              src = BASE_URL + src;
+            } else {
+              src = BASE_URL + '/' + src;
+            }
+          }
+          content.images.push(src);
+        }
+      });
+    } else {
+      _logWarning('MSR: No content div in tab panel ' + i + ' ("' + tabName + '")');
+    }
+
+    tabs.push({ name: tabName, content: content });
+  }
+
+  return { tabs: tabs };
+}
+
+/**
+ * Ensure `.correct-answer` markers are visible in the right panel.
+ *
+ * Behavior discovered empirically on GMAT Hero:
+ *  - Binary sub-questions: `.correct-answer` on <p-radiobutton> is present automatically
+ *    in review mode (no click required).
+ *  - Multiple-choice sub-questions: `.correct-answer` on an inner <label> only appears
+ *    after the "Answer" button is clicked. That button TOGGLES state on each click.
+ *
+ * Strategy: if we already see a `.correct-answer`, return immediately (don't toggle off).
+ * Otherwise wait for the Answer button to become visible, then click-verify up to 3 times.
+ */
+async function ensureMsrAnswerRevealed() {
+  var rightPanel = document.querySelector('#right-panel') || document;
+  var hasCorrect = function () {
+    return !!rightPanel.querySelector(
+      '.standard-choices .correct-answer, .yes-no-question .correct-answer'
+    );
+  };
+
+  if (hasCorrect()) return;
+
+  // Wait up to 2s for the Answer button to render (Angular may still be hydrating)
+  var btn = null;
+  for (var w = 0; w < 10; w++) {
+    btn = document.querySelector('.pointer.hover-green.sub.only-review');
+    if (btn && btn.offsetParent !== null) break;
+    await delay(200);
+  }
+
+  if (!btn) {
+    _logWarning('MSR: "Answer" button not found — URL=' + window.location.href);
+    return;
+  }
+  if (btn.offsetParent === null) {
+    _logWarning('MSR: "Answer" button hidden (is this a /practice/ URL?) — ' + window.location.href);
+    return;
+  }
+
+  // The button toggles. Click up to 3 times, verifying after each click.
+  for (var i = 0; i < 3; i++) {
+    if (hasCorrect()) return;
+    btn.click();
+    await delay(700);
+  }
+
+  if (!hasCorrect()) {
+    _logWarning('MSR: Reveal failed after 3 clicks — ' + window.location.href);
+  }
+}
+
+/**
+ * Extract the currently-visible MSR sub-question (binary or multiple-choice)
+ */
+function extractMsrQuestion() {
+  var questionStem = document.querySelector('#right-panel .question-stem');
+  if (!questionStem) {
+    _logError('MSR: No #right-panel .question-stem found');
+    return null;
+  }
+
+  var stemClone = questionStem.cloneNode(true);
+  escapeCurrencyInElement(stemClone);
+  processKaTeX(stemClone);
+  var questionText = normalizeCurrency(decodeHtmlEntities(stemClone.textContent.trim()));
+
+  var yesNoQuestion = document.querySelector('.yes-no-question');
+  var standardChoices = document.querySelector('.standard-choices');
+  var question = { questionText: questionText };
+
+  if (yesNoQuestion) {
+    question.questionType = 'binary';
+    var gridItems = Array.from(yesNoQuestion.querySelectorAll('.grid-item'));
+    var msrChoice1 = (gridItems[0] && gridItems[0].querySelector('b') ? gridItems[0].querySelector('b').textContent.trim() : null) || 'Yes';
+    var msrChoice2 = (gridItems[1] && gridItems[1].querySelector('b') ? gridItems[1].querySelector('b').textContent.trim() : null) || 'No';
+    question.choiceLabels = [msrChoice1, msrChoice2];
+    question.statements = [];
+
+    for (var i = 3; i < gridItems.length; i += 3) {
+      var rc1Div = gridItems[i], rc2Div = gridItems[i + 1], stmtDiv = gridItems[i + 2];
+      if (!stmtDiv) break;
+
+      var stmtClone = stmtDiv.cloneNode(true);
+      escapeCurrencyInElement(stmtClone);
+      processKaTeX(stmtClone);
+      var stmtText = normalizeCurrency(stmtClone.textContent.trim());
+
+      var msrCorrect = null;
+      var rb1 = rc1Div.querySelector('p-radiobutton');
+      var rb2 = rc2Div.querySelector('p-radiobutton');
+      if (rb1 && rb1.classList.contains('correct-answer')) {
+        msrCorrect = msrChoice1;
+      } else if (rb2 && rb2.classList.contains('correct-answer')) {
+        msrCorrect = msrChoice2;
+      } else {
+        _logWarning('MSR binary: No correct-answer class on statement ' + question.statements.length + ': "' + stmtText.substring(0, 50) + '"');
+      }
+      question.statements.push({ text: stmtText, correctAnswer: msrCorrect });
+    }
+
+  } else if (standardChoices) {
+    question.questionType = 'multipleChoice';
+    question.options = [];
+    question.correctAnswer = null;
+
+    standardChoices.querySelectorAll('.option').forEach(function (option) {
+      var radioButton = option.querySelector('p-radiobutton input') ||
+        option.querySelector('p-radiobutton div input');
+      var label = option.querySelector('label span');
+      if (!label) return;
+
+      var letter = radioButton ? radioButton.value : '';
+      var labelClone = label.cloneNode(true);
+      escapeCurrencyInElement(labelClone);
+      processKaTeX(labelClone);
+      var text = normalizeCurrency(decodeHtmlEntities(labelClone.textContent.trim()));
+
+      // Primary: .correct-answer class anywhere inside the option div
+      var isCorrect = !!option.querySelector('.correct-answer');
+
+      // Fallback: when user answered correctly, GMAT Hero may only use aria-checked / p-highlight
+      if (!isCorrect && !standardChoices.querySelector('.correct-answer')) {
+        var input = option.querySelector('input[type="radio"]');
+        var rbBox = option.querySelector('.p-radiobutton-box');
+        isCorrect = !!(
+          (input && input.getAttribute('aria-checked') === 'true') ||
+          (rbBox && rbBox.classList.contains('p-highlight'))
+        );
+      }
+
+      question.options.push({ letter: letter, text: text, isCorrect: isCorrect });
+      if (isCorrect) question.correctAnswer = letter;
+    });
+
+    if (!question.correctAnswer) {
+      _logWarning('MSR multipleChoice: No correct answer identified. Letters seen: ' +
+        question.options.map(function (o) { return o.letter; }).join(', '));
+    }
+
+  } else {
+    _logError('MSR: Neither .yes-no-question nor .standard-choices found in right panel');
+    return null;
+  }
+
+  return question;
+}
+
+/**
+ * Extract Multi-Source Reasoning question from GMAT Hero.
+ * Async due to tab clicks when extracting data sources.
+ * Uses module-level state to accumulate sub-questions within the same question set.
+ */
+async function extractGMATHeroDIMSR() {
+  try {
+    // Reveal the correct answer BEFORE doing anything else. MC sub-questions require
+    // clicking the "Answer" button; binary ones already have .correct-answer present.
+    // Idempotent — won't toggle off an already-revealed state.
+    await ensureMsrAnswerRevealed();
+
+    var currentSignature = getMsrTabSignature();
+    var isNewSet = !_msrLastTabSignature || currentSignature !== _msrLastTabSignature;
+
+    if (!_msrQuestionSet || isNewSet) {
+      if (isNewSet && _msrQuestionSet) {
+        _logWarning('MSR: Tab signature changed — starting new question set');
+      }
+
+      var dataSources = await extractMsrDataSources();
+      if (!dataSources) return null; // errors already logged
+
+      _msrQuestionSet = {
+        questionSetLink: getPracticeUrl(),
+        source: 'gmat-hero',
+        section: 'di',
+        questionType: 'di',
+        category: 'MSR',
+        dataSources: dataSources,
+        questions: [],
+        _tabSignature: currentSignature
+      };
+      _msrLastTabSignature = currentSignature;
+    }
+
+    // Reveal correct answers before reading the right panel. Idempotent — safe to
+    // call even if the scraper already clicked the button, because we detect
+    // existing `.correct-answer` markers and skip re-clicking (which would toggle).
+    await ensureMsrAnswerRevealed();
+
+    var question = extractMsrQuestion();
+    if (!question) return null;
+
+    // Self-heal: if MC came back without a correctAnswer but the Answer button is
+    // available, retry once. This handles rare Angular timing where the first
+    // extraction raced against DOM paint of the `.correct-answer` label.
+    if (question.questionType === 'multipleChoice' && !question.correctAnswer) {
+      await delay(500);
+      await ensureMsrAnswerRevealed();
+      var retry = extractMsrQuestion();
+      if (retry && retry.correctAnswer) {
+        question = retry;
+      }
+    }
+
+    var msrMeta = extractGMATHeroMetadata();
+    question.questionId = _msrQuestionSet.questions.length + 1;
+    question.questionLink = getPracticeUrl();
+    question.difficulty = msrMeta.difficulty || '';
+    _msrQuestionSet.questions.push(question);
+
+    return _msrQuestionSet;
+
+  } catch (error) {
+    _logError('MSR: Exception — ' + error.message);
+    return null;
+  }
+}
+
+/**
+ * Reset MSR module state. Call this when beginning a new extraction session
+ * (e.g., when the user navigates to a different question set).
+ */
+export function resetMsrState() {
+  _msrQuestionSet = null;
+  _msrLastTabSignature = null;
+}
+
+// ============================================================================
+// MAIN EXPORT
+// ============================================================================
+
 /**
  * Main export: Extract question from GMAT Hero page
  */
 export function extractGMATHeroQuestion() {
+  // Reset extraction log at the start of each call
+  _extractionLog = { errors: [], warnings: [] };
+
   const questionType = detectQuestionType();
   console.log("Detected GMAT Hero question type:", questionType);
 
@@ -1012,21 +2029,21 @@ export function extractGMATHeroQuestion() {
     case 'quant':
       return extractGMATHeroQuantContent();
     case 'ds':
-      // DS questions are skipped for now (or could add specific extractor)
-      console.log("DS question detected - skipping");
-      return null;
+      return extractGMATHeroDIDS();
     case 'cr':
       return extractGMATHeroCRContent();
     case 'rc':
       return extractGMATHeroRCContent();
     case 'di-gi':
+      return extractGMATHeroDIGI();
     case 'di-msr':
+      return extractGMATHeroDIMSR();
     case 'di-ta':
+      return extractGMATHeroDITA();
     case 'di-tpa':
-      // DI questions - could add specific extractors
-      console.log("DI question type detected:", questionType);
-      return null;
+      return extractGMATHeroDITPA();
     default:
+      _logWarning('No extractor for question type: ' + questionType);
       console.warn("Unsupported GMAT Hero question type:", questionType);
       return null;
   }

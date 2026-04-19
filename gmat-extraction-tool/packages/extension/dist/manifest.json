@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "GMAT Extraction Tool",
-    "version": "3.0.5",
+    "version": "3.0.12",
     "description": "Extract GMAT questions and log them to your Error Log.",
     "permissions": [
         "activeTab",

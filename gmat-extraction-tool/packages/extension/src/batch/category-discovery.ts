@@ -27,6 +27,9 @@ const TABLE_CLASS_TO_TYPE: Record<string, string> = {
     'tpa': 'TPA',
     'di': 'DI',
     'ir': 'IR',
+    // real-gmat specific table classes
+    'rq': 'RQ',   // Real Quant (PS + DS mixed)
+    'rv': 'RV',   // Real Verbal (CR + RC mixed — row name determines sub-type)
 };
 
 /** Map of table CSS class → section */
@@ -43,6 +46,9 @@ const TABLE_CLASS_TO_SECTION: Record<string, string> = {
     'tpa': 'di',
     'di': 'di',
     'ir': 'di',
+    // real-gmat specific table classes
+    'rq': 'quant',
+    'rv': 'verbal',
 };
 
 /**
@@ -104,8 +110,29 @@ function getSourcePrefix(studyPage: string): string {
     if (studyPage.startsWith('lsat-')) return 'LSAT';
     if (studyPage.startsWith('real-')) return 'REAL';
     if (studyPage.includes('class/')) return 'CLASS';
+    if (studyPage === 'gmat-club') return 'GMC';
+    if (studyPage === 'real-gmat') return 'REAL';
     return 'OG';
 }
+
+/**
+ * Per-study-page type code overrides.
+ * Some pages reuse a generic table class (e.g., "ps") but route to different category ID
+ * segments (e.g., "QT" for GMAT Club Quant Tests).
+ *
+ * Map: studyPage → { originalTypeCode → overrideTypeCode }
+ */
+const STUDY_PAGE_TYPE_OVERRIDES: Record<string, Record<string, string>> = {
+    'gmat-club': {
+        'PS': 'QT',   // "GMAT Club - Quant" table uses class "ps" but IDs are GMC-QT-XX
+        'CR': 'VT',   // future verbal test table would use class "cr" → GMC-VT-XX
+    },
+    'real-gmat': {
+        'PS': 'RQ',   // "GMAT Club - Quant" table uses class "ps" but IDs are RQ-XX
+        'CR': 'RCR',
+        'RC': 'RRC',
+    }
+};
 
 /**
  * Construct the category ID from the row number and type.
@@ -118,6 +145,23 @@ function constructCategoryId(
     sourcePrefix: string
 ): string {
     const nameLower = rowName.toLowerCase();
+
+    // ── real-gmat ──────────────────────────────────────────────────────────────
+    // IDs embed the type in the prefix itself (RQ-01, RCR-01, RRC-01) and carry
+    // no separate source prefix. The row name determines the sub-type for the
+    // mixed "rv" (Real Verbal) table.
+    if (sourcePrefix === 'REAL') {
+        // Derive the ID segment and number from the row name
+        const realMatch = nameLower.match(/^real\s+(quant|cr|rc)\s+(\d+)/i);
+        if (realMatch) {
+            const typeMap: Record<string, string> = { quant: 'RQ', cr: 'RCR', rc: 'RRC' };
+            const idPrefix = typeMap[realMatch[1].toLowerCase()] ?? typeCode;
+            const num = String(parseInt(realMatch[2], 10)).padStart(2, '0');
+            return `${idPrefix}-${num}`;
+        }
+        // Fallback: use typeCode + rowIndex (no source prefix)
+        return `${typeCode}-${String(rowIndex).padStart(2, '0')}`;
+    }
 
     // Advance categories
     if (nameLower.includes('advance')) {
@@ -151,11 +195,15 @@ export function discoverCategories(): CategoryDefinition[] {
     const tables = document.querySelectorAll('table');
 
     for (const table of tables) {
-        const { typeCode, section, headerText } = detectTypeFromTable(table as HTMLTableElement);
-        if (typeCode === 'UNKNOWN') {
+        const { typeCode: rawTypeCode, section, headerText } = detectTypeFromTable(table as HTMLTableElement);
+        if (rawTypeCode === 'UNKNOWN') {
             console.log(`[Batch Discovery] Skipping unknown table: "${headerText}"`);
             continue;
         }
+
+        // Apply per-study-page type code overrides (e.g., gmat-club "ps" table → "QT")
+        const pageOverrides = STUDY_PAGE_TYPE_OVERRIDES[studyPage] || {};
+        const typeCode = pageOverrides[rawTypeCode] ?? rawTypeCode;
 
         console.log(`[Batch Discovery] Found table: "${headerText}" (type=${typeCode}, section=${section})`);
 

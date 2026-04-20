@@ -27,6 +27,7 @@ function createInitialState(): BatchState {
         totalCategories: 0,
         results: {},
         categoryNames: {},
+        testGroups: {},
         errors: [],
         startedAt: null,
         stats: { totalCategories: 0, completedCategories: 0, totalQuestions: 0, totalErrors: 0, skippedQuestions: 0 },
@@ -70,6 +71,14 @@ export async function startBatch(
     batchState.incorrectOnly = incorrectOnly;
     batchState.concurrency = Math.min(concurrency, 5);
     batchState.originTabId = originTabId;
+
+    // Pre-populate category name + testGroup maps
+    for (const cat of categories) {
+        batchState.categoryNames[cat.id] = cat.name;
+        if (cat.testGroup) {
+            batchState.testGroups[cat.id] = cat.testGroup;
+        }
+    }
 
     await persistState();
 
@@ -252,6 +261,14 @@ export async function onCategoryComplete(
     const worker = batchState.workers.find(w => w.tabId === senderTabId);
     const categoryName = worker?.categoryName || categoryId;
 
+    // Attach test_group to every question (if this is a Full Test category)
+    const testGroup = batchState.testGroups[categoryId];
+    if (testGroup) {
+        for (const q of questions) {
+            q.test_group = testGroup;
+        }
+    }
+
     // Validate
     const report = validateBatch(questions, categoryId, categoryName);
 
@@ -275,7 +292,7 @@ export async function onCategoryComplete(
         const section = questions[0]?.section || 'mixed';
         const questionType = questions[0]?.category || 'unknown';
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = buildFilename(categoryId, categoryName, section, timestamp);
+        const filename = buildFilename(categoryId, categoryName, section, timestamp, testGroup);
         await downloadFile(JSON.stringify({
             exportedAt: new Date().toISOString(),
             totalRecords: questions.length,
@@ -365,15 +382,16 @@ async function finalizeBatch(): Promise<void> {
         } catch { /* tab may already be closed */ }
     }
 
-    // Download error report if there were any errors
-    if (batchState.errors.length > 0) {
-        await downloadFile(JSON.stringify({
-            generatedAt: new Date().toISOString(),
-            stats: batchState.stats,
-            errors: batchState.errors.filter(e => e.severity === 'error'),
-            warnings: batchState.errors.filter(e => e.severity === 'warning')
-        }, null, 2), `GMAT-HERO/error-report-${timestamp}.json`);
-    }
+    // Always download a batch report (errors + warnings + stats summary)
+    const reportErrors = batchState.errors.filter(e => e.severity === 'error');
+    const reportWarnings = batchState.errors.filter(e => e.severity === 'warning');
+    await downloadFile(JSON.stringify({
+        generatedAt: new Date().toISOString(),
+        stats: batchState.stats,
+        status: reportErrors.length === 0 ? 'clean' : 'has_errors',
+        errors: reportErrors,
+        warnings: reportWarnings
+    }, null, 2), `GMAT-HERO/batch-report-${timestamp}.json`);
 
     // Broadcast completion to side panel
     chrome.runtime.sendMessage({
@@ -416,10 +434,17 @@ export async function getBatchStatus(): Promise<BatchState> {
 
 /**
  * Build a filename from categoryId slug + display name.
- * e.g. "OG-CR-01" + "Inference" → "GMAT-HERO/verbal/og-cr-inference-01-{ts}.json"
- *      "ADVANCE-CR" + "Advance CR" → "GMAT-HERO/verbal/advance-cr-advance_cr-{ts}.json"
+ * e.g. "OG-CR-01" + "Inference"       → "GMAT-HERO/verbal/og-cr-inference-01-{ts}.json"
+ *      "ADVANCE-CR" + "Advance CR"     → "GMAT-HERO/verbal/advance-cr-advance_cr-{ts}.json"
+ *      "FULLTEST-01-M" (testGroup set) → "GMAT-HERO/Full Test/fulltest-01-m-...-{ts}.json"
  */
-function buildFilename(categoryId: string, categoryName: string, section: string, timestamp: string): string {
+function buildFilename(
+    categoryId: string,
+    categoryName: string,
+    section: string,
+    timestamp: string,
+    testGroup?: string
+): string {
     const safeDisplayName = categoryName
         .replace(/[^a-zA-Z0-9_-]/g, '_')
         .replace(/_+/g, '_')
@@ -437,7 +462,9 @@ function buildFilename(categoryId: string, categoryName: string, section: string
         base = `${categoryId.toLowerCase()}-${safeDisplayName}`;
     }
 
-    return `GMAT-HERO/${section}/${base}-${timestamp}.json`;
+    // Full Test categories go into their own top-level folder
+    const folder = testGroup ? 'Full Test' : section;
+    return `GMAT-HERO/${folder}/${base}-${timestamp}.json`;
 }
 
 function delay(ms: number): Promise<void> {

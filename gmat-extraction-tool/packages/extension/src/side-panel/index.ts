@@ -12,6 +12,7 @@ interface CategoryDefinition {
     section: string;
     url: string;
     questionCount: number;
+    testGroup?: string;
 }
 
 interface TabWorker {
@@ -177,7 +178,8 @@ function renderCategoryList(categories: CategoryDefinition[]) {
                         data-name="${esc(cat.name)}"
                         data-section="${esc(cat.section)}"
                         data-url="${esc(cat.url)}"
-                        data-count="${cat.questionCount}">
+                        data-count="${cat.questionCount}"
+                        ${cat.testGroup ? `data-test-group="${esc(cat.testGroup)}"` : ''}>
                     <span class="name">${escHtml(cat.name)}</span>
                     ${cat.questionCount ? `<span class="count">${cat.questionCount}Q</span>` : ''}
                 </label>`;
@@ -255,13 +257,15 @@ btnStop.addEventListener('click', () => {
 function getSelectedCategories(): CategoryDefinition[] {
     const categories: CategoryDefinition[] = [];
     categoryListEl.querySelectorAll<HTMLInputElement>('.cat-checkbox:checked').forEach(cb => {
-        categories.push({
+        const cat: CategoryDefinition = {
             id: cb.dataset.id || '',
             name: cb.dataset.name || '',
             section: cb.dataset.section || '',
             url: cb.dataset.url || '',
             questionCount: parseInt(cb.dataset.count || '0', 10)
-        });
+        };
+        if (cb.dataset.testGroup) cat.testGroup = cb.dataset.testGroup;
+        categories.push(cat);
     });
     return categories;
 }
@@ -362,7 +366,7 @@ function showCompletion(data: {
         for (const [cat, count] of Object.entries(byCat)) {
             html += `<div>• ${escHtml(cat)}: ${count} issue(s)</div>`;
         }
-        html += `<div style="margin-top: 6px; color: #667eea; font-style: italic;">See error-report.json for details</div>`;
+        html += `<div style="margin-top: 6px; color: #667eea; font-style: italic;">See batch-report.json in GMAT-HERO/ for details</div>`;
         ($('#error-summary')).innerHTML = html;
     } else {
         ($('#results-errors')).style.display = 'none';

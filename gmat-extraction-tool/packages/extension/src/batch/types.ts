@@ -8,6 +8,8 @@ export interface CategoryDefinition {
     section: string; // 'verbal' | 'quant' | 'di'
     url: string;
     questionCount: number;
+    /** For Full Test categories: e.g. 'official-01', 'official-02' */
+    testGroup?: string;
 }
 
 export interface TabWorker {
@@ -27,6 +29,8 @@ export interface BatchState {
     totalCategories: number;
     results: Record<string, ExtractedQuestion[]>;
     categoryNames: Record<string, string>;
+    /** Maps categoryId → testGroup (e.g. 'official-01') for Full Test categories */
+    testGroups: Record<string, string>;
     errors: BatchError[];
     startedAt: string | null;
     stats: BatchStats;
@@ -63,6 +67,8 @@ export interface ExtractedQuestion {
     topic?: string;
     correctAnswer?: string | null;
     content: Record<string, unknown>;
+    // Full Test grouping
+    test_group?: string;
     // MSR-specific
     questionSetLink?: string;
     dataSources?: Record<string, unknown>;

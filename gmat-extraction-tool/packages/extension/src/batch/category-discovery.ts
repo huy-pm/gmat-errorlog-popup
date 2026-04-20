@@ -180,6 +180,67 @@ function constructCategoryId(
 }
 
 /**
+ * Discover categories from the Full Test listing page (/pages/study/full-test).
+ *
+ * Structure: `.test-card` elements, each with:
+ *   - `h5.test-name` = date string like "2025.05-01"
+ *   - `.score-section.quant / .verbal / .data` → scores + question totals
+ *
+ * URL pattern:
+ *   "2025.05-01" → slug "202505-01"
+ *   Quant  → full-test/202505-01M/review/1
+ *   Verbal → full-test/202505-01V/review/1
+ *   Data   → full-test/202505-01D/review/1
+ *
+ * test_group follows the sequential card order: official-01, official-02, ...
+ */
+function discoverFullTestCategories(baseUrl: string): CategoryDefinition[] {
+    const categories: CategoryDefinition[] = [];
+
+    const cards = document.querySelectorAll('.test-card');
+    if (cards.length === 0) {
+        console.log('[Batch Discovery] No .test-card elements found on full-test page');
+        return categories;
+    }
+
+    const sectionDefs = [
+        { cssClass: 'quant',  code: 'M', section: 'quant',  label: 'Quant'  },
+        { cssClass: 'verbal', code: 'V', section: 'verbal', label: 'Verbal' },
+        { cssClass: 'data',   code: 'D', section: 'di',     label: 'Data'   },
+    ];
+
+    cards.forEach((card, index) => {
+        // e.g. "2025.05-01" → "202505-01" (remove the single dot between year and month)
+        const rawName = (card.querySelector('.test-name') as HTMLElement)?.textContent?.trim() || '';
+        const dateSlug = rawName.replace('.', ''); // "202505-01"
+
+        // test_group: "2025.05-01" → "fulltest-2025-05-01" (dot → dash)
+        const testGroup = `fulltest-${rawName.replace('.', '-')}`;
+
+        sectionDefs.forEach(({ cssClass, code, section, label }) => {
+            const scoreEl = card.querySelector(`.score-section.${cssClass} .score-value`);
+            const scoreText = scoreEl?.textContent?.trim() || '0/0';
+            const questionCount = parseInt(scoreText.split('/')[1] || '0', 10) || 0;
+
+            const categoryId = `FULLTEST-${dateSlug}-${code}`;
+            const reviewUrl = `${baseUrl}/${dateSlug}${code}/review/1`;
+
+            categories.push({
+                id: categoryId,
+                name: `${testGroup} - ${label}`,
+                section,
+                url: reviewUrl,
+                questionCount,
+                testGroup,
+            });
+        });
+    });
+
+    console.log(`[Batch Discovery] Full Test: discovered ${cards.length} tests → ${categories.length} categories`);
+    return categories;
+}
+
+/**
  * Main discovery function - finds all categories from tables on the current page.
  * This is a dynamic approach that works with any GMAT Hero study page.
  */
@@ -190,6 +251,11 @@ export function discoverCategories(): CategoryDefinition[] {
     const baseUrl = `${window.location.origin}/pages/study/${studyPage}`;
 
     console.log(`[Batch Discovery] Study page: ${studyPage}, source: ${sourcePrefix}`);
+
+    // Full Test page uses a completely different DOM structure (cards, not tables)
+    if (studyPage === 'full-test') {
+        return discoverFullTestCategories(baseUrl);
+    }
 
     // Find all category tables - they are inside .selection divs or directly in the card body
     const tables = document.querySelectorAll('table');
